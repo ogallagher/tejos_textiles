@@ -1,0 +1,33 @@
+{
+  "name": "tejos_textiles",
+  "version": "1.0.0",
+  "description": "A literature journal publishing written works in a new interactive and visual medium.",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ogallagher/tejos_textiles.git"
+  },
+  "keywords": [
+    "literature",
+    "nodejs",
+    "mysql",
+    "paperjs",
+    "revista",
+    "textiles",
+    "tejos"
+  ],
+  "author": "Owen Gallagher",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ogallagher/tejos_textiles/issues"
+  },
+  "homepage": "https://github.com/ogallagher/tejos_textiles#readme"
+}

@@ -1,0 +1,16 @@
+{
+	"name":"tejos_textiles",
+	"description":"An online literary journal publishing works in an interactive new medium.",
+	"repository": "https://github.com/ogallagher/tejos_textiles",
+	"logo": "https://node-js-sample.herokuapp.com/node.png",
+	"keywords": [
+		"literature",
+		"nodejs",
+		"mysql",
+		"paperjs",
+		"revista",
+		"textiles",
+		"tejos"
+	]
+}
+
