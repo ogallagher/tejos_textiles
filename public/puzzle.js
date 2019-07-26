@@ -1,3 +1,9 @@
+/*
+puzzle.js
+Owen Gallagher
+25 july 2019
+*/
+
 var puzzles = [];
 
 function onload() {

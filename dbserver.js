@@ -9,15 +9,13 @@ Exposes a connected mysql server to tejos//textiles clients via http.
 const fs = require('fs');
 const mysql = require('mysql');
 
-const enums = require('enums');
+const enums = require('./enums');
 
 const PATH_DB_CONFIG = 'db_config.json';
 const DB_TEJOS = 'db_revistatejos';
 const DB_TEXTILES = 'db_textilesjournal';
 
-function init(site) {
-	var success = false;
-	
+exports.init = function(site) {	
 	fs.readFile(PATH_DB_CONFIG, function(err,data) {
 		if (err) {
 			console.log('error: read from db config file failed');
@@ -47,7 +45,7 @@ function init(site) {
 				console.log('connecting to ' + config.name + '...');
 				
 				db = mysql.createConnection({
-					host: config.url,
+					host: config.host,
 					user: config.user,
 					password: config.pass,
 					database: config.db
@@ -55,15 +53,14 @@ function init(site) {
 				
 				db.connect(function(err) {
 					if (err) {
-						console.log('error: failed to connect to ' + config.url);
+						console.log('error: failed to connect to ' + config.host);
+						console.log(err);
 					}
 					else {
-						success = true;
+						console.log('database connected!');
 					}
-				})
+				});
 			}
 		}
 	});
-	
-	return success;
 }

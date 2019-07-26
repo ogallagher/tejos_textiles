@@ -1,8 +1,14 @@
+/*
+server.js
+Owen Gallagher
+25 july 2019
+*/
+
 const express = require('express');
 const app = express();
 
-const enums = requre('enums');
-const dbserver = require('dbserver');
+const enums = require('./enums');
+const dbserver = require('./dbserver');
 
 const SITE = enums.site.TEXTILES;
 
@@ -15,9 +21,6 @@ app.listen(app.get('port'), function() {
 	console.log('Tejos//Textiles server is running at localhost:' + app.get('port'));
 	
 	console.log('connecting to database...');
-	dbconnected = dbserver.init(SITE);
-	if (dbconnected) {
-		console.log('database connected!');
-	}
+	dbserver.init(SITE);
 })
 
