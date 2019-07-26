@@ -1,7 +1,9 @@
 # tejos_textiles
 An online literary journal publishing works in an interactive new medium.
 <hr>
-[![heroku_deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+<a href="https://heroku.com/deploy">
+  <img src="https://www.herokucdn.com/deploy/button.svg">
+</a>
 <hr>
 
 # Used technologies
