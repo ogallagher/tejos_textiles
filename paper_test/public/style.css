@@ -1,0 +1,13 @@
+body {
+    font-family: monospace;
+    background: #111;   
+	color: #fff;
+}
+
+.puzzle {
+    background: #bbb;
+    border-style: solid;
+    border-width: 4pt;
+    border-color: #555;
+	margin: 0pt;
+}
