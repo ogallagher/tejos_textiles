@@ -1,6 +1,8 @@
 var puzzles = [];
 
-window.onload = function() {
+function onload() {
+	console.log('initializing puzzles...')
+	
 	var canvases = document.getElementsByClassName('puzzle');
 	var puzzle = null;
 	for (var i=0; i<canvases.length; i++) {
@@ -37,3 +39,5 @@ Puzzle.prototype.init = function() {
 		self.mouse = event.point;
 	}
 }
+
+export {onload};

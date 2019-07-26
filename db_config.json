@@ -1,0 +1,17 @@
+{
+	"db_revistatejos": {
+		"name": "tejosdb",
+		"url": "mysql://b4d6163e503090:be9a5731@us-cdbr-iron-east-02.cleardb.net/heroku_33bfa4aa1f50346?reconnect=true",
+		"user": "b4d6163e503090",
+		"pass": "be9a5731",
+		"db": "heroku_33bfa4aa1f50346"
+	},
+	"db_textilesjournal": {
+		"name": "textilesdb",
+		"url": "mysql://b7d067a2bb9888:512092ef@us-cdbr-iron-east-02.cleardb.net/heroku_8b64f1191de4740?reconnect=true",
+		"user": "b7d067a2bb9888",
+		"pass": "512092ef",
+		"db": "heroku_8b64f1191de4740"
+	}
+}
+
