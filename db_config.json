@@ -1,17 +1,16 @@
 {
 	"db_revistatejos": {
 		"name": "tejosdb",
-		"host":"us-cdbr-iron-east-02.cleardb.net",
-		"user": "b4d6163e503090",
-		"pass": "be9a5731",
-		"db": "heroku_33bfa4aa1f50346"
+		"host": "zj2x67aktl2o6q2n.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
+		"user": "cww03585564icgef",
+		"pass": "h33c2lxgsgyaglbv",
+		"db": "nfz76fb0ozdnav16"
 	},
 	"db_textilesjournal": {
 		"name": "textilesdb",
-		"host": "us-cdbr-iron-east-02.cleardb.net",
-		"user": "b7d067a2bb9888",
-		"pass": "512092ef",
-		"db": "heroku_8b64f1191de4740"
+		"host": "axxb6a0z2kydkco3.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
+		"user": "cadwgjdw7ewfoxfn",
+		"pass": "f3wakbqbpdjanfim",
+		"db": "x7ku0pg29r5qx2ro"
 	}
 }
-
