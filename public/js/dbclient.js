@@ -7,6 +7,6 @@ Handles connection and queries to the database by communicating with server.js
 via HTTP requests.
 */
 
-function onload() {
+function dbclient_onload() {
 	console.log('database will be exposed to client over http...')
 }

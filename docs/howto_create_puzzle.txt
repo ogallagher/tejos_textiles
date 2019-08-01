@@ -1,0 +1,50 @@
+Owen Gallagher
+1 August 2019
+
+=== TITLE ===
+
+How to create, prep, and upload a new tejo/textile puzzle
+
+== PROCEDURE: DB.PUZZLES ===
+
+1. Gather lit fragments to be used in the text background.
+
+2. Draw (a) the shapes for the foreground.
+
+3. Draw the text background using the fragments and shapes as guidelines. Stay within shape boundaries with a animation light box.
+
+4. Scan the text drawing to a raster image.
+
+5. Convert the text scan to bmp with ffmpeg, and use potrace to vectorize the bmp. I created vectorize_img.sh to do these steps. The output is ./input_file_name.svg.
+
+6. Scan the shapes drawing and vectorize it the same way as the text.
+
+7. Open the text svg in a vector graphics program, like Inkscape, and crop as necessary. Make sure all the text is grouped into a single path.
+
+8. Copy the svg.path.d string from the text svg and insert at puzzle[text]. (b)
+
+9. Open the shapes svg as in step 7 and make two compound paths: one for the outlines, and another for the inlines. This is so that when the shapes are created in the browser puzzle canvas, the outlines are clipping paths for the background text and the inlines are clipping paths for the foreground opaque rectangle.
+
+10. Copy svg.path_outline.d into puzzle[shapes_outline] and copy svg.path_inline.d into puzzle[shapes_inline].
+
+11. Pick puzzle[forecolor,backcolor,textcolor] and insert into those fields in hex 0xrrggbb format. Defaults are 0x000, 0xfff and 0x000 respectively.
+
+12. Set puzzle[date] equal to today's date, in mm-dd-yyyy format.
+
+13. Set puzzle[title] to the puzzle's title.
+
+14. Insert row into db.puzzles.
+
+=== PROCEDURE: DB.FRAGMENTS & DB.WORKS & DB.CONTRIBUTIONS ===
+
+15. If the lit fragments came from yet unpublished works, insert new entries into db.works in the form work[title,text,date,description,author]. Make sure author references an existing person[username] in db.people. If not, see howto_create_person.txt for updating db.people.
+
+16. Insert new entries into db.fragments in the form fragment[puzzle_id,work_id].
+
+17. Insert new entries into db.contributions in the form contribution[ username, puzzle_id, method ], where method is one of { text_designer, shape_designer, recommender, curator }.
+
+=== NOTES ===
+
+(a) Drawings are done in dark ink on white paper.
+
+(b) puzzle[] refers to the new tuple to be inserted into the db.puzzles table, where puzzle[col] is the 'col' field in that row.

@@ -22,5 +22,5 @@ app.listen(app.get('port'), function() {
 	
 	console.log('connecting to database...');
 	dbserver.init(SITE);
-})
+});
 

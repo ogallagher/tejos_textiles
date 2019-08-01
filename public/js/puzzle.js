@@ -6,10 +6,10 @@ Owen Gallagher
 
 var puzzles = [];
 
-function onload() {
+function puzzle_onload() {
 	console.log('initializing puzzles...')
 	
-	var canvases = document.getElementsByClassName('puzzle');
+	var canvases = $('.puzzle');
 	var puzzle = null;
 	for (var i=0; i<canvases.length; i++) {
 		puzzle = new Puzzle(i,canvases[i]);
@@ -40,10 +40,8 @@ Puzzle.prototype.init = function() {
 	var self = this;
     this.paper.view.onFrame = function(event) {
         circle.position = circle.position.add((self.mouse.subtract(circle.position)).multiply(0.1));
-    };
+    }
 	this.paper.view.onMouseMove = function(event) {
 		self.mouse = event.point;
 	}
 }
-
-export {onload};

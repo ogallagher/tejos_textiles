@@ -1,0 +1,15 @@
+Owen Gallagher
+1 August 2019
+
+=== TITLE ===
+
+How to create a new person for the db.people table.
+
+=== PROCEDURE ===
+
+1. The tuple person is in the form person[ username, password, email?, links?, subscription, bio?, photo? ] (a).
+
+=== NOTES ===
+
+(a) The ? in col? means the field can be null.
+
