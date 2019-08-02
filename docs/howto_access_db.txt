@@ -1,0 +1,23 @@
+Owen Gallagher
+2 August 2019
+
+=== TITLE ===
+
+How to connect to the Textiles//Tejos databases and use their api.
+
+=== PROCEDURE: BACKEND ===
+
+1. Import the mysql nodejs module.
+
+2. db = mysql.createConnection(connect_info); (a)
+   db.connect(callback(err));
+
+3. db.query(sql, callback(err,res));
+
+=== PROCEDURE: FRONTEND ===
+
+5. Expose the db connection via html protocol with web clients. Handle different routes (GET /db?fetch|update=query) with different db.query statements.
+
+=== NOTES ===
+
+(a) The database connection information for both Tejos and Textiles is found in db_config.json.
