@@ -11,7 +11,7 @@ const mysql = require('mysql');
 
 const enums = require('./enums');
 
-const PATH_DB_CONFIG = 'db_config.json';
+const PATH_DB_CONFIG = './db_config.json';
 const DB_TEJOS = 'db_revistatejos';
 const DB_TEXTILES = 'db_textilesjournal';
 
