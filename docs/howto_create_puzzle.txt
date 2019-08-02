@@ -47,4 +47,4 @@ How to create, prep, and upload a new tejo/textile puzzle
 
 (a) Drawings are done in dark ink on white paper.
 
-(b) puzzle[] refers to the new tuple to be inserted into the db.puzzles table, where puzzle[col] is the 'col' field in that row.
+(b) puzzle[] refers to the new tuple to be inserted into the db.puzzles table, where puzzle[col] is the 'col' field in that row. Each row in db.puzzles has the following form: puzzle[ id, title, date, text, shapes_outline, shapes_inline, forecolor, backcolor, textcolor, plays, preview, rating ].
