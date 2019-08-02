@@ -13,11 +13,9 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded());
 
 const enums = require('./enums');
-const dbserver = require('./dbserver');
+const dbserver = require('./db/dbserver');
 
 const SITE = enums.site.TEXTILES; //select database to connect to
-
-var dbconnected = false;
 
 app.set('port', (process.env.PORT || 5000));
 

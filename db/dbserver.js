@@ -9,11 +9,13 @@ Exposes a connected mysql server to tejos//textiles clients via http.
 const fs = require('fs');
 const mysql = require('mysql');
 
-const enums = require('./enums');
+const enums = require('../enums');
 
 const PATH_DB_CONFIG = './db_config.json';
 const DB_TEJOS = 'db_revistatejos';
 const DB_TEXTILES = 'db_textilesjournal';
+
+var db; //database connection object
 
 exports.init = function(site) {	
 	fs.readFile(PATH_DB_CONFIG, function(err,data) {
@@ -63,4 +65,17 @@ exports.init = function(site) {
 			}
 		}
 	});
+};
+
+exports.fetch = function(sql,callback) {
+	db.query(sql, function(err,res) {
+		callback(err,res); //return error if defined, and response results
+	});
+};
+
+exports.push = function(sql,callback) {
+	db.query(sql, function(err,res) {
+		callback(err); //ignore response, return error if defined
+	});
 }
+
