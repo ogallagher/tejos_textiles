@@ -10,7 +10,7 @@ const app = express();
 //handle POST request data with bodyparser
 const bodyparser = require('body-parser');
 app.use(bodyparser.json());
-app.use(bodyparser.urlencoded());
+app.use(bodyparser.urlencoded({extended: false}));
 
 const enums = require('./enums');
 const dbserver = require('./db/dbserver');

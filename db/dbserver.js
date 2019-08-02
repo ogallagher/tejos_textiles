@@ -11,7 +11,7 @@ const mysql = require('mysql');
 
 const enums = require('../enums');
 
-const PATH_DB_CONFIG = './db_config.json';
+const PATH_DB_CONFIG = 'db/db_config.json'; //accessed from server.js = from root dir
 const DB_TEJOS = 'db_revistatejos';
 const DB_TEXTILES = 'db_textilesjournal';
 
@@ -20,7 +20,7 @@ var db; //database connection object
 exports.init = function(site) {	
 	fs.readFile(PATH_DB_CONFIG, function(err,data) {
 		if (err) {
-			console.log('error: read from db config file failed');
+			console.log('error: read from db config file failed: ' + err);
 		}
 		else {
 			//read config file
