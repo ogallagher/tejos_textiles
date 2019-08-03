@@ -4,39 +4,57 @@ Owen Gallagher
 25 july 2019
 */
 
+//internal puzzle vars
+var featuredCanvas;
+var featuredPuzzle;
 var puzzles = [];
+var domlist;
 
-function puzzle_onload() {
-	console.log('initializing puzzles...')
-	
-	var canvases = $('.puzzle');
-	var puzzle = null;
-	for (var i=0; i<canvases.length; i++) {
-		puzzle = new Puzzle(i,canvases[i]);
-		puzzle.init(i);
-		puzzles.push(puzzle);
-	}
-}
+const PATTERN_ID = '?id?';
+const PATTERN_TITLE = '?title?';
+const PUZZLE_ITEM_HTML= '<div class=\"box has-text-centered\" id=' + PATTERN_ID + '><p>' + PATTERN_TITLE + '</p></div>';
 
-function Puzzle(id,canvas) {
-	this.id = id;
-	this.canvas = canvas;
+//Puzzle class
+function Puzzle(dbdata) {
+	this.id = dbdata.id;
+	this.title = dbdata.title;
 	this.paper = new paper.PaperScope();
-	this.paper.setup(canvas);
 	this.mouse = new paper.Point();
+	
+	/* JSON object representing puzzle in the db
+	{
+		id: int,
+		title: string,
+		text: svg.path.d,
+		shapes: [
+			{
+				hole: svg.path.d,
+				cap: svg.path.d
+			},
+			...
+		],
+		background: color,
+		foreground: color
+	}
+	*/
+	this.data = dbdata;
 }
 
 Puzzle.prototype.init = function() {
-	paper = this.paper; //add elements to this paper context
+	//attach to featuredCanvas
+	this.paper.setup(featuredCanvas);
+	paper = this.paper; 
+	this.resize();
 	
-    var halfW = this.canvas.width/2;
-    var halfH = this.canvas.height/2;
-	this.mouse = new paper.Point(halfW,halfH);
+	//add graphic elements
+	var center = paper.view.center;
+	this.mouse = center;
 
-    var circle = new paper.Shape.Circle(new paper.Point(halfW,halfH), 10);
+    var circle = new paper.Shape.Circle(center, 10);
     circle.fillColor = 'white';
     circle.strokeColor = '#000000cc';
 	
+	//event handlers
 	var self = this;
     this.paper.view.onFrame = function(event) {
         circle.position = circle.position.add((self.mouse.subtract(circle.position)).multiply(0.1));
@@ -44,4 +62,53 @@ Puzzle.prototype.init = function() {
 	this.paper.view.onMouseMove = function(event) {
 		self.mouse = event.point;
 	}
+	
+	//feature
+	if (featuredPuzzle != null && featuredPuzzle.view != null) {
+		featuredPuzzle.view.remove(); //unselect other
+	}
+ 	featuredPuzzle = this; //select this
+}
+
+Puzzle.prototype.resize = function() {	
+	//resize canvas via paper
+	var container = featuredCanvas.parentElement;
+	var w = container.clientWidth;
+	var h = container.clientHeight;
+	this.paper.view.setViewSize(w,h);
+}
+
+Puzzle.prototype.domAppend = function() {
+	var puzzleItem = PUZZLE_ITEM_HTML
+									.replace(PATTERN_TITLE,this.title)
+									.replace(PATTERN_ID,this.id); //load html source
+	
+	puzzleItem = $(puzzleItem); //create dom element
+	
+	domlist.append(puzzleItem); //add to list
+}
+
+//exposed puzzle methods
+function puzzle_onload(dbdata) {
+	//bind puzzles to list
+	domlist = $('#puzzles_list');
+	
+	//load puzzle data from db and add puzzles
+	var p,puzzle;
+	for (p of dbdata) {
+		puzzle = new Puzzle(p);
+		puzzles.push(puzzle);
+		puzzle.domAppend();
+	}
+	
+	//feature the most recent puzzle
+	featuredCanvas = $('#featured_puzzle')[0];
+	var n = puzzles.length;
+	if (n != 0) {
+		puzzles[n-1].init();
+	}
+}
+
+function puzzle_onresize() {
+	featuredPuzzle.resize();
 }

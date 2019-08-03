@@ -5,6 +5,9 @@ Owen Gallagher
 */
 
 window.onload = function() {
-	puzzle_onload();
-	dbclient_onload();
+	dbclient_fetchPuzzles(puzzle_onload);
+}
+
+window.onresize = function() {
+	puzzle_onresize();
 }

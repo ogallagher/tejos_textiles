@@ -3,10 +3,13 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <!--scales viewport depending on worldspace device width-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <title>Revista Tejos // Textiles Journal</title>
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://kit.fontawesome.com/45796a91b9.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-full.min.js"></script>
         
         <script src="js/puzzle.js"></script>
@@ -17,32 +20,177 @@
     </head>
     
     <body>
-        <h1>This is an example using paperjs with multiple canvases</h1>
-        <canvas class="puzzle" width="1100" height="200"></canvas>
-        <canvas class="puzzle" width="400" height="200"></canvas>
-        <canvas class="puzzle" width="900" height="200"></canvas>
-        <canvas class="puzzle" width="500" height="200"></canvas>
-        <canvas class="puzzle" width="600" height="200"></canvas>
-        <canvas class="puzzle" width="700" height="200"></canvas>
-        <canvas class="puzzle" width="200" height="200"></canvas>
-        <canvas class="puzzle" width="300" height="200"></canvas>
-        <canvas class="puzzle" width="400" height="200"></canvas>
-        <canvas class="puzzle" width="500" height="200"></canvas>
-        <canvas class="puzzle" width="600" height="200"></canvas>
-        <canvas class="puzzle" width="700" height="200"></canvas>
-        <canvas class="puzzle" width="800" height="200"></canvas>
-        <canvas class="puzzle" width="900" height="200"></canvas>
-        <canvas class="puzzle" width="200" height="200"></canvas>
-        <canvas class="puzzle" width="1000" height="200"></canvas>
-        <canvas class="puzzle" width="1100" height="200"></canvas>
-        <canvas class="puzzle" width="500" height="200"></canvas>
-        <canvas class="puzzle" width="600" height="200"></canvas>
-        <canvas class="puzzle" width="700" height="200"></canvas>
-        <canvas class="puzzle" width="800" height="200"></canvas>
-        <canvas class="puzzle" width="900" height="200"></canvas>
-        <canvas class="puzzle" width="200" height="200"></canvas>
-        <canvas class="puzzle" width="600" height="200"></canvas>
-        <canvas class="puzzle" width="800" height="200"></canvas>
-        <canvas class="puzzle" width="900" height="200"></canvas>
+        <nav class="navbar" role="navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item">
+                    <span class="icon">
+                        <i class="fas fa-home"></i>
+                    </span>
+                </a>
+            </div>
+            <div class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item" role="button">About</a>
+                    <a class="navbar-item" role="button">Gallery</a>
+                    <a class="navbar-item" role="button">Contact</a>
+                </div>
+                <div class="navbar-end">
+                    <a class="navbar-item" role="button">Apple</a>
+                    <a class="navbar-item" role="button">Banana</a>
+                    <a class="navbar-item" role="button">Cherry</a>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="section">
+            <div class="columns">
+                <div class="column is-9">
+                    <div class="card" id="featured_card" style="margin:0 0 8px 0;">
+                        <div class="card-header" style="padding:8px;">
+                            <div class="columns is-multiline">
+                                <div class="column is-narrow has-text-centered">
+                                    <a class="level">
+                                        <span class="icon has-text-primary">
+                                            <i class="fas fa-3x fa-play-circle"></i>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="column">
+                                    <div class="field is-grouped is-grouped-multiline is-grouped-centered">
+                                        <!--title-->
+                                        <div class="control field has-addons">
+                                            <div class="control">
+                                                 <button class="button is-static">
+                                                     <span class="icon">
+                                                         <i class="fas fa-cross"></i>
+                                                     </span>
+                                                     <span>
+                                                         textile
+                                                     </span>
+                                                 </button>
+                                            </div>
+                                            <div class="control">
+                                                <a class="button" id="featured_title">
+                                                    Example Puzzle
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!--author-->
+                                        <div class="control field has-addons">
+                                            <div class="control">
+                                                 <button class="button is-static">
+                                                     <span class="icon">
+                                                         <i class="fas fa-font"></i>
+                                                     </span>
+                                                     <span>
+                                                         author
+                                                     </span>
+                                                 </button>
+                                            </div>
+                                            <div class="control">
+                                                <a class="button" id="featured_author">
+                                                    Owen Gallagher
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!--date-->
+                                        <div class="control field has-addons">
+                                            <div class="control">
+                                                 <button class="button is-static">
+                                                     <span class="icon">
+                                                         <i class="fas fa-calendar"></i>
+                                                     </span>
+                                                     <span>
+                                                         date
+                                                     </span>
+                                                 </button>
+                                            </div>
+                                            <div class="control">
+                                                <a class="button">
+                                                    <span id="featured_date">
+                                                        July 2019
+                                                    </span>
+                                                    <span class="icon">
+                                                        <i class="fas fa-angle-down"></i>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!--rating-->
+                                        <div class="control field has-addons">
+                                            <div class="control">
+                                                 <button class="button is-static">
+                                                     <span class="icon">
+                                                         <i class="fas fa-star"></i>
+                                                     </span>
+                                                     <span>
+                                                         rating
+                                                     </span>
+                                                 </button>
+                                            </div>
+                                            <div class="control">
+                                                <button class="button" id="featured_rating">
+                                                    <a class="icon has-text-warning">
+                                                        <i class="fas fa-star" id="featured_rating_1"></i>
+                                                    </a>
+                                                    <a class="icon has-text-warning">
+                                                        <i class="fas fa-star" id="featured_rating_2"></i>
+                                                    </a>
+                                                    <a class="icon has-text-warning">
+                                                        <i class="fas fa-star" id="featured_rating_3"></i>
+                                                    </a>
+                                                    <a class="icon has-text-warning">
+                                                        <i class="fas fa-star" id="featured_rating_4"></i>
+                                                    </a>
+                                                    <a class="icon has-text-warning">
+                                                        <i class="fas fa-star" id="featured_rating_5"></i>
+                                                    </a>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div id="featured_container" style="border:2px solid black;">
+                                <canvas id="featured_puzzle" class="puzzle-canvas" height="400px"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            
+                        </div>
+                    </div>
+                    <div class="columns is-centered">
+                        <div class="column is-narrow">
+                            <div class="card">
+                                <div class="card-header">
+                                    <p class="card-header-title">
+                                        svg_test.svg
+                                    </p>
+                                </div>
+                                <div class="card-image has-text-centered" id="svg_test_parent">
+                                    <!--insert svg_test here-->
+                                </div>
+                                <div class="card-footer">
+                                    <div class="container" style="padding:15px;">
+                                        <p class="subtitle">
+                                            SVG console output
+                                        </p>
+                                        <p class="is-family-code" id="svg_output">
+                                            Hello world.
+                                        </p>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column" id="puzzles_list">
+                    <!--Insert puzzles loaded from database here-->
+                </div>
+            </div>
+        </div>
     </body>
 </html>
