@@ -1,0 +1,16 @@
+{
+	"puzzles": {
+		"id": "id",
+		"title": "title",
+		"date": "date",
+		"text": "text",
+		"shapes_outline": "shapes_outline",
+		"shapes_inline": "shapes_inline",
+		"forecolor": "forecolor",
+		"backcolor": "backcolor",
+		"textcolor": "textcolor",
+		"plays": "plays",
+		"rating": "rating",
+		"preview": "preview"
+	}
+}

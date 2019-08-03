@@ -6,6 +6,10 @@ Owen Gallagher
 
 //internal puzzle vars
 var featuredCanvas;
+var featuredTitle;
+var featuredAuthor;
+var featuredDate;
+var featuredRating;
 var featuredPuzzle;
 var puzzles = [];
 var domlist;
@@ -18,10 +22,14 @@ const PUZZLE_ITEM_HTML= '<div class=\"box has-text-centered\" id=' + PATTERN_ID 
 function Puzzle(dbdata) {
 	this.id = dbdata.id;
 	this.title = dbdata.title;
+	this.author = dbdata.author;
+	this.date = dbdata.date;
 	this.paper = new paper.PaperScope();
 	this.mouse = new paper.Point();
 	
-	/* JSON object representing puzzle in the db
+	/* 
+	JSON object representing puzzle in the db.
+	Eventually results in the following fields...
 	{
 		id: int,
 		title: string,
@@ -41,6 +49,14 @@ function Puzzle(dbdata) {
 }
 
 Puzzle.prototype.init = function() {
+	//update metadata fields
+	featuredTitle.html(this.title);
+	
+	featuredAuthor.html(this.Author);
+	
+	var date = this.date.substring(0,this.date.indexOf('T'));
+	featuredDate.html(date);
+	
 	//attach to featuredCanvas
 	this.paper.setup(featuredCanvas);
 	paper = this.paper; 
@@ -102,7 +118,12 @@ function puzzle_onload(dbdata) {
 	}
 	
 	//feature the most recent puzzle
+	featuredTitle = $('#featured_title');
+	featuredAuthor = $('#featured_author');
+	featuredDate = $('#featured_date');
+	featuredRating = $('#featured_rating');
 	featuredCanvas = $('#featured_puzzle')[0];
+	
 	var n = puzzles.length;
 	if (n != 0) {
 		puzzles[n-1].init();

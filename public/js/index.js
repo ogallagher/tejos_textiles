@@ -5,7 +5,20 @@ Owen Gallagher
 */
 
 window.onload = function() {
-	dbclient_fetchPuzzles(puzzle_onload);
+	dbclient_onload.then(function() {
+		var cols = dbclient_db.puzzles;
+		var projection = [
+			cols.id,
+			cols.title,
+			cols.date,
+			cols.forecolor,
+			cols.backcolor,
+			cols.textcolor,
+			cols.preview
+		];
+		
+		dbclient_fetchPuzzles(projection,puzzle_onload);
+	});
 }
 
 window.onresize = function() {
