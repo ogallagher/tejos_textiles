@@ -4,16 +4,19 @@ Owen Gallagher
 25 july 2019
 */
 
-//internal puzzle vars
+//pointers to html dom elements
 var featuredCanvas;
 var featuredTitle;
 var featuredAuthor;
 var featuredDate;
 var featuredRating;
-var featuredPuzzle;
-var puzzles = [];
 var domlist;
 
+//puzzles
+var featuredPuzzle;
+var puzzles = [];
+
+//html templates
 const PATTERN_ID = '?id?';
 const PATTERN_TITLE = '?title?';
 const PUZZLE_ITEM_HTML= '<div class=\"box has-text-centered\" id=' + PATTERN_ID + '><p>' + PATTERN_TITLE + '</p></div>';
@@ -24,31 +27,28 @@ function Puzzle(dbdata) {
 	this.title = dbdata.title;
 	this.author = dbdata.author;
 	this.date = dbdata.date;
+	
 	this.paper = new paper.PaperScope();
 	this.mouse = new paper.Point();
 	
-	/* 
-	JSON object representing puzzle in the db.
-	Eventually results in the following fields...
-	{
-		id: int,
-		title: string,
-		text: svg.path.d,
-		shapes: [
-			{
-				hole: svg.path.d,
-				cap: svg.path.d
-			},
-			...
-		],
-		background: color,
-		foreground: color
-	}
-	*/
-	this.data = dbdata;
+	this.forecolor;
+	this.backcolor;
+	this.textcolor;
+	this.parseColors(dbdata.forecolor,dbdata.backcolor,dbdata.textcolor);
 }
 
-Puzzle.prototype.init = function() {
+Puzzle.prototype.parseColors = function(fore,back,text) {
+	//TODO parse colors
+}
+
+Puzzle.prototype.parsePaths = new Promise(function(resolve,reject) {	
+	//pull paths from db
+	dbclient_fetchPuzzlePaths(this.id, function(data) {
+		resolve(data.text,data.shapes_outline,data.shapes_inline);
+	});
+});
+
+Puzzle.prototype.feature = function() {
 	//update metadata fields
 	featuredTitle.html(this.title);
 	
@@ -65,6 +65,11 @@ Puzzle.prototype.init = function() {
 	//add graphic elements
 	var center = paper.view.center;
 	this.mouse = center;
+	
+	this.parsePaths.then(function(text,outline,inline) {
+		//TODO create paths from text, outlines and inlines
+		console.log('loading graphic elements for puzzle ' + this.title + '...');
+	});
 
     var circle = new paper.Shape.Circle(center, 10);
     circle.fillColor = 'white';
@@ -126,7 +131,7 @@ function puzzle_onload(dbdata) {
 	
 	var n = puzzles.length;
 	if (n != 0) {
-		puzzles[n-1].init();
+		puzzles[n-1].feature();
 	}
 }
 

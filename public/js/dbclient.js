@@ -9,8 +9,6 @@ via HTTP requests.
 
 const DB_CONFIG_PATH = '/json/db_config.json';
 var dbclient_db;
-const SQL_PROJECT = '<project>';
-const SQL_TABLE = '<table>';
 
 var dbclient_onload = new Promise(function(resolve,reject) {
 	console.log('loading db configuration...');
@@ -25,6 +23,18 @@ var dbclient_onload = new Promise(function(resolve,reject) {
 
 function dbclient_fetchPuzzles(projection,callback) {
 	var sql = 'select ' + projection.join() + ' from puzzles';
+	
+	console.log('fetching: ' + sql + '...');
+	
+	$.get('/db', {sql: sql}, function(data) {
+		console.log('fetched ' + data.length + ' puzzles from db');
+		
+		callback(data);
+	});
+}
+
+function dbclient_fetchPuzzlePaths(id,callback) {
+	var sql = 'select text,shapes_outline,shapes_inline from puzzles where id=' + id;
 	
 	console.log('fetching: ' + sql + '...');
 	
