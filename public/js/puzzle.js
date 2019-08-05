@@ -16,6 +16,9 @@ var domlist;
 var featuredPuzzle;
 var puzzles = [];
 
+//interaction
+var selectedShape = null;
+
 //html templates
 const PATTERN_ID = '?id?';
 const PATTERN_TITLE = '?title?';
@@ -57,6 +60,7 @@ Puzzle.prototype.feature = function() {
 	this.mouse = v0.center;
 	
 	var self = this;
+	var shapes = [];
 	dbclient_fetchPuzzlePaths(this.id, function(data) {	
 		//foreground solid
 		var foreground = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
@@ -76,18 +80,18 @@ Puzzle.prototype.feature = function() {
 		var text = new paper.CompoundPath(data.text);
 		var tc = self.textcolor;
 		text.fillColor = new paper.Color(tc[0],tc[1],tc[2]);
-		text.applyMatrix = false;
+		var textRaster = text.rasterize(200);
+		textRaster.applyMatrix = false;
+		text.remove();
 		
 		var shapesOut = data.shapes_outline.split(';;');
 		var shapesIn = data.shapes_inline.split(';;');
-		var shapes = [];
 		
 		//define graphics transform
 		self.resizeGraphics = function() {
 			var v = self.paper.view;
 			
-			var M = new paper.Matrix();
-			var bounds = text.bounds;
+			var bounds = textRaster.bounds;
 			var center = bounds.center;
 			var size = bounds.size;
 			var sw = v.size.width / size.width;
@@ -100,18 +104,16 @@ Puzzle.prototype.feature = function() {
 				s = sh;
 			}
 			
-			M = M.scale(s);
-			M = M.translate(v.center.subtract(center));
+			var M = (new paper.Matrix()).scale(s);
 			
 			foreground.bounds.size = v.size;
 			foregroundCaps.bounds.size = v.size;
-			text.transform(M);
+			textRaster.transform(M);
 			for (shape of shapes) {
 				shape.transform(M);
 			}
 		};
 		
-		//
 		if (shapesOut.length == shapesIn.length) {
 			var holeClips = new paper.Group();
 			var capClips = new paper.Group();
@@ -125,7 +127,7 @@ Puzzle.prototype.feature = function() {
 				capClips.addChild(shape.cap);
 			}
 			
-			var holes = new paper.Group(holeClips, background, text);
+			var holes = new paper.Group(holeClips, background, textRaster);
 			holes.clipped = true;
 			var caps = new paper.Group(capClips, foregroundCaps);
 			caps.clipped = true;
@@ -136,14 +138,28 @@ Puzzle.prototype.feature = function() {
 		else {
 			console.log('error loading ' + this.title + ': shapes_outline.length != shapes_inline.length');
 		}
-		
-		//element event handlers
 	});
 	
 	//global event handlers
 	this.paper.view.onMouseMove = function(event) {
 		self.mouse = event.point;
-		//TODO
+	}
+	this.paper.view.onMouseDown = function(event) {		
+		for (shape of shapes) {
+			if (shape.contains(self.mouse)) {
+				selectedShape = shape;
+				shape.throwAnchor(self.mouse);
+				break;
+			}
+		}
+	}
+	this.paper.view.onMouseUp = function(event) {
+		selectedShape = null;
+	}
+	this.paper.view.onMouseDrag = function(event) {
+		if (selectedShape != null) {
+			selectedShape.dragTo(event.point);
+		}
 	}
 	
 	//feature
