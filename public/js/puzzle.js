@@ -31,22 +31,12 @@ function Puzzle(dbdata) {
 	this.paper = new paper.PaperScope();
 	this.mouse = new paper.Point();
 	
-	this.forecolor;
-	this.backcolor;
-	this.textcolor;
-	this.parseColors(dbdata.forecolor,dbdata.backcolor,dbdata.textcolor);
+	this.forecolor = dbdata.forecolor.data;
+	this.backcolor = dbdata.backcolor.data;
+	this.textcolor = dbdata.textcolor.data;
+	
+	this.resizeGraphics = function(){}; //defined in this.feature()
 }
-
-Puzzle.prototype.parseColors = function(fore,back,text) {
-	//TODO parse colors
-}
-
-Puzzle.prototype.parsePaths = new Promise(function(resolve,reject) {	
-	//pull paths from db
-	dbclient_fetchPuzzlePaths(this.id, function(data) {
-		resolve(data.text,data.shapes_outline,data.shapes_inline);
-	});
-});
 
 Puzzle.prototype.feature = function() {
 	//update metadata fields
@@ -61,27 +51,99 @@ Puzzle.prototype.feature = function() {
 	this.paper.setup(featuredCanvas);
 	paper = this.paper; 
 	this.resize();
+	var v0 = this.paper.view;
 	
 	//add graphic elements
-	var center = paper.view.center;
-	this.mouse = center;
+	this.mouse = v0.center;
 	
-	this.parsePaths.then(function(text,outline,inline) {
-		//TODO create paths from text, outlines and inlines
-		console.log('loading graphic elements for puzzle ' + this.title + '...');
-	});
-
-    var circle = new paper.Shape.Circle(center, 10);
-    circle.fillColor = 'white';
-    circle.strokeColor = '#000000cc';
-	
-	//event handlers
 	var self = this;
-    this.paper.view.onFrame = function(event) {
-        circle.position = circle.position.add((self.mouse.subtract(circle.position)).multiply(0.1));
-    }
+	dbclient_fetchPuzzlePaths(this.id, function(data) {	
+		//foreground solid
+		var foreground = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
+		var fc = self.forecolor;
+		foreground.fillColor = new paper.Color(fc[0],fc[1],fc[2]);
+		
+		var foregroundCaps = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
+		foregroundCaps.fillColor = foreground.fillColor;
+		
+		//background solid
+		var background = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
+		var bc = self.backcolor;
+		console.log('backcolor: ' + JSON.stringify(bc));
+		background.fillColor = new paper.Color(bc[0],bc[1],bc[2]);
+		
+		//background text
+		var text = new paper.CompoundPath(data.text);
+		var tc = self.textcolor;
+		text.fillColor = new paper.Color(tc[0],tc[1],tc[2]);
+		text.applyMatrix = false;
+		
+		var shapesOut = data.shapes_outline.split(';;');
+		var shapesIn = data.shapes_inline.split(';;');
+		var shapes = [];
+		
+		//define graphics transform
+		self.resizeGraphics = function() {
+			var v = self.paper.view;
+			
+			var M = new paper.Matrix();
+			var bounds = text.bounds;
+			var center = bounds.center;
+			var size = bounds.size;
+			var sw = v.size.width / size.width;
+			var sh = v.size.height / size.height;
+			var s;
+			if (sw < sh) {
+				s = sw;
+			}
+			else {
+				s = sh;
+			}
+			
+			M = M.scale(s);
+			M = M.translate(v.center.subtract(center));
+			
+			foreground.bounds.size = v.size;
+			foregroundCaps.bounds.size = v.size;
+			text.transform(M);
+			for (shape of shapes) {
+				shape.transform(M);
+			}
+		};
+		
+		//
+		if (shapesOut.length == shapesIn.length) {
+			var holeClips = new paper.Group();
+			var capClips = new paper.Group();
+			var shape;
+			for (var i=0; i<shapesOut.length; i++) {
+				shape = new Shape(shapesOut[i],shapesIn[i]);
+				
+				shapes.push(shape);
+				
+				holeClips.addChild(shape.hole);
+				capClips.addChild(shape.cap);
+			}
+			
+			var holes = new paper.Group(holeClips, background, text);
+			holes.clipped = true;
+			var caps = new paper.Group(capClips, foregroundCaps);
+			caps.clipped = true;
+			
+			self.resizeGraphics();
+			console.log('finished loading graphics for ' + self.title);
+		}
+		else {
+			console.log('error loading ' + this.title + ': shapes_outline.length != shapes_inline.length');
+		}
+		
+		//element event handlers
+	});
+	
+	//global event handlers
 	this.paper.view.onMouseMove = function(event) {
 		self.mouse = event.point;
+		//TODO
 	}
 	
 	//feature
@@ -97,6 +159,8 @@ Puzzle.prototype.resize = function() {
 	var w = container.clientWidth;
 	var h = container.clientHeight;
 	this.paper.view.setViewSize(w,h);
+	
+	this.resizeGraphics();
 }
 
 Puzzle.prototype.domAppend = function() {

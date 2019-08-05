@@ -6,6 +6,21 @@ Owen Gallagher
 */
 
 function Shape(hole,cap) {
-	this.hole = hole;
-	this.cap = cap;
+	this.hole = new paper.Path(hole);
+	
+	this.cap;
+	if (cap == 'null') {
+		this.cap = null;
+	}
+	else {
+		this.cap = new paper.CompoundPath(cap);
+	}
+}
+
+Shape.prototype.transform = function(matrix) {
+	this.hole.transform(matrix);
+	
+	if (this.cap != null) {
+		this.cap.transform(matrix);
+	}
 }

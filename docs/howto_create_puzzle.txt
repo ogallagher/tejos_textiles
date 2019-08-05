@@ -23,13 +23,13 @@ How to create, prep, and upload a new tejo/textile puzzle
 
 8. Copy the svg.path.d string from the text svg and insert at puzzle[text]. (b)
 
-9. Open the shapes svg as in step 7 and make two compound paths: one for the outlines, and another for the inlines. This is so that when the shapes are created in the browser puzzle canvas, the outlines are clipping paths for the background text and the inlines are clipping paths for the foreground opaque rectangle.
+9. Open the shapes svg as in step 7 and make lists of compound paths: one for the outlines, and another for the inlines (c). Each list should be equal length, where outline[i] corresponds to inline[i]. This is so that when the shapes are created in the browser puzzle canvas, the outlines are clipping paths for the background text and the inlines are clipping paths for the foreground opaque rectangle.
 
 10. Copy svg.path_outline.d into puzzle[shapes_outline] and copy svg.path_inline.d into puzzle[shapes_inline].
 
 11. Pick puzzle[forecolor,backcolor,textcolor] and insert into those fields in hex 0xrrggbb format. Defaults are 0x000, 0xfff and 0x000 respectively.
 
-12. Set puzzle[date] equal to today's date, in mm-dd-yyyy format.
+12. Set puzzle[date] equal to today's date, in yyyy-mm-dd format.
 
 13. Set puzzle[title] to the puzzle's title.
 
@@ -48,3 +48,11 @@ How to create, prep, and upload a new tejo/textile puzzle
 (a) Drawings are done in dark ink on white paper.
 
 (b) puzzle[] refers to the new tuple to be inserted into the db.puzzles table, where puzzle[col] is the 'col' field in that row. Each row in db.puzzles has the following form: puzzle[ id, title, date, text, shapes_outline, shapes_inline, forecolor, backcolor, textcolor, plays, preview, rating ].
+
+(c) The outlines and inlines are inserted into puzzle[shapes_outline] and puzzle[shapes_inline]. The format for each becomes a double-semicolon-delimited list:
+{
+...
+shapes_outline: "svg.path.d[0];;svg.path.d[1];;...;;svg.path.d[n]",
+shapes_inline: "svg.path.d[0];;svg.path.d[1];;...;;svg.path.d[n]"
+}
+where each svg.path.d[i] can be "null" in shapes_inline if the shape has no holes.

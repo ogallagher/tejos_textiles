@@ -41,6 +41,6 @@ function dbclient_fetchPuzzlePaths(id,callback) {
 	$.get('/db', {sql: sql}, function(data) {
 		console.log('fetched ' + data.length + ' puzzles from db');
 		
-		callback(data);
+		callback(data[0]);
 	});
 }
