@@ -32,13 +32,38 @@ function Puzzle(dbdata) {
 	this.date = dbdata.date;
 	
 	this.paper = new paper.PaperScope();
-	this.mouse = new paper.Point();
 	
 	this.forecolor = dbdata.forecolor.data;
 	this.backcolor = dbdata.backcolor.data;
 	this.textcolor = dbdata.textcolor.data;
 	
-	this.resizeGraphics = function(){}; //defined in this.feature()
+	this.foreground;
+	this.foregroundCaps;
+	this.background;
+	this.text;
+	this.textP = new paper.Point();
+	this.shapes = [];
+	
+	this.pan = new paper.Point();
+	this.zoom = new paper.Point(1,1);
+	this.dragBegin = new paper.Point();
+	this.anchor = new paper.Point();
+}
+
+Puzzle.prototype.updateGraphics = function() {
+	var v = this.paper.view;
+	
+	if (featuredPuzzle == this) {
+		this.background.bounds.size = v.size;
+		this.foreground.bounds.size = v.size;
+		this.foregroundCaps.bounds.size = v.size;
+	
+		this.text.position.set(this.textP.add(this.pan));
+	
+		for (shape of this.shapes) {
+			shape.panTo(this.pan);
+		}
+	}
 }
 
 Puzzle.prototype.feature = function() {
@@ -54,65 +79,43 @@ Puzzle.prototype.feature = function() {
 	this.paper.setup(featuredCanvas);
 	paper = this.paper; 
 	this.resize();
-	var v0 = this.paper.view;
+	var v0 = paper.view;
+	
+	//feature
+	if (featuredPuzzle != null && featuredPuzzle.paper.view != null) {
+		featuredPuzzle.paper.view.remove(); //unselect other
+	}
+ 	featuredPuzzle = this; //select this
 	
 	//add graphic elements
-	this.mouse = v0.center;
-	
+	this.foreground = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
+	this.foregroundCaps = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
+	this.background = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
 	var self = this;
-	var shapes = [];
 	dbclient_fetchPuzzlePaths(this.id, function(data) {	
 		//foreground solid
-		var foreground = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
 		var fc = self.forecolor;
-		foreground.fillColor = new paper.Color(fc[0],fc[1],fc[2]);
-		
-		var foregroundCaps = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
-		foregroundCaps.fillColor = foreground.fillColor;
+		self.foreground.fillColor = new paper.Color(fc[0],fc[1],fc[2]);
+		self.foregroundCaps.fillColor = self.foreground.fillColor;
 		
 		//background solid
-		var background = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
 		var bc = self.backcolor;
-		console.log('backcolor: ' + JSON.stringify(bc));
-		background.fillColor = new paper.Color(bc[0],bc[1],bc[2]);
+		self.background.fillColor = new paper.Color(bc[0],bc[1],bc[2]);
 		
 		//background text
-		var text = new paper.CompoundPath(data.text);
+		var textVector = new paper.CompoundPath(data.text);
 		var tc = self.textcolor;
-		text.fillColor = new paper.Color(tc[0],tc[1],tc[2]);
-		var textRaster = text.rasterize(200);
-		textRaster.applyMatrix = false;
-		text.remove();
+		textVector.fillColor = new paper.Color(tc[0],tc[1],tc[2]);
 		
+		self.text = textVector.rasterize(200);
+		self.textP = self.text.position;
+		
+		textVector.remove();
+		textVector = null;
+		
+		self.shapes = [];
 		var shapesOut = data.shapes_outline.split(';;');
 		var shapesIn = data.shapes_inline.split(';;');
-		
-		//define graphics transform
-		self.resizeGraphics = function() {
-			var v = self.paper.view;
-			
-			var bounds = textRaster.bounds;
-			var center = bounds.center;
-			var size = bounds.size;
-			var sw = v.size.width / size.width;
-			var sh = v.size.height / size.height;
-			var s;
-			if (sw < sh) {
-				s = sw;
-			}
-			else {
-				s = sh;
-			}
-			
-			var M = (new paper.Matrix()).scale(s);
-			
-			foreground.bounds.size = v.size;
-			foregroundCaps.bounds.size = v.size;
-			textRaster.transform(M);
-			for (shape of shapes) {
-				shape.transform(M);
-			}
-		};
 		
 		if (shapesOut.length == shapesIn.length) {
 			var holeClips = new paper.Group();
@@ -121,52 +124,57 @@ Puzzle.prototype.feature = function() {
 			for (var i=0; i<shapesOut.length; i++) {
 				shape = new Shape(shapesOut[i],shapesIn[i]);
 				
-				shapes.push(shape);
+				self.shapes.push(shape);
 				
 				holeClips.addChild(shape.hole);
 				capClips.addChild(shape.cap);
 			}
 			
-			var holes = new paper.Group(holeClips, background, textRaster);
+			var holes = new paper.Group(holeClips, self.background, self.text);
 			holes.clipped = true;
-			var caps = new paper.Group(capClips, foregroundCaps);
+			var caps = new paper.Group(capClips, self.foregroundCaps);
 			caps.clipped = true;
 			
-			self.resizeGraphics();
+			self.updateGraphics();
+			
 			console.log('finished loading graphics for ' + self.title);
 		}
 		else {
-			console.log('error loading ' + this.title + ': shapes_outline.length != shapes_inline.length');
+			console.log('error loading ' + self.title + ': shapes_outline.length != shapes_inline.length');
 		}
 	});
 	
-	//global event handlers
-	this.paper.view.onMouseMove = function(event) {
-		self.mouse = event.point;
-	}
-	this.paper.view.onMouseDown = function(event) {		
-		for (shape of shapes) {
-			if (shape.contains(self.mouse)) {
+	//event handlers
+	paper.view.onMouseDown = function(event) {	
+		var mouse = event.point;
+		var miss = true;
+		
+		for (shape of self.shapes) {
+			if (shape.contains(mouse)) {
+				miss = false;
+				shape.throwAnchor();
 				selectedShape = shape;
-				shape.throwAnchor(self.mouse);
 				break;
 			}
 		}
+		
+		self.dragBegin = mouse;
+		self.anchor = self.pan;
 	}
-	this.paper.view.onMouseUp = function(event) {
+	paper.view.onMouseUp = function(event) {
 		selectedShape = null;
 	}
-	this.paper.view.onMouseDrag = function(event) {
-		if (selectedShape != null) {
-			selectedShape.dragTo(event.point);
+	paper.view.onMouseDrag = function(event) {
+		var mouse = event.point.subtract(self.dragBegin);
+		
+		if (selectedShape == null) {
+			self.pan = self.anchor.add(mouse);
+			self.updateGraphics();
+		}
+		else {
+			selectedShape.dragTo(mouse);
 		}
 	}
-	
-	//feature
-	if (featuredPuzzle != null && featuredPuzzle.view != null) {
-		featuredPuzzle.view.remove(); //unselect other
-	}
- 	featuredPuzzle = this; //select this
 }
 
 Puzzle.prototype.resize = function() {	
@@ -176,7 +184,7 @@ Puzzle.prototype.resize = function() {
 	var h = container.clientHeight;
 	this.paper.view.setViewSize(w,h);
 	
-	this.resizeGraphics();
+	this.updateGraphics();
 }
 
 Puzzle.prototype.domAppend = function() {
