@@ -7,13 +7,15 @@ Owen Gallagher
 
 function Shape(hole,cap) {
 	this.hole = new paper.Path(hole);
-	this.holeP = this.hole.position;
+	this.hole.scale(2);
+	this.holeP = this.hole.position.multiply(2);
 	
 	this.cap = null;	
 	this.hasCap = false;
 	if (cap != 'null') {
 		this.cap = new paper.CompoundPath(cap);
-		this.capP = this.cap.position;
+		this.cap.scale(2);
+		this.capP = this.cap.position.multiply(2);
 		this.hasCap = true;
 	}
 	
@@ -51,7 +53,7 @@ Shape.prototype.dragTo = function(point) {
 	this.move();
 }
 
-Shape.prototype.panTo = function(point) {
-	this.pan = point;
+Shape.prototype.cameraTo = function(pan) {
+	this.pan = pan;
 	this.move();
 }

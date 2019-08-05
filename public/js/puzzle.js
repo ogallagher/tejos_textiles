@@ -45,7 +45,6 @@ function Puzzle(dbdata) {
 	this.shapes = [];
 	
 	this.pan = new paper.Point();
-	this.zoom = new paper.Point(1,1);
 	this.dragBegin = new paper.Point();
 	this.anchor = new paper.Point();
 }
@@ -61,7 +60,7 @@ Puzzle.prototype.updateGraphics = function() {
 		this.text.position.set(this.textP.add(this.pan));
 	
 		for (shape of this.shapes) {
-			shape.panTo(this.pan);
+			shape.cameraTo(this.pan);
 		}
 	}
 }
@@ -104,6 +103,8 @@ Puzzle.prototype.feature = function() {
 		
 		//background text
 		var textVector = new paper.CompoundPath(data.text);
+		textVector.scale(2);
+		textVector.position = textVector.position.multiply(2);
 		var tc = self.textcolor;
 		textVector.fillColor = new paper.Color(tc[0],tc[1],tc[2]);
 		
