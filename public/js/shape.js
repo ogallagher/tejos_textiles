@@ -5,18 +5,20 @@ Owen Gallagher
 3 august 2019
 */
 
-function Shape(hole,cap,scale) {
+function Shape(hole,cap,puzzle) {
+	this.puzzle = puzzle;
+	
 	this.hole = new paper.Path(hole);
-	this.hole.scale(scale);
-	this.holeP = this.hole.position.multiply(scale);
+	this.hole.scale(puzzle.scale);
+	this.holeP = this.hole.position.multiply(puzzle.scale);
 	this.holeS = this.hole.bounds.size;
 	
 	this.cap = null;	
 	this.hasCap = false;
 	if (cap != 'null') {
 		this.cap = new paper.CompoundPath(cap);
-		this.cap.scale(scale);
-		this.capP = this.cap.position.multiply(scale);
+		this.cap.scale(puzzle.scale);
+		this.capP = this.cap.position.multiply(puzzle.scale);
 		this.capS = this.cap.bounds.size;
 		this.hasCap = true;
 	}
@@ -24,17 +26,18 @@ function Shape(hole,cap,scale) {
 	this.holeAnchor;
 	this.capAnchor;
 	this.anchor;
-	this.pan = new paper.Point();
-	this.zoom = 1;
 	this.drag = new paper.Point();
 }
 
 Shape.prototype.move = function() {
-	this.hole.bounds.size.set(this.holeS.multiply(this.zoom));
-	this.hole.position.set(this.holeP.add(this.drag).add(this.pan).multiply(this.zoom));
+	var z = this.puzzle.zoom;
+	var p = this.puzzle.pan;
+	
+	this.hole.bounds.size.set(this.holeS.multiply(z));
+	this.hole.position.set(this.holeP.add(this.drag).add(p).multiply(z));
 	if (this.hasCap) {
-		this.cap.bounds.size.set(this.capS.multiply(this.zoom));
-		this.cap.position.set(this.capP.add(this.drag).add(this.pan).multiply(this.zoom));
+		this.cap.bounds.size.set(this.capS.multiply(z));
+		this.cap.position.set(this.capP.add(this.drag).add(p).multiply(z));
 	}
 }
 
@@ -55,11 +58,5 @@ Shape.prototype.throwAnchor = function() {
 
 Shape.prototype.dragTo = function(point) {
 	this.drag = this.anchor.add(point);
-	this.move();
-}
-
-Shape.prototype.cameraTo = function(pan,zoom) {
-	this.pan = pan;
-	this.zoom = zoom;
 	this.move();
 }

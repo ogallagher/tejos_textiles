@@ -18,6 +18,7 @@ var puzzles = [];
 
 //interaction
 var selectedShape = null;
+var doubleClick = new paper.Point();
 
 //html templates
 const PATTERN_ID = '?id?';
@@ -68,7 +69,7 @@ Puzzle.prototype.updateGraphics = function() {
 		this.text.position.set(this.textP.add(this.pan).multiply(this.zoom));
 	
 		for (shape of this.shapes) {
-			shape.cameraTo(this.pan,this.zoom);
+			shape.move();
 		}
 	}
 }
@@ -132,7 +133,7 @@ Puzzle.prototype.feature = function() {
 			var capClips = new paper.Group();
 			var shape;
 			for (var i=0; i<shapesOut.length; i++) {
-				shape = new Shape(shapesOut[i],shapesIn[i],self.scale);
+				shape = new Shape(shapesOut[i],shapesIn[i],self);
 				
 				self.shapes.push(shape);
 				
@@ -170,6 +171,8 @@ Puzzle.prototype.feature = function() {
 		
 		self.dragBegin = mouse;
 		self.anchor = self.pan;
+		
+		doubleClick = mouse;
 	}
 	paper.view.onMouseUp = function(event) {
 		selectedShape = null;
@@ -187,19 +190,22 @@ Puzzle.prototype.feature = function() {
 	}
 	paper.view.onDoubleClick = function(event) {
 		var m = event.point;
-		var z1= self.zoom;
+		
+		if (m.equals(doubleClick)) {
+			var z1 = self.zoom;
 				
-		if (self.zoom == PUZZLE_Z_MIN) {
-			self.zoom = 1;
-		}
-		else {
-			self.zoom = PUZZLE_Z_MIN;
-		}
+			if (self.zoom == PUZZLE_Z_MIN) {
+				self.zoom = 1;
+			}
+			else {
+				self.zoom = PUZZLE_Z_MIN;
+			}
 		
-		var x = m.subtract(m.divide(z1).multiply(self.zoom));
-		self.pan = self.pan.add(x);
+			var x = m.subtract(m.divide(z1).multiply(self.zoom));
+			self.pan = self.pan.add(x);
 		
-		self.updateGraphics();
+			self.updateGraphics();
+		}
 	}
 }
 
