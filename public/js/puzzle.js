@@ -24,6 +24,10 @@ const PATTERN_ID = '?id?';
 const PATTERN_TITLE = '?title?';
 const PUZZLE_ITEM_HTML= '<div class=\"box has-text-centered\" id=' + PATTERN_ID + '><p>' + PATTERN_TITLE + '</p></div>';
 
+//configuration
+const PUZZLE_DPI = 200;
+const PUZZLE_Z_MIN = 0.75;
+
 //Puzzle class
 function Puzzle(dbdata) {
 	this.id = dbdata.id;
@@ -42,9 +46,12 @@ function Puzzle(dbdata) {
 	this.background;
 	this.text;
 	this.textP = new paper.Point();
+	this.textS = new paper.Point();
 	this.shapes = [];
 	
+	this.scale = 2; //TODO include scale in dbdata
 	this.pan = new paper.Point();
+	this.zoom = 1;
 	this.dragBegin = new paper.Point();
 	this.anchor = new paper.Point();
 }
@@ -56,11 +63,12 @@ Puzzle.prototype.updateGraphics = function() {
 		this.background.bounds.size = v.size;
 		this.foreground.bounds.size = v.size;
 		this.foregroundCaps.bounds.size = v.size;
-	
-		this.text.position.set(this.textP.add(this.pan));
+		
+		this.text.bounds.size.set(this.textS.multiply(this.zoom));
+		this.text.position.set(this.textP.add(this.pan).multiply(this.zoom));
 	
 		for (shape of this.shapes) {
-			shape.cameraTo(this.pan);
+			shape.cameraTo(this.pan,this.zoom);
 		}
 	}
 }
@@ -103,13 +111,14 @@ Puzzle.prototype.feature = function() {
 		
 		//background text
 		var textVector = new paper.CompoundPath(data.text);
-		textVector.scale(2);
-		textVector.position = textVector.position.multiply(2);
+		textVector.scale(self.scale);
+		textVector.position = textVector.position.multiply(self.scale);
 		var tc = self.textcolor;
 		textVector.fillColor = new paper.Color(tc[0],tc[1],tc[2]);
 		
-		self.text = textVector.rasterize(200);
+		self.text = textVector.rasterize(PUZZLE_DPI);
 		self.textP = self.text.position;
+		self.textS = self.text.bounds.size;
 		
 		textVector.remove();
 		textVector = null;
@@ -123,7 +132,7 @@ Puzzle.prototype.feature = function() {
 			var capClips = new paper.Group();
 			var shape;
 			for (var i=0; i<shapesOut.length; i++) {
-				shape = new Shape(shapesOut[i],shapesIn[i]);
+				shape = new Shape(shapesOut[i],shapesIn[i],self.scale);
 				
 				self.shapes.push(shape);
 				
@@ -166,7 +175,7 @@ Puzzle.prototype.feature = function() {
 		selectedShape = null;
 	}
 	paper.view.onMouseDrag = function(event) {
-		var mouse = event.point.subtract(self.dragBegin);
+		var mouse = event.point.subtract(self.dragBegin).divide(self.zoom);
 		
 		if (selectedShape == null) {
 			self.pan = self.anchor.add(mouse);
@@ -175,6 +184,16 @@ Puzzle.prototype.feature = function() {
 		else {
 			selectedShape.dragTo(mouse);
 		}
+	}
+	paper.view.onDoubleClick = function(event) {		
+		if (self.zoom == PUZZLE_Z_MIN) {
+			self.zoom = 1;
+		}
+		else {
+			self.zoom = PUZZLE_Z_MIN;
+		}
+		
+		self.updateGraphics();
 	}
 }
 

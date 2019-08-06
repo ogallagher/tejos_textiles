@@ -5,17 +5,19 @@ Owen Gallagher
 3 august 2019
 */
 
-function Shape(hole,cap) {
+function Shape(hole,cap,scale) {
 	this.hole = new paper.Path(hole);
-	this.hole.scale(2);
-	this.holeP = this.hole.position.multiply(2);
+	this.hole.scale(scale);
+	this.holeP = this.hole.position.multiply(scale);
+	this.holeS = this.hole.bounds.size;
 	
 	this.cap = null;	
 	this.hasCap = false;
 	if (cap != 'null') {
 		this.cap = new paper.CompoundPath(cap);
-		this.cap.scale(2);
-		this.capP = this.cap.position.multiply(2);
+		this.cap.scale(scale);
+		this.capP = this.cap.position.multiply(scale);
+		this.capS = this.cap.bounds.size;
 		this.hasCap = true;
 	}
 	
@@ -23,13 +25,16 @@ function Shape(hole,cap) {
 	this.capAnchor;
 	this.anchor;
 	this.pan = new paper.Point();
+	this.zoom = 1;
 	this.drag = new paper.Point();
 }
 
 Shape.prototype.move = function() {
-	this.hole.position = this.holeP.add(this.drag).add(this.pan);
+	this.hole.bounds.size.set(this.holeS.multiply(this.zoom));
+	this.hole.position.set(this.holeP.add(this.drag).add(this.pan).multiply(this.zoom));
 	if (this.hasCap) {
-		this.cap.position = this.capP.add(this.drag).add(this.pan);
+		this.cap.bounds.size.set(this.capS.multiply(this.zoom));
+		this.cap.position.set(this.capP.add(this.drag).add(this.pan).multiply(this.zoom));
 	}
 }
 
@@ -53,7 +58,8 @@ Shape.prototype.dragTo = function(point) {
 	this.move();
 }
 
-Shape.prototype.cameraTo = function(pan) {
+Shape.prototype.cameraTo = function(pan,zoom) {
 	this.pan = pan;
+	this.zoom = zoom;
 	this.move();
 }
