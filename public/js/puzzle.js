@@ -26,7 +26,7 @@ const PUZZLE_ITEM_HTML= '<div class=\"box has-text-centered\" id=' + PATTERN_ID 
 
 //configuration
 const PUZZLE_DPI = 200;
-const PUZZLE_Z_MIN = 0.75;
+const PUZZLE_Z_MIN = 0.5;
 
 //Puzzle class
 function Puzzle(dbdata) {
@@ -185,13 +185,19 @@ Puzzle.prototype.feature = function() {
 			selectedShape.dragTo(mouse);
 		}
 	}
-	paper.view.onDoubleClick = function(event) {		
+	paper.view.onDoubleClick = function(event) {
+		var m = event.point;
+		var z1= self.zoom;
+				
 		if (self.zoom == PUZZLE_Z_MIN) {
 			self.zoom = 1;
 		}
 		else {
 			self.zoom = PUZZLE_Z_MIN;
 		}
+		
+		var x = m.subtract(m.divide(z1).multiply(self.zoom));
+		self.pan = self.pan.add(x);
 		
 		self.updateGraphics();
 	}
