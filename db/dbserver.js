@@ -89,7 +89,7 @@ exports.getQuery = function(endpoint, args) {
 	var params = entry.params; //array of parameters to be replaced in query
 	var query = entry.query; //sql query to be assembled
 	
-	for (int i=0; i<params.length; i++) {
+	for (var i=0; i<params.length; i++) {
 		query = query.replace(params[i],args[i]);
 	}
 	console.log('endpoint(' + endpoint + ') --> query(' + query + ')'); //TODO remove this

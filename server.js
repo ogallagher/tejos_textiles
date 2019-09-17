@@ -35,7 +35,7 @@ app.route('/db')
 		var endpoint = req.query.endpoint; //db api endpoint
 		var args = req.query.args; //inputs for compiled sql string
 		
-		console.log('GET db data fetch: ' + endpoint + ' [' + args.join() + ']');
+		console.log('GET db data fetch: ' + endpoint + ' [' + args + ']');
 		
 		dbserver.getQuery(endpoint, args).then(function(sql) {
 			dbserver.fetch(sql, function(err,data) {
@@ -55,7 +55,7 @@ app.route('/db')
 		var endpoint = req.body.endpoint; //db api endpoint
 		var args = req.body.args; //inputs for compiled sql string
 		
-		console.log('POST db data push: ' + endpoint + ' [' + args.join() + ']');
+		console.log('POST db data push: ' + endpoint + ' [' + args + ']');
 		
 		dbserver.getQuery(endpoint, args).then(function(sql) {
 			dbserver.push(sql, function(err) {

@@ -7,18 +7,11 @@ Handles connection and queries to the database by communicating with server.js
 via HTTP requests.
 */
 
-const DB_CONFIG_PATH = '/json/db_config.json';
-var dbclient_db;
-
 var dbclient_onload = new Promise(function(resolve,reject) {
 	console.log('loading db configuration...');
+	console.log('db configuration loaded!');
 	
-	$.getJSON(DB_CONFIG_PATH, function(data) {
-		console.log('db configuration loaded! ' + JSON.stringify(data));
-		
-		dbclient_db = data;
-		resolve();
-	});
+	resolve();
 });
 
 function dbclient_fetchPuzzles(callback) {	
