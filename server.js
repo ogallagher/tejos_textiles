@@ -58,6 +58,5 @@ app.route('/db')
 			else {
 				res.json({success: 'push success'});
 			}
-		})
+		});
 	});
-
