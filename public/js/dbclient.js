@@ -21,12 +21,15 @@ var dbclient_onload = new Promise(function(resolve,reject) {
 	});
 });
 
-function dbclient_fetchPuzzles(projection,callback) {
-	var sql = 'select ' + projection.join() + ' from puzzles';
+function dbclient_fetchPuzzles(callback) {	
+	console.log('fetching puzzles...');
 	
-	console.log('fetching: ' + sql + '...');
+	var req = {
+		endpoint: 'fetch_puzzles',
+		args: []
+	};
 	
-	$.get('/db', {sql: sql}, function(data) {
+	$.get('/db', req, function(data) {
 		console.log('fetched ' + data.length + ' puzzles from db');
 		
 		callback(data);
@@ -34,11 +37,14 @@ function dbclient_fetchPuzzles(projection,callback) {
 }
 
 function dbclient_fetchPuzzlePaths(id,callback) {
-	var sql = 'select text,shapes_outline,shapes_inline from puzzles where id=' + id;
+	console.log('fetching paths for puzzle[' + id + ']...');
 	
-	console.log('fetching: ' + sql + '...');
+	var req = {
+		endpoint: 'fetch_puzzle_paths',
+		args: [id]
+	};
 	
-	$.get('/db', {sql: sql}, function(data) {
+	$.get('/db', req, function(data) {
 		console.log('fetched ' + data.length + ' puzzles from db');
 		
 		callback(data[0]);

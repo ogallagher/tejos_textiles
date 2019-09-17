@@ -12,10 +12,14 @@ const mysql = require('mysql');
 const enums = require('../enums');
 
 const PATH_DB_CONFIG = 'db/db_config.json'; //accessed from server.js = from root dir
+const PATH_DB_API = 'db/db_api.json';
+
 const DB_TEJOS = 'db_revistatejos';
 const DB_TEXTILES = 'db_textilesjournal';
 
 var db; //database connection object
+var scheme; //database scheme object
+var api; //database api, for hiding actual sql from the client
 
 exports.init = function(site) {	
 	fs.readFile(PATH_DB_CONFIG, function(err,data) {
@@ -25,6 +29,9 @@ exports.init = function(site) {
 		else {
 			//read config file
 			var config = JSON.parse(data);
+			
+			//store scheme
+			scheme = config.db;
 			
 			//select database
 			switch (site) {
@@ -63,6 +70,36 @@ exports.init = function(site) {
 					}
 				});
 			}
+		}
+	});
+	
+	fs.readFile(PATH_DB_API, function(err,data) {
+		if (err) {
+			console.log('error: read from db api file failed: ' + err);
+		}
+		else {
+			//read api file
+			api = JSON.parse(data);
+		}
+	});
+};
+
+exports.getQuery = function(endpoint, args) {
+	var entry = api[endpoint];
+	var params = entry.params; //array of parameters to be replaced in query
+	var query = entry.query; //sql query to be assembled
+	
+	for (int i=0; i<params.length; i++) {
+		query = query.replace(params[i],args[i]);
+	}
+	console.log('endpoint(' + endpoint + ') --> query(' + query + ')'); //TODO remove this
+	
+	return new Promise(function(resolve,reject) {
+		if (query != null && query.length != 0) {
+			resolve(query);
+		}
+		else {
+			reject('no query for endpoint');
 		}
 	});
 };
