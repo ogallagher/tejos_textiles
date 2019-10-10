@@ -10,6 +10,8 @@ window.onload = function() {
 	});
 	
 	index_featuredStars();
+	
+	html_imports_onload();
 }
 
 window.onresize = function() {

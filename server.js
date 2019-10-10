@@ -19,6 +19,24 @@ const SITE = enums.site.TEXTILES; //select database to connect to
 
 app.set('port', (process.env.PORT || 5000));
 
+//enable cross-origin requests for same origin html imports
+const cors = require('cors');
+const origins = [
+	'https://localhost:5000', 					//for local testing
+	'https://textilesjournal.herokuapp.com',	//english site url
+	'https://revistatejos.herokuapp.com'		//spanish site url
+];
+app.use(cors({
+	origin: function(origin,callback) {
+		if (origin != null && origins.indexOf(origin) == -1) {
+			return callback(new Error('CORS for origin ' + origin + ' is not allowed access.'), false);
+		}
+		else {
+			return callback(null,true);
+		}
+	}
+}));
+
 //serve the website from public/
 app.use(express.static('public'));
 

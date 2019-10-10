@@ -23,7 +23,7 @@ var doubleClick = new paper.Point();
 //html templates
 const PATTERN_ID = '?id?';
 const PATTERN_TITLE = '?title?';
-const PUZZLE_ITEM_HTML= '<div class=\"box has-text-centered\" id=' + PATTERN_ID + '><p>' + PATTERN_TITLE + '</p></div>';
+const PUZZLE_ITEM_HTML = '<div class=\"d-flex\"><div class=\"card mx-1 mt-1 w-100 text-center\" id=' + PATTERN_ID + '><div class=\"card-body\"><p class=\"card-text font-title-md text-uppercase\">' + PATTERN_TITLE + '</p></div></div></div>';
 
 //configuration
 const PUZZLE_DPI = 200;
