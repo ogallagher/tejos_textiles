@@ -33,7 +33,6 @@ const PUZZLE_Z_MIN = 0.5;
 function Puzzle(dbdata) {
 	this.id = dbdata.id;
 	this.title = dbdata.title;
-	this.author = dbdata.author;
 	this.date = dbdata.date;
 	
 	this.paper = new paper.PaperScope();
@@ -77,8 +76,6 @@ Puzzle.prototype.updateGraphics = function() {
 Puzzle.prototype.feature = function() {
 	//update metadata fields
 	featuredTitle.html(this.title);
-	
-	featuredAuthor.html(this.Author);
 	
 	var date = this.date.substring(0,this.date.indexOf('T'));
 	featuredDate.html(date);

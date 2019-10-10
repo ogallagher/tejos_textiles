@@ -29,38 +29,38 @@ function index_featuredStars() {
 	var five = $('#featured_rating_5');
 	
 	one.mouseenter(function() {
-		one.removeClass('has-text-grey-lighter').addClass('has-text-warning');
+		one.removeClass('text-gray').addClass('text-warning');
 	}).mouseleave(function() {
-		stars.removeClass('has-text-warning').addClass('has-text-grey-lighter');
+		stars.removeClass('text-warning').addClass('text-gray');
 	});
 	
 	two.mouseenter(function() {
-		one.removeClass('has-text-grey-lighter').addClass('has-text-warning');
-		two.removeClass('has-text-grey-lighter').addClass('has-text-warning');
+		one.removeClass('text-gray').addClass('text-warning');
+		two.removeClass('text-gray').addClass('text-warning');
 	}).mouseleave(function() {
-		stars.removeClass('has-text-warning').addClass('has-text-grey-lighter');
+		stars.removeClass('text-warning').addClass('text-gray');
 	});
 	
 	three.mouseenter(function() {
-		one.removeClass('has-text-grey-lighter').addClass('has-text-warning');
-		two.removeClass('has-text-grey-lighter').addClass('has-text-warning');
-		three.removeClass('has-text-grey-lighter').addClass('has-text-warning');
+		one.removeClass('text-gray').addClass('text-warning');
+		two.removeClass('text-gray').addClass('text-warning');
+		three.removeClass('text-gray').addClass('text-warning');
 	}).mouseleave(function() {
-		stars.removeClass('has-text-warning').addClass('has-text-grey-lighter');
+		stars.removeClass('text-warning').addClass('text-gray');
 	});
 	
 	four.mouseenter(function() {
-		one.removeClass('has-text-grey-lighter').addClass('has-text-warning');
-		two.removeClass('has-text-grey-lighter').addClass('has-text-warning');
-		three.removeClass('has-text-grey-lighter').addClass('has-text-warning');
-		four.removeClass('has-text-grey-lighter').addClass('has-text-warning');
+		one.removeClass('text-gray').addClass('text-warning');
+		two.removeClass('text-gray').addClass('text-warning');
+		three.removeClass('text-gray').addClass('text-warning');
+		four.removeClass('text-gray').addClass('text-warning');
 	}).mouseleave(function() {
-		stars.removeClass('has-text-warning').addClass('has-text-grey-lighter');
+		stars.removeClass('text-warning').addClass('text-gray');
 	});
 	
 	five.mouseenter(function() {
-		stars.removeClass('has-text-grey-lighter').addClass('has-text-warning');
+		stars.removeClass('text-gray').addClass('text-warning');
 	}).mouseleave(function() {
-		stars.removeClass('has-text-warning').addClass('has-text-grey-lighter');
+		stars.removeClass('text-warning').addClass('text-gray');
 	});
 }

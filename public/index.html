@@ -39,10 +39,10 @@
             <div class="row no-gutters">
                 <div class="col-md-9">
                     <div class="card m-2" id="featured_card">
-                        <div class="card-header p-1">
+                        <div class="card-header py-1 px-3">
                             <div class="row">
-                                <div class="col font-title-md text-left">
-                                    EXAMPLE PUZZLE
+                                <div class="col font-title-md text-left text-uppercase" id="featured_title">
+                                	tbd
                                 </div>
                                 <div class="col font-title-md text-right">
                                     #
@@ -55,95 +55,62 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div class="field is-grouped is-grouped-multiline is-grouped-centered">
-                                <!--title-->
-                                <div class="control field has-addons">
-                                    <div class="control">
-                                         <button class="button is-static">
-                                             <span class="icon">
-                                                 <i class="fas fa-cross"></i>
-                                             </span>
-                                             <span>
-                                                 textile
-                                             </span>
-                                         </button>
+                            <div class="row justify-content-start font-navigation">
+                                <!--authors-->
+                                <div class="col-auto input-group m-1">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <span class="icon">
+                                                <i class="fas fa-font"></i>
+                                            </span>
+                                            authors
+                                        </div>
                                     </div>
-                                    <div class="control">
-                                        <a class="button" id="featured_title">
-                                            Example Puzzle
-                                        </a>
-                                    </div>
-                                </div>
-                                <!--author-->
-                                <div class="control field has-addons">
-                                    <div class="control">
-                                         <button class="button is-static">
-                                             <span class="icon">
-                                                 <i class="fas fa-font"></i>
-                                             </span>
-                                             <span>
-                                                 author
-                                             </span>
-                                         </button>
-                                    </div>
-                                    <div class="control">
-                                        <a class="button" id="featured_author">
-                                            Owen Gallagher
-                                        </a>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            Adam Ankles
+                                        </button>
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            Bailey Bunches
+                                        </button>
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            Candice Charleston
+                                        </button>
                                     </div>
                                 </div>
                                 <!--date-->
-                                <div class="control field has-addons">
-                                    <div class="control">
-                                         <button class="button is-static">
-                                             <span class="icon">
-                                                 <i class="fas fa-calendar"></i>
-                                             </span>
-                                             <span>
-                                                 date
-                                             </span>
-                                         </button>
-                                    </div>
-                                    <div class="control">
-                                        <a class="button">
-                                            <span id="featured_date">
-                                                July 2019
-                                            </span>
+                                <div class="col-auto input-group m-1">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
                                             <span class="icon">
-                                                <i class="fas fa-angle-down"></i>
+                                                <i class="fas fa-calendar"></i>
                                             </span>
-                                        </a>
+                                            date
+                                        </div>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="featured_date">
+                                            tbd
+                                        </button>
                                     </div>
                                 </div>
                                 <!--rating-->
-                                <div class="control field has-addons">
-                                    <div class="control">
-                                         <button class="button is-static">
-                                             <span class="icon">
-                                                 <i class="fas fa-star"></i>
-                                             </span>
-                                             <span>
-                                                 rating
-                                             </span>
-                                         </button>
+                                <div class="col-auto input-group m-1">
+                                    <div class="input-group-prepend">
+										<div class="input-group-text">
+											<span class="icon">
+												<i class="fas fa-star"></i>
+											</span>
+											rating
+										</div>
                                     </div>
-                                    <div class="control">
-                                        <button class="button" id="featured_rating">
-                                            <a class="icon has-text-grey-lighter" id="featured_rating_1">
-                                                <i class="fas fa-star" id="featured_rating_1_star"></i>
-                                            </a>
-                                            <a class="icon has-text-grey-lighter" id="featured_rating_2">
-                                                <i class="fas fa-star" id="featured_rating_2_star"></i>
-                                            </a>
-                                            <a class="icon has-text-grey-lighter" id="featured_rating_3">
-                                                <i class="fas fa-star" id="featured_rating_3_star"></i>
-                                            </a>
-                                            <a class="icon has-text-grey-lighter" id="featured_rating_4">
-                                                <i class="fas fa-star" id="featured_rating_4_star"></i>
-                                            </a>
-                                            <a class="icon has-text-grey-lighter" id="featured_rating_5">
-                                                <i class="fas fa-star" id="featured_rating_5_star"></i>
-                                            </a>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="featured_rating" disabled>
+											<span class="oi oi-star text-gray" id="featured_rating_1"></span>
+											<span class="oi oi-star text-gray" id="featured_rating_2"></span>
+											<span class="oi oi-star text-gray" id="featured_rating_3"></span>
+											<span class="oi oi-star text-gray" id="featured_rating_4"></span>
+											<span class="oi oi-star text-gray" id="featured_rating_5"></span>
                                         </button>
                                     </div>
                                 </div>
@@ -158,7 +125,7 @@
         </article>
         
         <footer class="bg-secondary">
-            <div class="container" style="padding:8px;">
+            <div class="container p-1">
                  <span class="text-white">Owen Gallagher</span>
             </div>
         </footer>
