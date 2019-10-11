@@ -28,9 +28,13 @@ content = font-family: 'Darker Grotesque', sans-serif;
 Custom classes 
 
 */
-.font-title-lg {
+.font-title-xlg {
 	font-family: 'Poiret One', cursive;
 	font-size: xx-large;
+}
+.font-title-lg {
+	font-family: 'Poiret One', cursive;
+	font-size: x-large;
 }
 .font-title-md {
 	font-family: 'Poiret One', cursive;
