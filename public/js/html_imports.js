@@ -18,6 +18,10 @@ const imports = [
 	{
 		url: 'components/navbar.html',
 		dest: 'import_navbar'
+	},
+	{
+		url: 'components/footer.html',
+		dest: 'import_footer'
 	}
 ];
 
