@@ -1,5 +1,153 @@
 <!doctype html>
 
 <html>
+	<head>
+		<!--
+			Owen Gallagher
+			16 October 2019
+		-->
+		
+        <meta charset="utf-8"/>
+        <!--scales viewport depending on worldspace device width-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="description" content="An online literary journal, presenting written word in a new medium"/>
+        <meta name="author" content="Owen Gallagher"/>
+        
+        <title>Revista Tejos // Textiles Journal</title>
+        
+        <!-- js external -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-full.min.js"></script>
+        
+        <!-- js internal -->
+        <script src="js/html_imports.js"></script>
+        <script src="js/about.js"></script>
+        
+        <!-- css external -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        
+        <!-- css internal -->
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+	</head>
+	
+	<body>
+		<header>
+			<!--<div id="import_navbar"></div> this works if cross-origin requests are enabled by the server, but not if the file is viewed stand-alone-->
+			<nav class="navbar navbar-expand-md navbar-light bg-light" id="common_navbar">
+			    <!--points to top of current page-->
+			    <a class="navbar-brand text-black font-title-xlg" href="index.html">
+			        TEXTILES
+			    </a>
+				
+			    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar_navigation" aria-controls="navbar_navigation" aria-expanded="false" aria-label="Toggle navigation">
+			        <span class="navbar-toggler-icon text-light"></span>
+			    </button>
+    			
+			    <div class="collapse navbar-collapse" id="navbar_navigation">
+			        <span class="navbar-nav mr-auto" id="navbar_spacer"></span>
+			        <div class="flex-column justify-content-center">
+			            <ul class="form-inline my-auto">
+			                <a class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="contact.html">CONTACT</a>
+			                <a class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="about.html">ABOUT</a>
+			                <a class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="contribute.html">CONTRIBUTE</a>
+			                <a class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="gallery.html">GALLERY</a>
+			                <a class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="account.html">ACCOUNT</a>
+			            </ul>
+			        </div>
+			    </div>
+			</nav>
+		</header>
+		
+		<br>
+		
+		<div class="jumbotron row" id="mission_banner">
+			<div class="display-1 font-title col-lg-4 bg-dark text-light rounded-left" id="mission_statement_title">
+				Our Mission
+			</div>
+			<div class="display-4 font-title col-lg bg-light text-dark rounded-right" id="mission_statement_main">
+				To publish literature in a new, modern, accessible and fun medium for the benefit of writers, readers and gamers alike.
+			</div>
+		</div>
+		
+		<article class="container">
+			<table class="table">
+				<div class="row">
+					<div class="col-8 font-content-md text-justify" id="col_main">
+						<h1>First Section</h1>
+						<div>
+							<div class="float-right ml-3 img-thumbnail font-content-sm text-truncate bg-info text-light text-center" style="width:150px;height:150px;">
+								PHOTO
+							</div>
+							<p>
+								Before the site implementation was first begun near the end of the summer of 2019, the idea came from a certain source of inspiration. The details are fuzzy and all the sentences following are more or less stream of consciousness, but that is all that is required for now since this is just placeholder text. After time and some changes the idea was further solidifed and was eventually crystallized to the point of realization. About here the paragraph should be long enough to flow past the first image associated with it. Now I'll continue to the next example paragraph, with its own photo, floated right.
+							</p>
+						</div>
+						
+						<h1>Second Section</h1>
+						<div>
+							<div class="float-right ml-3 img-thumbnail font-content-sm text-truncate bg-info text-light text-center" style="width:200px;height:300px;">
+								PHOTO
+							</div>
+							<p>
+								Before the site implementation was first begun near the end of the summer of 2019, the idea came from a certain source of inspiration. The details are fuzzy and all the sentences following are more or less stream of consciousness, but that is all that is required for now since this is just placeholder text. After time and some changes the idea was further solidifed and was eventually crystallized to the point of realization. About here the paragraph should be long enough to flow past the first image associated with it. Now I'll continue to the next example paragraph, with its own photo, floated right.
+							</p>
+							<p>
+								I needed a second paragraph to better show how a taller image could behave. Before the site implementation was first begun near the end of the summer of 2019, the idea came from a certain source of inspiration. The details are fuzzy and all the sentences following are more or less stream of consciousness, but that is all that is required for now since this is just placeholder text. After time and some changes the idea was further solidifed and was eventually crystallized to the point of realization. About here the paragraph should be long enough to flow past the first image associated with it. Now I'll continue to the next example paragraph, with its own photo, floated right. ETC.
+							</p>
+						</div>
+					</div>
+					
+					<div class="col" id="col_contacts">
+						<div class="card mb-3">
+							<div class="card-header font-navigation-md">
+								Allen Albedos
+							</div>
+							<div class="card-body">
+								<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
+									PROFILE PHOTO
+								</div>
+								<p class="card-text font-content-sm">
+									Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to see how more lines look.
+								</p>
+							</div>
+						</div>
+						
+						<div class="card mb-3">
+							<div class="card-header font-navigation-md">
+								Beatrice Blecking
+							</div>
+							<div class="card-body">
+								<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
+									PROFILE PHOTO
+								</div>
+								<p class="card-text font-content-sm">
+									Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to see how more lines look.
+								</p>
+							</div>
+						</div>
+						
+						<div class="card mb-3">
+							<div class="card-header font-navigation-md">
+								Charlie Carranza
+							</div>
+							<div class="card-body">
+								<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
+									PROFILE PHOTO
+								</div>
+								<p class="card-text font-content-sm">
+									Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to see how more lines look.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</table>
+		</article>
+		
+		<footer>
+			<div id="import_footer"></div>
+		</footer>
+	</body>
 </html>
-
