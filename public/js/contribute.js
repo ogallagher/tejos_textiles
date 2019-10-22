@@ -5,5 +5,6 @@ Owen Gallagher
 */
 
 window.onload = function() {
-	html_imports_onload();
+	html_imports('navbar','import_navbar');
+	html_imports('footer','import_footer');
 }

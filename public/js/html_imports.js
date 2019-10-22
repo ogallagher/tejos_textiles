@@ -14,30 +14,33 @@ Imports elements defined in other pages
 
 */
 
+const imports_dir = 'components/';
 const imports = [
 	{
-		url: 'components/navbar.html',
-		dest: 'import_navbar'
+		name: 'navbar',
+		url: 'navbar.html'
 	},
 	{
-		url: 'components/footer.html',
-		dest: 'import_footer'
+		name: 'footer',
+		url: 'footer.html'
 	}
 ];
 
-function html_import(importer) {
-	$.get({
-		url: importer.url, 
-		success: function(component) {
-			$('#' + importer.dest).html(component);
-		}, 
-		error: function(err) {
-			console.log(err);
-		},
-		dataType: 'html'
+function html_imports(name,dest) {
+	var component = imports.find(function(c) {
+		return c.name == name;
 	});
-}
-
-function html_imports_onload() {
-	imports.forEach(html_import);
+	
+	if (component) {
+		$.get({
+			url: imports_dir + component.url, 
+			success: function(component) {
+				$('#' + dest).html(component);
+			}, 
+			error: function(err) {
+				console.log(err);
+			},
+			dataType: 'html'
+		});
+	}
 }

@@ -13,7 +13,8 @@ window.onload = function() {
 	index_featured_date();
 	index_featured_stars();
 	
-	html_imports_onload();
+	html_imports('navbar','import_navbar');
+	html_imports('footer','import_footer');
 }
 
 window.onresize = function() {
