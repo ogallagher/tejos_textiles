@@ -77,6 +77,22 @@ Custom classes
   max-height: 100%; 
 }
 
+.bg-olive {
+  background-color: #457E62;
+}
+.bg-olive-dark {
+  background-color: #294939;
+}
+.bg-copper {
+  background-color: #7A780E;
+}
+.bg-sand {
+  background-color: #F0EEB6;
+}
+.bg-lychee {
+  background-color: #E3F4CF;
+}
+
 /*
 
 id-specific styles

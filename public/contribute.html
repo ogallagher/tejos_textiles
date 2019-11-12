@@ -32,9 +32,50 @@
 			<div id="import_navbar"></div>
 		</head>
 		
-		<article class="container-fluid">
-			
-		</article>
+		<div class="container-fluid p-0">
+  		<div class="jumbotron row p-0 mb-2" id="message_banner">
+  			<div class="display-1 py-3 font-title col-lg-6 d-flex flex-column justify-content-center bg-copper text-white" id="message_title">
+  				Contribute
+  			</div>
+  			<div class="display-4 font-title col-lg bg-light text-dark py-1" id="message_main">
+          Textiles Journal needs your help! You write, we share.
+        </div>
+  		</div>
+  		<div class="jumbotron py-1 text-center bg-sand rounded-0 border-top border-bottom border-dark" id="subtitle_banner">
+  			<div class="font-navigation-lg text-dark" id="subtitle">
+          This page needs a subtitle.
+        </div>
+  		</div>
+		</div>
+    
+    <article class="container">
+      <form class="font-navigation mb-3">
+        <div class="form-row">
+          <div class="col-lg">
+            <div class="form-group">
+              <label for="title">Your Work</label>
+              <input type="text" class="form-control mb-1" id="title" placeholder="Title">
+              <textarea rows="10" class="form-control" id="content" placeholder="Once upon two times..."></textarea>
+            </div>
+          </div>
+          
+          <div class="col-lg">
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea rows="2" class="form-control" id="description" placeholder="Description"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="notes_conditions">Notes / Conditions</label>
+              <textarea rows="6" class="form-control" id="notes_conditions" placeholder="How do you want to be credited? Which fragments of your work"></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </article>
 		
 		<footer>
 			<div id="import_footer"></div>
