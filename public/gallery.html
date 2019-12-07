@@ -82,9 +82,37 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-lg p-1 bg-sand">
-					<div class="border p-1">
-						Text on the right
+				<div class="col-lg py-1 px-2 bg-sand">
+					<div class="py-2">
+						<div class="input-group">
+							<input class="form-control border-dark font-content-md" id="search_input" type="text" placeholder="search" />
+							<div class="input-group-append">
+								<button class="btn btn-outline-dark" id="search_button">
+									<span class="oi oi-magnifying-glass"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="pb-2 text-center">
+						<div class="dropdown">
+							<div class="btn-group font-navigation">
+								<button class="btn border-dark text-dark" disabled>
+									Order by
+								</button>
+								<button class="btn border-dark border-left-0 border-right-0" disabled>
+									<strong>attribute</strong>
+								</button>
+								<button class="btn btn-outline-dark dropdown-toggle dropdown-toggle-split" type="button" 
+										id="orderby_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								</button>
+								<div id="orderby_menu" class="dropdown-menu" aria-labelledby="orderby_button">
+									<a class="dropdown-item" href="#">Date</a>
+									<a class="dropdown-item" href="#">Title</a>
+									<a class="dropdown-item" href="#">Rating</a>
+									<a class="dropdown-item" href="#">Difficulty</a>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -15,11 +15,31 @@ let choice_container
 let jchoices
 let choice_scroll
 
+let search_input, search_button
+
 window.onload = function() {
 	html_imports('navbar', '#import_navbar')
 	html_imports('footer', '#import_footer')
 
 	html_imports('textile_thumbnail',load_collections)
+	
+	search_input = $('#search_input')
+	search_input.on('keyup', function (e) {
+        if (e.which === 13) { //13 = newline
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+            search_gallery();
+        }
+    });
+	
+	search_button = $('#search_button')
+	search_button.click(search_gallery)
+	
+	let orderby_options = $('#orderby_menu').children()
+	orderby_options.click(function() {
+		console.log($(this).html())
+	})
 	
 	let jwindow = $(window)
 	jwindow.resize(function() {
@@ -130,4 +150,19 @@ function circular_offset(base, offset, max) {
 
 function puzzle_thumb_click(clicked) {
 	console.log(clicked.html())
+}
+
+function search_gallery() {
+    var search_val = search_input.val().toString().toLowerCase();
+    console.log('searching gallery for ' + search_val);
+	
+    if (search_val != '') {
+        var search_vals = search_val.split(/[\s,]+/);
+		
+        //clear old results
+		
+        //search products
+		
+        //show search results
+    }
 }
