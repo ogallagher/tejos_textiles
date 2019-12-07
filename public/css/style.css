@@ -83,14 +83,65 @@ Custom classes
 .bg-olive-dark {
   background-color: #294939;
 }
-.bg-copper {
-  background-color: #7A780E;
-}
 .bg-sand {
   background-color: #F0EEB6;
 }
 .bg-lychee {
   background-color: #E3F4CF;
+}
+.bg-copper {
+  background-color: #7A780E; /* contribute page */
+}
+.bg-raspberry {
+  background-color: #8A2E60; /* account page */
+}
+.bg-peach {
+  background-color: #AA7639; /* contact page */
+}
+.bg-sea {
+  background-color: #2B4C6F; /* about page */
+}
+
+.bg-primary-nohover {
+  background-color: #007bff;
+}
+
+.bg-secondary-hover:hover {
+  background-color: #6c757d;
+}
+.bg-dark-hover:hover {
+  background-color: #343a40;
+}
+
+.text-light-hover {
+  color: transparent;
+}
+.text-light-hover:hover {
+  color: #f8f9fa;
+}
+
+.layers-container {
+  position: relative;
+}
+
+.overlap-1-left {
+  z-index: 1;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  height: 100%;
+}
+
+.overlap-1-right {
+  z-index: 1;
+  position: absolute;
+  top: 0%;
+  right: 0%;
+  height: 100%;
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 /*

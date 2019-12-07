@@ -1,5 +1,75 @@
 <!doctype html>
 
 <html>
+	<head>
+		<!--
+			Owen Gallagher
+			6 December 2019
+		-->
+		
+        <meta charset="utf-8"/>
+        <!--scales viewport depending on worldspace device width-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="description" content="An online literary journal, presenting written word in a new medium"/>
+        <meta name="author" content="Owen Gallagher"/>
+        
+        <title>Revista Tejos // Textiles Journal</title>
+        
+        <!-- js external -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        
+        <!-- js internal -->
+        <script src="js/html_imports.js"></script>
+        <script src="js/gallery.js"></script>
+        
+        <!-- css external -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        
+        <!-- css internal -->
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+	</head>
+	
+	<body>
+		<header>
+			<div id="import_navbar"></div>
+		</header>
+		
+		<article class="container-fluid">
+			<div class="row">
+				<div class="col-lg-7 p-1">
+					<div class="border p-1">
+						<div id="collection_top_rated" class="px-2 mb-3">
+							<div class="font-navigation-md border mb-2 px-2">
+								Top Rated
+							</div>
+							<div class="layers-container">
+								<div class="scroll-left overlap-1-left d-flex flex-column 
+											justify-content-center px-4 bg-dark-hover text-light-hover clickable">
+									<h3 class="oi oi-caret-left"></h3>
+								</div>
+								<div id="top_rated" class="border py-2 d-flex flex-row justify-content-around" data-scroll="0">
+									<div class="border bg-olive mx-1" style="width: 200px; height: 150px"></div>
+									<div class="border bg-olive mx-1" style="width: 200px; height: 150px"></div>
+									<div class="border bg-olive mx-1" style="width: 200px; height: 150px"></div>
+									<div class="border bg-olive mx-1" style="width: 200px; height: 150px"></div>
+								</div>
+								<div class="scroll-right overlap-1-right d-flex flex-column 
+											justify-content-center px-4 bg-dark-hover text-light-hover clickable">
+									<h3 class="oi oi-caret-right"></h3>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg p-1">
+					<div class="border p-1">
+						Text on the right
+					</div>
+				</div>
+			</div>
+		</article>
+	</body>
 </html>
-
