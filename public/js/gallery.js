@@ -17,6 +17,8 @@ let choice_scroll
 
 let search_input, search_button
 
+let puzzle_list
+
 window.onload = function() {
 	html_imports('navbar', '#import_navbar')
 	html_imports('footer', '#import_footer')
@@ -40,6 +42,8 @@ window.onload = function() {
 	orderby_options.click(function() {
 		console.log($(this).html())
 	})
+	
+	let puzzle_list = $('#puzzle_list')
 	
 	let jwindow = $(window)
 	jwindow.resize(function() {
@@ -160,9 +164,24 @@ function search_gallery() {
         var search_vals = search_val.split(/[\s,]+/);
 		
         //clear old results
+		$('#puzzle_list').empty()
 		
-        //search products
-		
-        //show search results
+		//import textile_row template
+		html_imports('textile_row', function(jstring) {
+	        //send search query
+			dbclient_fetch_search(search_vals, function(results) {			
+		        //show search results
+				let puzzle, jpuzzle
+				results.forEach(function(pstring) {
+					puzzle = new Puzzle(pstring)
+					
+					jpuzzle = $(jstring)
+					jpuzzle.find('.textile-row-card').attr('id',puzzle.title)
+					jpuzzle.find('.textile-row-title').html(puzzle.title)
+					
+					$('#puzzle_list').append(jpuzzle)
+				})
+			})
+		})
     }
 }

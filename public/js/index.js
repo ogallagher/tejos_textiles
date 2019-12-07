@@ -24,7 +24,7 @@ function puzzles_onload(dbdata) {
 	let domlist = $('#puzzles_list')
 	
 	//load textile template
-	html_imports('textile_index', function(jstring) {
+	html_imports('textile_row', function(jstring) {
 		//load puzzle data from db and add puzzles
 		let puzzle,jpuzzle
 		
@@ -32,8 +32,8 @@ function puzzles_onload(dbdata) {
 			puzzle = new Puzzle(p)
 			
 			jpuzzle = $(jstring)
-			jpuzzle.find('.textile-index-card').attr('id',puzzle.id)
-			jpuzzle.find('.textile-index-title').html(puzzle.title)
+			jpuzzle.find('.textile-row-card').attr('id',puzzle.id)
+			jpuzzle.find('.textile-row-title').html(puzzle.title)
 			
 			domlist.append(jpuzzle) //add to list
 		})

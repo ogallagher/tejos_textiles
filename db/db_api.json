@@ -7,13 +7,17 @@
 		"params": ["?puzzle_id?"],
 		"query": "select text,shapes_outline,shapes_inline from puzzles where id=?puzzle_id?"
 	},
-  "fetch_top_rated": {
+  "fetch_collection_top_rated": {
     "params": [],
     "query": ""
   },
-  "fetch_editors_choice": {
+  "fetch_collection_editors_choice": {
     "params": [],
     "query": ""
+  },
+  "search_puzzles": {
+    "params": ["?likes?"],
+    "query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles where ?likes?"
   }
 }
 

@@ -15,7 +15,7 @@ Imports elements defined in other pages
 */
 
 const imports_dir = 'components/'
-const imports = ['navbar','footer','textile_index','textile_thumbnail'];
+const imports = ['navbar','footer','textile_row','textile_thumbnail'];
 
 function html_imports(name,dest) {
 	var component = imports.find(function(c) {

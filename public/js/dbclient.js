@@ -30,18 +30,18 @@ function dbclient_fetch_puzzles(callback) {
 }
 
 function dbclient_fetch_puzzle_paths(id,callback) {
-	console.log('fetching paths for puzzle[' + id + ']...');
+	console.log('fetching paths for puzzle[' + id + ']...')
 	
 	var req = {
 		endpoint: 'fetch_puzzle_paths',
 		args: [id]
-	};
+	}
 	
 	$.get('/db', req, function(data) {
-		console.log('fetched ' + data.length + ' puzzles from db');
+		console.log('fetched paths for ' + data.length + ' puzzle(s) from db')
 		
-		callback(data[0]);
-	});
+		callback(data[0])
+	})
 }
 
 function dbclient_fetch_collection(collection,callback) {
@@ -64,4 +64,29 @@ function dbclient_fetch_collection(collection,callback) {
 		{title: '9',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
 		{title: '10',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}}
 	])
+}
+
+function dbclient_fetch_search(terms,callback) {
+	console.log('searching for ' + terms.join())
+	
+	var req = {
+		endpoint: 'search_puzzles',
+		args: []
+	}
+	
+	let where = ''
+	
+	//compile compound where clause
+	terms.forEach(function(term) {
+		where += 'title like \'%' + term + '%\' or '
+	})
+	
+	//remove last or
+	req.args.push(where.replace(/\s*or\s*$/,''))
+	
+	$.get('/db', req, function(data) {
+		console.log('fetched ' + data.length + ' puzzles from db')
+		
+		callback(data)
+	})
 }
