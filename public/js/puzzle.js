@@ -4,26 +4,12 @@ Owen Gallagher
 25 july 2019
 */
 
-//pointers to html dom elements
-var featuredCanvas;
-var featuredTitle;
-var featuredAuthor;
-var featuredDate;
-var featuredRating;
-var domlist;
-
 //puzzles
 var featuredPuzzle;
-var puzzles = [];
 
 //interaction
 var selectedShape = null;
 var doubleClick = new paper.Point();
-
-//html templates
-const PATTERN_ID = '?id?';
-const PATTERN_TITLE = '?title?';
-const PUZZLE_ITEM_HTML = '<div class=\"d-flex\"><div class=\"card mx-1 mt-1 w-100 text-center\" id=' + PATTERN_ID + '><div class=\"card-body\"><p class=\"card-text font-navigation-md text-uppercase\">' + PATTERN_TITLE + '</p></div></div></div>';
 
 //configuration
 const PUZZLE_DPI = 200;
@@ -73,17 +59,17 @@ Puzzle.prototype.updateGraphics = function() {
 	}
 }
 
-Puzzle.prototype.feature = function() {
+Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontainer) {
 	//update metadata fields
-	featuredTitle.html(this.title);
+	ftitle.html(this.title);
 	
 	var date = this.date.substring(0,this.date.indexOf('T'));
-	featuredDate.html(date);
+	fdate.html(date);
 	
-	//attach to featuredCanvas
-	this.paper.setup(featuredCanvas);
+	//attach to featured canvas
+	this.paper.setup(fcanvas);
 	paper = this.paper; 
-	this.resize();
+	this.resize(fcontainer);
 	var v0 = paper.view;
 	
 	//feature
@@ -97,7 +83,7 @@ Puzzle.prototype.feature = function() {
 	this.foregroundCaps = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
 	this.background = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height);
 	var self = this;
-	dbclient_fetchPuzzlePaths(this.id, function(data) {	
+	dbclient_fetch_puzzle_paths(this.id, function(data) {	
 		//foreground solid
 		var fc = self.forecolor;
 		self.foreground.fillColor = new paper.Color(fc[0],fc[1],fc[2]);
@@ -206,52 +192,11 @@ Puzzle.prototype.feature = function() {
 	}
 }
 
-Puzzle.prototype.resize = function() {	
+Puzzle.prototype.resize = function(container) {	
 	//resize canvas via paper
-	var container = featuredCanvas.parentElement;
 	var w = container.clientWidth;
 	var h = container.clientHeight;
 	this.paper.view.setViewSize(w,h);
 	
 	this.updateGraphics();
-}
-
-Puzzle.prototype.domAppend = function() {
-	var puzzleItem = PUZZLE_ITEM_HTML
-									.replace(PATTERN_TITLE,this.title)
-									.replace(PATTERN_ID,this.id); //load html source
-	
-	puzzleItem = $(puzzleItem); //create dom element
-	
-	domlist.append(puzzleItem); //add to list
-}
-
-//exposed puzzle methods
-function puzzle_onload(dbdata) {
-	//bind puzzles to list
-	domlist = $('#puzzles_list');
-	
-	//load puzzle data from db and add puzzles
-	var p,puzzle;
-	for (p of dbdata) {
-		puzzle = new Puzzle(p);
-		puzzles.push(puzzle);
-		puzzle.domAppend();
-	}
-	
-	//feature the most recent puzzle
-	featuredTitle = $('#featured_title');
-	featuredAuthor = $('#featured_author');
-	featuredDate = $('#featured_date');
-	featuredRating = $('#featured_rating');
-	featuredCanvas = $('#featured_puzzle')[0];
-	
-	var n = puzzles.length;
-	if (n != 0) {
-		puzzles[n-1].feature();
-	}
-}
-
-function puzzle_onresize() {
-	featuredPuzzle.resize();
 }

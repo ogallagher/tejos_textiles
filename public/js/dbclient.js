@@ -14,7 +14,7 @@ var dbclient_onload = new Promise(function(resolve,reject) {
 	resolve();
 });
 
-function dbclient_fetchPuzzles(callback) {	
+function dbclient_fetch_puzzles(callback) {	
 	console.log('fetching puzzles...');
 	
 	var req = {
@@ -29,7 +29,7 @@ function dbclient_fetchPuzzles(callback) {
 	});
 }
 
-function dbclient_fetchPuzzlePaths(id,callback) {
+function dbclient_fetch_puzzle_paths(id,callback) {
 	console.log('fetching paths for puzzle[' + id + ']...');
 	
 	var req = {
@@ -42,4 +42,26 @@ function dbclient_fetchPuzzlePaths(id,callback) {
 		
 		callback(data[0]);
 	});
+}
+
+function dbclient_fetch_collection(collection,callback) {
+	console.log('fetching collection ' + collection + '...')
+	
+	var req = {
+		endpoint: 'fetch_collection_' + collection,
+		args: []
+	}
+	
+	callback([
+		{title: '1',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '2',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '3',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '4',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '5',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '6',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '7',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '8',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '9',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: '10',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}}
+	])
 }

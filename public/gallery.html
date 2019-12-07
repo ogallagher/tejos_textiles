@@ -19,9 +19,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-full.min.js"></script>
         
         <!-- js internal -->
         <script src="js/html_imports.js"></script>
+		<script src="js/dbclient.js"></script>
+		<script src="js/puzzle.js"></script>
         <script src="js/gallery.js"></script>
         
         <!-- css external -->
@@ -39,29 +42,47 @@
 		
 		<article class="container-fluid">
 			<div class="row">
-				<div class="col-lg-7 p-1">
-					<div class="border p-1">
-						<div id="collection_top_rated" class="px-2 mb-3">
-							<div class="font-navigation-md border mb-2 px-2">
+				<div class="col-lg-7 pb-1 px-1">
+					<div class="px-1 pb-1">
+						<div id="collection_top_rated" class="px-2 my-1">
+							<div class="font-navigation-lg pt-2 px-2">
 								Top Rated
 							</div>
 							<div class="layers-container">
 								<div class="scroll-left overlap-1-left d-flex flex-column 
-											justify-content-center px-4 bg-dark-hover text-light-hover clickable unselectable">
+											justify-content-center px-4 text-light-hover clickable unselectable">
 									<h3 class="oi oi-caret-left"></h3>
 								</div>
-								<div id="top_rated" class="border py-2 d-flex flex-row justify-content-around" data-scroll="0">
+								<div id="top_rated" class="p-2 d-flex flex-row justify-content-around" data-scroll="0">
 									<!--gallery.js-->
 								</div>
 								<div class="scroll-right overlap-1-right d-flex flex-column 
-											justify-content-center px-4 bg-dark-hover text-light-hover clickable unselectable">
+											justify-content-center px-4 text-light-hover clickable unselectable">
+									<h3 class="oi oi-caret-right"></h3>
+								</div>
+							</div>
+						</div>
+						<div id="collection_editors_choice" class="px-2 mt-3 mb-1">
+							<div class="font-navigation-lg pt-2 px-2">
+								Editor's Picks
+							</div>
+							<div class="layers-container">
+								<div class="scroll-left overlap-1-left d-flex flex-column 
+											justify-content-center px-4 text-light-hover clickable unselectable">
+									<h3 class="oi oi-caret-left"></h3>
+								</div>
+								<div id="editors_choice" class="p-2 d-flex flex-row justify-content-around" data-scroll="0">
+									<!--gallery.js-->
+								</div>
+								<div class="scroll-right overlap-1-right d-flex flex-column 
+											justify-content-center px-4 text-light-hover clickable unselectable">
 									<h3 class="oi oi-caret-right"></h3>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col-lg p-1">
+				<div class="col-lg p-1 bg-sand">
 					<div class="border p-1">
 						Text on the right
 					</div>

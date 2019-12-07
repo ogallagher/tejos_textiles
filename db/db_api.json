@@ -6,6 +6,14 @@
 	"fetch_puzzle_paths": {
 		"params": ["?puzzle_id?"],
 		"query": "select text,shapes_outline,shapes_inline from puzzles where id=?puzzle_id?"
-	}
+	},
+  "fetch_top_rated": {
+    "params": [],
+    "query": ""
+  },
+  "fetch_editors_choice": {
+    "params": [],
+    "query": ""
+  }
 }
 

@@ -84,7 +84,7 @@ exports.init = function(site) {
 	});
 };
 
-exports.getQuery = function(endpoint, args) {
+exports.get_query = function(endpoint, args) {
 	var entry = api[endpoint];
 	var params = entry.params; //array of parameters to be replaced in query
 	var query = entry.query; //sql query to be assembled
@@ -104,15 +104,9 @@ exports.getQuery = function(endpoint, args) {
 	});
 };
 
-exports.fetch = function(sql,callback) {
+exports.send_query = function(sql,callback) {
 	db.query(sql, function(err,res) {
 		callback(err,res); //return error if defined, and response results
 	});
 };
-
-exports.push = function(sql,callback) {
-	db.query(sql, function(err,res) {
-		callback(err); //ignore response, return error if defined
-	});
-}
 

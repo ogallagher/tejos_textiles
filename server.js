@@ -47,45 +47,35 @@ app.listen(app.get('port'), function() {
 	dbserver.init(SITE);
 });
 
+function handle_db(endpoint,args,res) {
+	console.log('db: ' + endpoint + ' [' + args + ']');
+	
+	dbserver.get_query(endpoint, args).then(function(sql) {
+		dbserver.send_query(sql, function(err,data) {
+			if (err) {
+				console.log('error in db data fetch: ' + err);
+				res.json({error: 'fetch error'});
+			}
+			else {
+				res.json(data);
+			}
+		});
+	}).catch(function(problem) {
+		console.log('error in conversion from endpoint to sql: ' + problem);
+	});
+}
+
 //expose database
 app.route('/db')
 	.get(function (req,res) {
 		var endpoint = req.query.endpoint; //db api endpoint
 		var args = req.query.args; //inputs for compiled sql string
 		
-		console.log('GET db data fetch: ' + endpoint + ' [' + args + ']');
-		
-		dbserver.getQuery(endpoint, args).then(function(sql) {
-			dbserver.fetch(sql, function(err,data) {
-				if (err) {
-					console.log('error in db data fetch: ' + err);
-					res.json({error: 'fetch error'});
-				}
-				else {
-					res.json(data);
-				}
-			});
-		}).catch(function(problem) {
-			console.log('error in conversion from endpoint to sql: ' + problem);
-		});
+		handle_db(endpoint,args,res)
 	})
 	.post(function (req,res) {
 		var endpoint = req.body.endpoint; //db api endpoint
 		var args = req.body.args; //inputs for compiled sql string
 		
-		console.log('POST db data push: ' + endpoint + ' [' + args + ']');
-		
-		dbserver.getQuery(endpoint, args).then(function(sql) {
-			dbserver.push(sql, function(err) {
-				if (err) {
-					console.log('error in db push: ' + err);
-					res.json({error: 'push error'});
-				}
-				else {
-					res.json({success: 'push success'});
-				}
-			});
-		}).catch(function(problem) {
-			console.log('error in conversion from endpoint to sql: ' + problem);
-		});
+		handle_db(endpoint,args,res)
 	});

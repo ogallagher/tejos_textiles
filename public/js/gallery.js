@@ -8,14 +8,18 @@ const thumbnail_width = 200
 let scroll_view_size = 4
 
 let top_rated_container
-let jtops = []
+let jtops
 let top_rated_scroll
 
-window.onload = function() {
-	html_imports('navbar', 'import_navbar')
-	html_imports('footer', 'import_footer')
+let choice_container
+let jchoices
+let choice_scroll
 
-	load_collections()
+window.onload = function() {
+	html_imports('navbar', '#import_navbar')
+	html_imports('footer', '#import_footer')
+
+	html_imports('textile_thumbnail',load_collections)
 	
 	let jwindow = $(window)
 	jwindow.resize(function() {
@@ -29,35 +33,73 @@ window.onload = function() {
 			scroll_view_size = new_size
 			
 			update_collection(top_rated_container,jtops,top_rated_scroll)
+			update_collection(choice_container,jchoices,choice_scroll)
 		}
 	})
 }
 
-function load_collections() {
-	let coll_top_rated = $('#collection_top_rated')
-	top_rated_container = $('#top_rated')
-	top_rated_scroll = 0
+function load_collections(thumbnail) {
+	dbclient_onload.then(function() {
+		dbclient_fetch_collection('top_rated', function(tops) {
+			let coll_top_rated = $('#collection_top_rated')
+			top_rated_container = $('#top_rated')
+			top_rated_scroll = 0
+			
+			let tops_n = tops.length
+			jtops = []
+			
+			tops.forEach(function(top) {
+				let ptop = new Puzzle(top)
+				let jtop = $(thumbnail)
+				
+				jtop.find('.textile-thumbnail-title').html(ptop.title)
+				
+				jtops.push(jtop)
+			})
+			
+			coll_top_rated.find('.scroll-left').click(function() {
+				top_rated_scroll = circular_offset(top_rated_scroll, -scroll_view_size, tops_n)
+				update_collection(top_rated_container, jtops, top_rated_scroll)
+			})
 
-	//TODO replace with db data
-	let tops = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
-	let tops_n = tops.length
-	jtops = []
-	tops.forEach(function(top) {
-		//TODO replace with interactive puzzle thumbnails
-		jtops.push($('<div class="bg-secondary-hover bg-primary-nohover text-light mx-1 clickable" style="width: 200px; height: 150px" onclick="puzzle_thumb_click($(this))">' + top + '</div>'))
-	})
-
-	coll_top_rated.find('.scroll-left').click(function() {
-		top_rated_scroll = circular_offset(top_rated_scroll, -scroll_view_size, tops_n)
-		update_collection(top_rated_container, jtops, top_rated_scroll)
-	})
-
-	coll_top_rated.find('.scroll-right').click(function() {
-		top_rated_scroll = circular_offset(top_rated_scroll, scroll_view_size, tops_n)
-		update_collection(top_rated_container, jtops, top_rated_scroll)
-	})
+			coll_top_rated.find('.scroll-right').click(function() {
+				top_rated_scroll = circular_offset(top_rated_scroll, scroll_view_size, tops_n)
+				update_collection(top_rated_container, jtops, top_rated_scroll)
+			})
 	
-	update_collection(top_rated_container, jtops, top_rated_scroll)
+			update_collection(top_rated_container, jtops, top_rated_scroll)
+		})
+		
+		dbclient_fetch_collection('editors_choice', function(choices) {
+			let coll_choice = $('#collection_editors_choice')
+			choice_container = $('#editors_choice')
+			choice_scroll = 0
+			
+			let choices_n = choices.length
+			jchoices = []
+			
+			choices.forEach(function(choice) {
+				let pchoice = new Puzzle(choice)
+				let jchoice = $(thumbnail)
+				
+				jchoice.find('.textile-thumbnail-title').html(pchoice.title)
+				
+				jchoices.push(jchoice)
+			})
+			
+			coll_choice.find('.scroll-left').click(function() {
+				choice_scroll = circular_offset(choice_scroll, -scroll_view_size, choices_n)
+				update_collection(choice_container, jchoices, choice_scroll)
+			})
+			
+			coll_choice.find('.scroll-right').click(function() {
+				choice_scroll = circular_offset(choice_scroll, scroll_view_size, choices_n)
+				update_collection(choice_container, jchoices, choice_scroll)
+			})
+			
+			update_collection(choice_container, jchoices, choice_scroll)
+		})
+	})
 }
 
 function update_collection(container, collection, base) {
@@ -72,15 +114,17 @@ function update_collection(container, collection, base) {
 }
 
 function circular_offset(base, offset, max) {
-	base += offset
-
-	if (base >= max) {
-		base = base - max
+	if (max > scroll_view_size) {
+		base += offset
+	
+		if (base >= max) {
+			base = base - max
+		}
+		if (base < 0) {
+			base = base + max
+		}
 	}
-	if (base < 0) {
-		base = base + max
-	}
-
+	
 	return base
 }
 

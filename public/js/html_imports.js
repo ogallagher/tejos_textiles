@@ -14,31 +14,27 @@ Imports elements defined in other pages
 
 */
 
-const imports_dir = 'components/';
-const imports = [
-	{
-		name: 'navbar',
-		url: 'navbar.html'
-	},
-	{
-		name: 'footer',
-		url: 'footer.html'
-	}
-];
+const imports_dir = 'components/'
+const imports = ['navbar','footer','textile_index','textile_thumbnail'];
 
 function html_imports(name,dest) {
 	var component = imports.find(function(c) {
-		return c.name == name;
+		return c == name
 	});
 	
 	if (component) {
 		$.get({
-			url: imports_dir + component.url, 
+			url: imports_dir + component + '.html', 
 			success: function(component) {
-				$('#' + dest).html(component);
+				if (typeof dest == 'string') {
+					$(dest).append(component)
+				}
+				else {
+					dest(component)
+				}
 			}, 
 			error: function(err) {
-				console.log(err);
+				console.log(err)
 			},
 			dataType: 'html'
 		});
