@@ -11,7 +11,7 @@ How to create, prep, and upload a new tejo/textile puzzle
 
 2. Draw (a) the shapes for the foreground.
 
-3. Draw the text background using the fragments and shapes as guidelines. Stay within shape boundaries with a animation light box.
+3. Draw the text background using the fragments and shapes as guidelines. Stay within shape boundaries with an animation light box.
 
 4. Scan the text drawing to a raster image.
 

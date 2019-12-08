@@ -5,7 +5,7 @@ Owen Gallagher
 */
 
 const thumbnail_width = 200
-let scroll_view_size = 4
+let scroll_view_size = 5
 
 let top_rated_container
 let jtops
@@ -38,19 +38,26 @@ window.onload = function() {
 	search_button = $('#search_button')
 	search_button.click(search_gallery)
 	
+	let orderby = $('#orderby')
 	let orderby_options = $('#orderby_menu').children()
 	orderby_options.click(function() {
-		console.log($(this).html())
+		orderby.html($(this).html().toLowerCase())
 	})
 	
-	let puzzle_list = $('#puzzle_list')
+	puzzle_list = $('#puzzle_list')
+	
+	//get all puzzles
+	dbclient_fetch_puzzles(load_search_results)
 	
 	let jwindow = $(window)
 	jwindow.resize(function() {
-		let new_size = 4
+		let new_size = 5
 		
 		if (jwindow.width() < 555) {
 			new_size = 3
+		}
+		else if (jwindow.width() < 700) {
+			new_size = 4
 		}
 		
 		if (new_size != scroll_view_size) {
@@ -160,28 +167,36 @@ function search_gallery() {
     var search_val = search_input.val().toString().toLowerCase();
     console.log('searching gallery for ' + search_val);
 	
+    //clear old results
+	$('#puzzle_list').empty()
+	
     if (search_val != '') {
         var search_vals = search_val.split(/[\s,]+/);
 		
-        //clear old results
-		$('#puzzle_list').empty()
-		
-		//import textile_row template
-		html_imports('textile_row', function(jstring) {
-	        //send search query
-			dbclient_fetch_search(search_vals, function(results) {			
-		        //show search results
-				let puzzle, jpuzzle
-				results.forEach(function(pstring) {
-					puzzle = new Puzzle(pstring)
-					
-					jpuzzle = $(jstring)
-					jpuzzle.find('.textile-row-card').attr('id',puzzle.title)
-					jpuzzle.find('.textile-row-title').html(puzzle.title)
-					
-					$('#puzzle_list').append(jpuzzle)
-				})
-			})
-		})
+        //send search query
+		dbclient_fetch_search(search_vals, load_search_results)
     }
+	else {
+		//get all puzzles
+		dbclient_fetch_puzzles(load_search_results)
+	}
+}
+
+function load_search_results(results) {
+	//import textile_row template
+	html_imports('textile_row', function(jstring) {
+	    //show search results
+		let puzzle, jpuzzle
+		results.forEach(function(pstring) {
+			puzzle = new Puzzle(pstring)
+	
+			for (let i=0; i<10; i++) {
+				jpuzzle = $(jstring)
+				jpuzzle.find('.textile-row-card').attr('id',puzzle.title + i)
+				jpuzzle.find('.textile-row-title').html(puzzle.title + ' - ' + i)
+				puzzle_list.append(jpuzzle.clone())
+			}
+			
+		})
+	})
 }

@@ -101,7 +101,11 @@ Custom classes
 .bg-sea {
 	background-color: #2B4C6F; /* about page */
 }
+
 .bg-slight {
+	background-color: #DDDDDD;
+}
+.bg-slight-hover:hover {
 	background-color: #DDDDDD;
 }
 
