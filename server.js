@@ -50,23 +50,32 @@ app.listen(app.get('port'), function() {
 function handle_db(endpoint,args,res) {
 	console.log('db: ' + endpoint + ' [' + args + ']');
 	
-	dbserver.get_query(endpoint, args).then(function(sql) {
-		dbserver.send_query(sql, function(err,data) {
-			if (err) {
-				console.log('error in db data fetch: ' + err);
-				res.json({error: 'fetch error'});
-			}
-			else {
-				res.json(data);
-			}
+	dbserver
+		.get_query(endpoint, args)
+		.then(function(action) {
+		    if (action.cached) {
+		    	res.json(action.cached)
+		    }
+		    else if (action.sql) {
+		  		dbserver.send_query(sql, function(err,data) {
+		  			if (err) {
+		  				console.log('error in db data fetch: ' + err);
+		  				res.json({error: 'fetch error'});
+		  			}
+		  			else {
+		  				res.json(data);
+		  			}
+		  		});
+		    }
+		})
+		.catch(function(problem) {
+			console.log('error in conversion from endpoint to sql: ' + problem);
 		});
-	}).catch(function(problem) {
-		console.log('error in conversion from endpoint to sql: ' + problem);
-	});
 }
 
 //expose database
-app.route('/db')
+app
+	.route('/db')
 	.get(function (req,res) {
 		var endpoint = req.query.endpoint; //db api endpoint
 		var args = req.query.args; //inputs for compiled sql string
