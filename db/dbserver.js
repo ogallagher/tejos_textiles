@@ -110,6 +110,7 @@ exports.get_query = function(endpoint, args) {
 		let cached = try_cache(endpoint, args)
 		
 		if (cached) {
+			console.log('got cache entry for ' + endpoint)
 			resolve({cached: cached})
 		}
 		else {
@@ -120,10 +121,10 @@ exports.get_query = function(endpoint, args) {
 			for (var i=0; i<params.length; i++) {
 				query = query.replace(params[i],args[i])
 			}
-			console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
+			//console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
 		
 			if (query != null && query.length != 0) {
-				resolve({query: query})
+				resolve({sql: query})
 			}
 			else {
 				reject('no query for endpoint')
@@ -134,6 +135,9 @@ exports.get_query = function(endpoint, args) {
 
 exports.send_query = function(sql,callback) {
 	db.query(sql, function(err,res) {
+		//try to cache result
+		cacheserver.set_saved(res)
+		
 		//return error if defined, and response results
 		callback(err,res)
 	})
@@ -153,7 +157,7 @@ function try_cache(endpoint, args) {
 			break
 			
 		default:
-			return 0 //endpoint not supported; skip cache
+			return undefined //endpoint not supported; skip cache
 			break
 	}
 	
@@ -166,8 +170,8 @@ function try_cache(endpoint, args) {
 			})
 			.catch(function(err) {
 				//no value found; remember key to add to cache
-				cacheserver.remember_key(key)
-				return 1
+				cacheserver.save_key(key)
+				return undefined
 			})
 	}
 }

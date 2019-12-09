@@ -57,7 +57,7 @@ function handle_db(endpoint,args,res) {
 		    	res.json(action.cached)
 		    }
 		    else if (action.sql) {
-		  		dbserver.send_query(sql, function(err,data) {
+		  		dbserver.send_query(action.sql, function(err,data) {
 		  			if (err) {
 		  				console.log('error in db data fetch: ' + err);
 		  				res.json({error: 'fetch error'});

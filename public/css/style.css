@@ -95,6 +95,9 @@ Custom classes
 .bg-raspberry {
 	background-color: #8A2E60; /* account page */
 }
+.bg-raspberry-light {
+	background-color: #CE89AF;
+}
 .bg-peach {
 	background-color: #AA7639; /* contact page */
 }
@@ -119,8 +122,13 @@ Custom classes
 .bg-secondary-hover:hover {
 	background-color: #6c757d;
 }
+
 .bg-dark-hover:hover {
 	background-color: #343a40;
+}
+
+.bg-light-hover:hover {
+	background-color: #f8f9fa;
 }
 
 .text-light-hover {
@@ -128,6 +136,27 @@ Custom classes
 }
 .text-light-hover:hover {
 	color: #f8f9fa;
+}
+
+.text-dark-nohover {
+	color: #343a40;
+}
+.text-dark-hover:hover {
+	color: #343a40;
+}
+
+.text-secondary-nohover {
+	color: #6c757d;
+}
+.text-secondary-hover:hover {
+	color: #6c757d;
+}
+
+.text-raspberry {
+	color: #8A2E60;
+}
+.text-raspberry-light {
+	color: #CE89AF;
 }
 
 .layers-container {
