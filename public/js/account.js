@@ -9,10 +9,11 @@ window.onload = function() {
 	console.log('TODO check cookies for account/session info')
 	
 	//get account info
-	dbclient_onload.then(function() {
-		console.log('TODO get account info')
-	})
+	console.log('TODO get account info')
 	
-	html_imports('navbar','#import_navbar')
+	//load navbar and footer components
+	html_imports('navbar', '#import_navbar', function() {
+		show_nav_page('account')
+	})
 	html_imports('footer','#import_footer')
 }

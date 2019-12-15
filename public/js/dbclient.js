@@ -7,13 +7,6 @@ Handles connection and queries to the database by communicating with server.js
 via HTTP requests.
 */
 
-var dbclient_onload = new Promise(function(resolve,reject) {
-	console.log('loading db configuration...');
-	console.log('db configuration loaded!');
-	
-	resolve();
-});
-
 function dbclient_fetch_puzzles(callback) {	
 	console.log('fetching puzzles...');
 	
@@ -44,6 +37,7 @@ function dbclient_fetch_puzzle_paths(id,callback) {
 	})
 }
 
+//TODO this is just a placeholder until collections are actually implemented
 function dbclient_fetch_collection(collection,callback) {
 	console.log('fetching collection ' + collection + '...')
 	
@@ -53,16 +47,16 @@ function dbclient_fetch_collection(collection,callback) {
 	}
 	
 	callback([
-		{title: '1',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '2',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '3',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '4',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '5',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '6',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '7',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '8',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '9',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: '10',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}}
+		{title: 'one',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'two',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'three',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'four',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'five',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'six',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'seven',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'eight',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'nine',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
+		{title: 'ten',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}}
 	])
 }
 
@@ -87,6 +81,8 @@ function dbclient_fetch_search(terms,callback) {
 	$.get('/db', req, function(data) {
 		console.log('fetched ' + data.length + ' puzzles from db')
 		
-		callback(data)
+		thread(function() {
+			callback(data)
+		})
 	})
 }

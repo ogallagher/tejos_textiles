@@ -20,12 +20,19 @@ let search_input, search_button
 let puzzle_list
 
 window.onload = function() {
-	html_imports('navbar', '#import_navbar')
+	//load navbar
+	html_imports('navbar', '#import_navbar', function() {
+		show_nav_page('gallery')
+	})
+	
+	//load footer
 	html_imports('footer', '#import_footer')
 
+	//load the textile thumbnail component html string, and pass it through load_collections
 	html_imports('textile_thumbnail',load_collections)
 	
 	search_input = $('#search_input')
+	//activate a search when the ENTER key is typed
 	search_input.on('keyup', function (e) {
         if (e.which === 13) { //13 = newline
             if (document.activeElement instanceof HTMLElement) {
@@ -36,10 +43,12 @@ window.onload = function() {
     });
 	
 	search_button = $('#search_button')
+	//enable the search button
 	search_button.click(search_gallery)
 	
 	let orderby = $('#orderby')
 	let orderby_options = $('#orderby_menu').children()
+	//update the orderby label to match the selected option
 	orderby_options.click(function() {
 		orderby.html($(this).html().toLowerCase())
 	})
@@ -49,6 +58,7 @@ window.onload = function() {
 	//get all puzzles
 	dbclient_fetch_puzzles(load_search_results)
 	
+	//manually handle collection flexbox behavior at different screen breakpoints
 	let jwindow = $(window)
 	jwindow.resize(function() {
 		let new_size = 5
@@ -70,69 +80,68 @@ window.onload = function() {
 }
 
 function load_collections(thumbnail) {
-	dbclient_onload.then(function() {
-		dbclient_fetch_collection('top_rated', function(tops) {
-			let coll_top_rated = $('#collection_top_rated')
-			top_rated_container = $('#top_rated')
-			top_rated_scroll = 0
+	dbclient_fetch_collection('top_rated', function(tops) {
+		let coll_top_rated = $('#collection_top_rated')
+		top_rated_container = $('#top_rated')
+		top_rated_scroll = 0
+		
+		let tops_n = tops.length
+		jtops = []
+		
+		tops.forEach(function(top) {
+			let ptop = new Puzzle(top)
+			let jtop = $(thumbnail)
 			
-			let tops_n = tops.length
-			jtops = []
+			jtop.find('.textile-thumbnail-title').html(ptop.title)
 			
-			tops.forEach(function(top) {
-				let ptop = new Puzzle(top)
-				let jtop = $(thumbnail)
-				
-				jtop.find('.textile-thumbnail-title').html(ptop.title)
-				
-				jtops.push(jtop)
-			})
-			
-			coll_top_rated.find('.scroll-left').click(function() {
-				top_rated_scroll = circular_offset(top_rated_scroll, -scroll_view_size, tops_n)
-				update_collection(top_rated_container, jtops, top_rated_scroll)
-			})
-
-			coll_top_rated.find('.scroll-right').click(function() {
-				top_rated_scroll = circular_offset(top_rated_scroll, scroll_view_size, tops_n)
-				update_collection(top_rated_container, jtops, top_rated_scroll)
-			})
-	
-			update_collection(top_rated_container, jtops, top_rated_scroll)
+			jtops.push(jtop)
 		})
 		
-		dbclient_fetch_collection('editors_choice', function(choices) {
-			let coll_choice = $('#collection_editors_choice')
-			choice_container = $('#editors_choice')
-			choice_scroll = 0
+		coll_top_rated.find('.scroll-left').click(function() {
+			top_rated_scroll = circular_offset(top_rated_scroll, -scroll_view_size, tops_n)
+			update_collection(top_rated_container, jtops, top_rated_scroll)
+		})
+
+		coll_top_rated.find('.scroll-right').click(function() {
+			top_rated_scroll = circular_offset(top_rated_scroll, scroll_view_size, tops_n)
+			update_collection(top_rated_container, jtops, top_rated_scroll)
+		})
+
+		update_collection(top_rated_container, jtops, top_rated_scroll)
+	})
+	
+	dbclient_fetch_collection('editors_choice', function(choices) {
+		let coll_choice = $('#collection_editors_choice')
+		choice_container = $('#editors_choice')
+		choice_scroll = 0
+		
+		let choices_n = choices.length
+		jchoices = []
+		
+		choices.forEach(function(choice) {
+			let pchoice = new Puzzle(choice)
+			let jchoice = $(thumbnail)
 			
-			let choices_n = choices.length
-			jchoices = []
+			jchoice.find('.textile-thumbnail-title').html(pchoice.title)
 			
-			choices.forEach(function(choice) {
-				let pchoice = new Puzzle(choice)
-				let jchoice = $(thumbnail)
-				
-				jchoice.find('.textile-thumbnail-title').html(pchoice.title)
-				
-				jchoices.push(jchoice)
-			})
-			
-			coll_choice.find('.scroll-left').click(function() {
-				choice_scroll = circular_offset(choice_scroll, -scroll_view_size, choices_n)
-				update_collection(choice_container, jchoices, choice_scroll)
-			})
-			
-			coll_choice.find('.scroll-right').click(function() {
-				choice_scroll = circular_offset(choice_scroll, scroll_view_size, choices_n)
-				update_collection(choice_container, jchoices, choice_scroll)
-			})
-			
+			jchoices.push(jchoice)
+		})
+		
+		coll_choice.find('.scroll-left').click(function() {
+			choice_scroll = circular_offset(choice_scroll, -scroll_view_size, choices_n)
 			update_collection(choice_container, jchoices, choice_scroll)
 		})
+		
+		coll_choice.find('.scroll-right').click(function() {
+			choice_scroll = circular_offset(choice_scroll, scroll_view_size, choices_n)
+			update_collection(choice_container, jchoices, choice_scroll)
+		})
+		
+		update_collection(choice_container, jchoices, choice_scroll)
 	})
 }
 
+//scroll the collection horizontally
 function update_collection(container, collection, base) {
 	container.empty()
 	let collection_n = collection.length
@@ -144,6 +153,7 @@ function update_collection(container, collection, base) {
 	}
 }
 
+//my implementation of circular indexes in the collection lists
 function circular_offset(base, offset, max) {
 	if (max > scroll_view_size) {
 		base += offset
@@ -159,6 +169,7 @@ function circular_offset(base, offset, max) {
 	return base
 }
 
+//TODO select the puzzle on click
 function puzzle_thumb_click(clicked) {
 	console.log(clicked.html())
 }

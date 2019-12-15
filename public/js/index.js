@@ -7,18 +7,20 @@ Owen Gallagher
 let featured_puzzle
 
 window.onload = function() {
-	dbclient_onload.then(function() {
-		dbclient_fetch_puzzles(puzzles_onload)
-	})
+	//fetch puzzles from db and insert into page
+	dbclient_fetch_puzzles(puzzles_onload)
 	
+	//enable featured card widgets
 	index_featured_authors()
 	index_featured_date()
 	index_featured_stars()
 	
+	//import navbar and footer
 	html_imports('navbar','#import_navbar')
 	html_imports('footer','#import_footer')
 }
 
+//when a puzzle is loaded from dbclient, add it to the document and make it interactive
 function puzzles_onload(dbdata) {
 	//bind puzzles to list
 	let domlist = $('#puzzles_list')
@@ -29,7 +31,7 @@ function puzzles_onload(dbdata) {
 		let puzzle,jpuzzle
 		
 		dbdata.forEach(function (p) {
-			puzzle = new Puzzle(p)
+			puzzle = new Puzzle(p) //see puzzle.js
 			
 			jpuzzle = $(jstring)
 			jpuzzle.find('.textile-row-card').attr('id',puzzle.id)
@@ -45,13 +47,19 @@ function puzzles_onload(dbdata) {
 		let fauthor = $('#featured_author')
 		let frating = $('#featured_rating')
 		let fcontainer = $('#featured_container')[0]
-	
+		
 		if (puzzle) {
 			featured_puzzle = puzzle
-			featured_puzzle.feature(ftitle,fdate,fcanvas,fauthor,frating,fcontainer)			
-		
+			featured_puzzle.feature(ftitle,fdate,fcanvas,fauthor,frating,fcontainer)
+			.then(function() {
+				$('#featured_placeholder').remove()
+				console.log('feature success')
+			})
+			.catch(function() {
+				console.log('feature failed')
+			})			
+			
 			window.onresize = function() {
-				console.log(fcontainer)
 				featured_puzzle.resize(fcontainer)
 			}
 		}
@@ -70,6 +78,7 @@ function index_featured_stars() {
 	var five = $('#featured_rating_5')
 	var r = 0
 	
+	//select stars from one until the one under the cursor
 	rating.mousemove(function(event) {
 		var offset = one.offset()
 		var x = event.pageX - offset.left
@@ -98,28 +107,30 @@ function index_featured_stars() {
 		stars.removeClass('text-warning').addClass('text-gray')
 	})
 	
+	//TODO update db tables with new rating
 	rating.click(function(event) {
-		alert('rating = ' + Math.floor(r+1))
+		alert('TODO rating = ' + Math.floor(r+1))
 	})
 }
 
-//handle interaction with featured author buttons
+//TODO handle interaction with featured author buttons
 function index_featured_authors() {
 	var authors = $('#featured_authors').children()
 	
 	authors.click(function(event) {
 		var author = $(this).html().trim()
 		
-		$(this).html(author + ' *')
+		console.log(author + ' clicked')
 	})
 }
 
+//TODO handle interaction with date
 function index_featured_date() {
 	var date_button = $('#featured_date')
 	
 	date_button.click(function(event) {
 		var date = date_button.html()
 		
-		date_button.html(date + '-*')
+		console.log(date + ' clicked')
 	})
 }
