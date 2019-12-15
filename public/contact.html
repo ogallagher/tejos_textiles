@@ -1,90 +1,86 @@
-<!doctype html>
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-        <meta charset="utf-8"/>
-        <!--scales viewport depending on worldspace device width-->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <meta name="description" content="Contact Textiles Journal"/>
-        <meta name="author" content="Owen Gallagher"/>
-        
-        <title>Contact Textiles Journal</title>
-        
-        <!-- js external -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-		
-        <!-- js internal -->
-        <script src="js/html_imports.js"></script>
+		<meta charset="utf-8"><!--scales viewport depending on worldspace device width-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Contact Textiles Journal">
+		<meta name="author" content="Owen Gallagher">
+		<title>
+			Contact Textiles Journal
+		</title><!-- js external -->
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script><!-- js internal -->
+
+		<script src="js/html_imports.js"></script>
 		<script src="js/show_nav_page.js"></script>
-        <script src="js/contact.js"></script>
-		
-        <!-- css external -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-		
-        <!-- css internal -->
-        <link rel="stylesheet" type="text/css" href="css/style.css" />
+		<script src="js/contact.js"></script><!-- css external -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"><!-- css internal -->
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 	</head>
 	
 	<body>
-		<head>
+		<header>
 			<div id="import_navbar"></div>
-		</head>
-    
-    <div class="container-fluid">
-  		<div class="jumbotron row p-0" id="message_banner">
-  			<div class="display-1 py-3 font-title col-lg-4 d-flex flex-column justify-content-center bg-olive-dark text-white" id="message_title">
-  				What's up?
-  			</div>
-  			<div class="display-4 font-title col-lg bg-light text-dark py-1" id="message_main">
-          Thanks so much for visiting! Get in touch to let us know if there's anything we could do better. Feeling inspired? Ask about joining the crew!
-        </div>
-  		</div>
-    </div>
+		</header>
+		
+		<!-- page banner -->
+		<div class="container-fluid">
+			<div class="jumbotron row p-0" id="message_banner">
+				<div class="display-1 py-3 font-title col-lg-4 d-flex flex-column justify-content-center bg-olive-dark text-white" id="message_title">
+					What's up?
+				</div>
+				<div class="display-4 font-title col-lg bg-light text-dark py-1" id="message_main">
+					Thanks so much for visiting! Get in touch to let us know if there's anything we could do better. Feeling inspired? Ask about joining the crew!
+				</div>
+			</div>
+		</div>
 		
 		<article class="container-fluid">
-      <div class="row">
-        <div class="col-lg-7 col-md-6">
-          <div class="form mb-4 font-navigation">
-            <div class="form-group">
-              <label for="email">Email address</label>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">From</span>
-                </div>
-                <input class="form-control" type="email" id="email" placeholder="someone@somewhere.com">
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="subject">Message</label>
-              
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Subject</span>
-                </div>
-                <input type="text" class="form-control" id="subject" placeholder="An Interesting Topic">
-              </div>
-              
-              <textarea rows="5" class="form-control" id="message"></textarea>
-            </div>
-            
-            <div class="form-group">
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-lg-5 col-md-6 p-3">
-          <div class="font-navigation-md text-uppercase my-auto">
-            <div class="mb-2">Email: <b class="font-content-lg">tejostextiles@somewhere.com</b></div>
-            <div class="mb-2">Phone: <b class="font-content-lg">+1 123 456 7890</b></div>
-            <div class="mb-2">Address: <b class="font-content-lg">123 W 45 ST, City, PA, 67890</b></div>
-          </div>
-        </div>
-      </div>
+			<div class="row">
+				<!-- contact form -->
+				<div class="col-lg-7 col-md-6">
+					<div class="form mb-4 font-navigation">
+						<div class="form-group">
+							<label for="email">Email address</label>
+							<div class="input-group">
+								<div class="input-group-prepend">
+									<span class="input-group-text">From</span>
+								</div><input class="form-control" type="email" id="email" placeholder="someone@somewhere.com">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="subject">Message</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Subject</span>
+								</div><input type="text" class="form-control" id="subject" placeholder="An Interesting Topic">
+							</div>
+							<textarea rows="5" class="form-control" id="message"></textarea>
+						</div>
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary">Submit</button>
+						</div>
+					</div>
+				</div>
+				
+				<!-- contact info -->
+				<div class="col-lg-5 col-md-6 p-3">
+					<div class="font-navigation-md text-uppercase my-auto">
+						<div class="mb-2">
+							Email: <b class="font-content-lg">tejostextiles@somewhere.com</b>
+						</div>
+						<div class="mb-2">
+							Phone: <b class="font-content-lg">+1 123 456 7890</b>
+						</div>
+						<div class="mb-2">
+							Address: <b class="font-content-lg">123 W 45 ST, City, PA, 67890</b>
+						</div>
+					</div>
+				</div>
+			</div>
 		</article>
 		
 		<footer>
