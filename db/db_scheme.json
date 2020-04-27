@@ -1,0 +1,54 @@
+{
+	"//description": "defines the database tables and fields, more for reference than anything else",
+	"puzzles": {
+		"id": "id",
+		"title": "title",
+		"date": "date",
+		"text": "text",
+		"shapes_outline": "shapes_outline",
+		"shapes_inline": "shapes_inline",
+		"forecolor": "forecolor",
+		"backcolor": "backcolor",
+		"textcolor": "textcolor",
+		"plays": "plays",
+		"rating": "rating",
+		"preview": "preview"
+	},
+	"people": {
+	    "username": "username",
+	    "password": "password",
+	    "email": "email",
+	    "links": "links",
+	    "subscription": "description",
+	    "bio": "bio",
+	    "photo": "photo"
+	},
+	"works": {
+		"id": "id",
+		"title": "title",
+		"text": "text",
+		"date": "date",
+		"description": "description",
+		"author": "author"
+	},
+	"ratings": {
+		"username": "username",
+		"puzzle_id": "puzzle_id",
+		"rating": "rating"
+	},
+	"contributions": {
+		"username": "username",
+		"puzzle_id": "puzzle_id",
+		"method": "method"
+	},
+	"plays": {
+		"username": "username",
+		"puzzle_id": "puzzle_id",
+		"count": "count",
+		"duration": "duration"
+	},
+	"fragments": {
+		"puzzle_id": "puzzle_id",
+		"work_id": "work_id"
+	}
+}

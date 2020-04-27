@@ -1,0 +1,20 @@
+Owen Gallagher
+26 April 2020
+
+=== TITLE ===
+
+How to manage environment variables in Heroku apps.
+
+=== PROCEDURE: MANAGE VARIABLES ===
+
+1. heroku config:edit --a <app>; edit the environment variables for <app> (a)
+
+2. the above command opens a nano editor with KEY=VALUE pairs on each line in the text doc.
+
+=== PROCEDURE: USE VARIABLES ===
+
+3. refer to a variable VARIABLE as process.env.VARIABLE
+
+=== NOTES ===
+
+(a) where <app> is one of [revistatejos,textilesjournal]

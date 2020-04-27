@@ -13,7 +13,7 @@ const enums = require('../enums')
 
 const cacheserver = require('./cacheserver')
 
-const PATH_DB_CONFIG = 'db/db_config.json' //accessed from server.js = from root dir TODO delete this use env vars
+const PATH_DB_SCHEME = 'db/db_scheme.json' //accessed from server.js = from root dir
 const PATH_DB_API = 'db/db_api.json'
 
 const DB_TEJOS = 'db_revistatejos'
@@ -24,33 +24,46 @@ var scheme //database scheme object
 var api //database api, for hiding actual sql from the client
 
 exports.init = function(site) {	
+	//get database connection credentials
+	let config = null
+	
+	//TODO delete testing
+	//let process = {env: {DATABASE_URL: 'mysql://cadwgjdw7ewfoxfn:f3wakbqbpdjanfim@axxb6a0z2kydkco3.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/x7ku0pg29r5qx2ro'}}
+	if (process.env.DATABASE_URL) {
+		config = {
+			url: process.env.DATABASE_URL, //url = mysql://user:password@host:3306/db
+			user: null,
+			pass: null,
+			host: null,
+			db: null,
+			name: null
+		} 
+		
+		let fields = config.url.split(/:|@/) //array = mysql //user password host 3306/db
+		config.user = fields[1].substring(2)
+		config.pass = fields[2]
+		config.host = fields[3]
+		config.db = fields[4].split('/')[1]
+		
+		if (site == enums.site.TEXTILES) {
+			config.name = 'textilesdb'
+		}
+		else if (site == enums.site.TEJOS){
+			config.name = 'tejosdb'
+		}		
+	}
+	else {
+		console.log('error: database credentials environment variables not found')
+	}
+	
 	//init db connection
-	fs.readFile(PATH_DB_CONFIG, function(err,data) {
+	fs.readFile(PATH_DB_SCHEME, function(err,data) {
 		if (err) {
-			console.log('error: read from db config file failed: ' + err)
+			console.log('error: read from db scheme file failed: ' + err)
 		}
 		else {
-			//read config file
-			var config = JSON.parse(data)
-			
 			//store scheme
-			scheme = config.db
-			
-			//select database
-			switch (site) {
-				case enums.site.TEXTILES:
-					config = config[DB_TEXTILES]
-					break
-				
-				case enums.site.TEJOS:
-					config = config[DB_TEJOS]
-					break
-					
-				default:
-					config = null
-					console.log('error: requested database for site ' + site + ' not found in ' + PATH_DB_CONFIG)
-					break
-			}
+			scheme = JSON.parse(data)
 			
 			//connect to database
 			if (config != null) {
@@ -122,7 +135,7 @@ exports.get_query = function(endpoint, args) {
 				query = query.replace(params[i],args[i])
 			}
 			//console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
-		
+			
 			if (query != null && query.length != 0) {
 				resolve({sql: query})
 			}

@@ -7,4 +7,4 @@ Owen Gallagher
 exports.site = {
 	TEXTILES: 0,
 	TEJOS: 1
-};
+}
