@@ -200,14 +200,12 @@ function load_search_results(results) {
 		let puzzle, jpuzzle
 		results.forEach(function(pstring) {
 			puzzle = new Puzzle(pstring)
-	
-			for (let i=0; i<10; i++) {
-				jpuzzle = $(jstring)
-				jpuzzle.find('.textile-row-card').attr('id',puzzle.title + i)
-				jpuzzle.find('.textile-row-title').html(puzzle.title + ' - ' + i)
-				puzzle_list.append(jpuzzle.clone())
-			}
 			
+			jpuzzle = $(jstring)
+			jpuzzle.find('.textile-row-card').attr('id',puzzle.title)
+			jpuzzle.find('.textile-row-title').html(puzzle.title)
+			
+			puzzle_list.append(jpuzzle.clone())
 		})
 	})
 }

@@ -32,6 +32,7 @@ function puzzles_onload(dbdata) {
 		
 		dbdata.forEach(function (p) {
 			puzzle = new Puzzle(p) //see puzzle.js
+			puzzle.onComplete = index_puzzle_on_complete //handle puzzle completion
 			
 			jpuzzle = $(jstring)
 			jpuzzle.find('.textile-row-card').attr('id',puzzle.id)
@@ -50,6 +51,7 @@ function puzzles_onload(dbdata) {
 		
 		if (puzzle) {
 			featured_puzzle = puzzle
+			
 			featured_puzzle.feature(ftitle,fdate,fcanvas,fauthor,frating,fcontainer)
 			.then(function() {
 				$('#featured_placeholder').remove()
@@ -57,7 +59,7 @@ function puzzles_onload(dbdata) {
 			})
 			.catch(function() {
 				console.log('feature failed')
-			})			
+			})		
 			
 			window.onresize = function() {
 				featured_puzzle.resize(fcontainer)
@@ -69,19 +71,19 @@ function puzzles_onload(dbdata) {
 //handle interaction with featured star buttons
 function index_featured_stars() {
 	//list of star buttons
-	var rating = $('#featured_rating')
-	var stars = rating.children()
-	var one = $('#featured_rating_1')
-	var two = $('#featured_rating_2')
-	var three = $('#featured_rating_3')
-	var four = $('#featured_rating_4')
-	var five = $('#featured_rating_5')
-	var r = 0
+	let rating = $('#featured_rating')
+	let stars = rating.children()
+	let one = $('#featured_rating_1')
+	let two = $('#featured_rating_2')
+	let three = $('#featured_rating_3')
+	let four = $('#featured_rating_4')
+	let five = $('#featured_rating_5')
+	let r = 0
 	
 	//select stars from one until the one under the cursor
 	rating.mousemove(function(event) {
-		var offset = one.offset()
-		var x = event.pageX - offset.left
+		let offset = one.offset()
+		let x = event.pageX - offset.left
 		
 		r = (x / $(this).width()) * 5
 		
@@ -133,4 +135,9 @@ function index_featured_date() {
 		
 		console.log(date + ' clicked')
 	})
+}
+
+//TODO handle puzzle completion
+function index_puzzle_on_complete(puzzle) {
+	
 }

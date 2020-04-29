@@ -80,9 +80,6 @@ function dbclient_fetch_search(terms,callback) {
 	
 	$.get('/db', req, function(data) {
 		console.log('fetched ' + data.length + ' puzzles from db')
-		
-		thread(function() {
-			callback(data)
-		})
+		callback(data)
 	})
 }

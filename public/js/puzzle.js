@@ -7,27 +7,27 @@ uses paperjs, a graphics library that builds ontop of the HTML canvas element
 */
 
 //puzzles
-var featuredPuzzle;
+let featuredPuzzle
 
 //interaction
-var selectedShape = null
-var doubleClick = new paper.Point();
+let selectedShape = null
+let doubleClick = new paper.Point()
 
 //configuration
 const PUZZLE_DPI = 200
-const PUZZLE_Z_MIN = 0.5;
+const PUZZLE_Z_MIN = 0.5
 
 //Puzzle class
 function Puzzle(dbdata) {
 	this.id = dbdata.id
 	this.title = dbdata.title
-	this.date = dbdata.date;
+	this.date = dbdata.date
 	
-	this.paper = new paper.PaperScope();
+	this.paper = new paper.PaperScope()
 	
 	this.forecolor = dbdata.forecolor.data
 	this.backcolor = dbdata.backcolor.data
-	this.textcolor = dbdata.textcolor.data;
+	this.textcolor = dbdata.textcolor.data
 	
 	this.foreground
 	this.foregroundCaps
@@ -42,10 +42,12 @@ function Puzzle(dbdata) {
 	this.zoom = 1
 	this.dragBegin = new paper.Point()
 	this.anchor = new paper.Point()
+	
+	this.onComplete //callback for when the puzzle is completed
 }
 
 Puzzle.prototype.updateGraphics = function() {
-	var v = this.paper.view
+	let v = this.paper.view
 	
 	if (featuredPuzzle == this) {
 		this.background.bounds.size = v.size
@@ -54,8 +56,8 @@ Puzzle.prototype.updateGraphics = function() {
 		
 		this.text.bounds.size.set(this.textS.multiply(this.zoom))
 		this.text.position.set(this.textP.add(this.pan).multiply(this.zoom))
-	
-		for (shape of this.shapes) {
+		
+		for (let shape of this.shapes) {
 			shape.move()
 		}
 	}
@@ -86,14 +88,14 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontai
 	this.foreground = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height)
 	this.foregroundCaps = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height)
 	this.background = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height)
-	var self = this
+	let self = this
 	
 	//event handlers
 	paper.view.onMouseDown = function(event) {	
-		var mouse = event.point
-		var miss = true;
+		let mouse = event.point
+		let miss = true;
 		
-		for (shape of self.shapes) {
+		for (let shape of self.shapes) {
 			if (shape.contains(mouse)) {
 				miss = false
 				shape.throwAnchor()
@@ -103,11 +105,25 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontai
 		}
 		
 		self.dragBegin = mouse
-		self.anchor = self.pan;
+		self.anchor = self.pan
 		
 		doubleClick = mouse
 	}
 	paper.view.onMouseUp = function(event) {
+		if (selectedShape != null) {
+			//shapes dragged, check for puzzle completion
+			let complete = true
+			for (let shape of this.shapes) {
+				if (!shape.complete()) {
+					complete = false
+				}
+			}
+			
+			if (complete) {
+				this.complete()
+			}
+		}
+		
 		selectedShape = null
 	}
 	paper.view.onMouseDrag = function(event) {
@@ -122,10 +138,10 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontai
 		}
 	}
 	paper.view.onDoubleClick = function(event) {
-		var m = event.point;
+		let m = event.point;
 		
 		if (m.equals(doubleClick)) {
-			var z1 = self.zoom;
+			let z1 = self.zoom;
 				
 			if (self.zoom == PUZZLE_Z_MIN) {
 				self.zoom = 1
@@ -134,7 +150,7 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontai
 				self.zoom = PUZZLE_Z_MIN
 			}
 		
-			var x = m.subtract(m.divide(z1).multiply(self.zoom))
+			let x = m.subtract(m.divide(z1).multiply(self.zoom))
 			self.pan = self.pan.add(x);
 		
 			self.updateGraphics()
@@ -203,9 +219,14 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontai
 
 Puzzle.prototype.resize = function(container) {	
 	//resize canvas via paper
-	var w = container.clientWidth
-	var h = container.clientHeight
-	this.paper.view.setViewSize(w,h);
+	this.paper.view.setViewSize(container.clientWidth,container.clientHeight);
 	
 	this.updateGraphics()
+}
+
+Puzzle.prototype.complete = function() {
+	//change appearance to show completion, disable interaction
+	
+	//use callback to do other things in the global context
+	this.onComplete(this)
 }
