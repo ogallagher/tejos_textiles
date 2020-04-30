@@ -10,7 +10,7 @@ via HTTP requests.
 function dbclient_fetch_puzzles(callback) {	
 	console.log('fetching puzzles...');
 	
-	var req = {
+	let req = {
 		endpoint: 'fetch_puzzles',
 		args: []
 	};
@@ -25,7 +25,7 @@ function dbclient_fetch_puzzles(callback) {
 function dbclient_fetch_puzzle_paths(id,callback) {
 	console.log('fetching paths for puzzle[' + id + ']...')
 	
-	var req = {
+	let req = {
 		endpoint: 'fetch_puzzle_paths',
 		args: [id]
 	}
@@ -41,7 +41,7 @@ function dbclient_fetch_puzzle_paths(id,callback) {
 function dbclient_fetch_collection(collection,callback) {
 	console.log('fetching collection ' + collection + '...')
 	
-	var req = {
+	let req = {
 		endpoint: 'fetch_collection_' + collection,
 		args: []
 	}
@@ -63,7 +63,7 @@ function dbclient_fetch_collection(collection,callback) {
 function dbclient_fetch_search(terms,callback) {
 	console.log('searching for ' + terms.join())
 	
-	var req = {
+	let req = {
 		endpoint: 'search_puzzles',
 		args: []
 	}
@@ -81,5 +81,32 @@ function dbclient_fetch_search(terms,callback) {
 	$.get('/db', req, function(data) {
 		console.log('fetched ' + data.length + ' puzzles from db')
 		callback(data)
+	})
+}
+
+function dbclient_user_exists(username,callback) {
+	console.log('checking if username ' + username + ' is taken')
+	
+	let req = {
+		endpoint: 'user_exists',
+		args: [username]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('error: username check failed: ' + data.error)
+				callback(false)
+			}
+			else {
+				callback(data[0].taken)
+			}
+		},
+		error: function(err) {
+			console.log('error: username check failed: ' + err.responseText)
+			callback(false)
+		}
 	})
 }

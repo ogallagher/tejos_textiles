@@ -101,6 +101,10 @@ function sessionclient_create(username,password) {
 	})
 }
 
+function sessionclient_login(username,password) {
+	
+}
+
 function sessionclient_validate(id) {
 	return new Promise(function(resolve,reject) {
 		$.post({

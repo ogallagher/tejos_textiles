@@ -1,68 +1,51 @@
-<div id="login_modal" class="modal fade" tabindex="-1" role="dialog">
-	<script>
-		let login = true
-		let register = false
-		
-		//toggle login/register buttons
-		function toggle_login_register(button) {
-			if (button == 'login') {
-				login = true
-				$('#login_button').removeClass('btn-light').addClass('btn-dark')
-				$('#register_button').removeClass('btn-dark').addClass('btn-light')
-				$('#email_group').hide()
-			}
-			else {
-				login = false
-				$('#register_button').removeClass('btn-light').addClass('btn-dark')
-				$('#login_button').removeClass('btn-dark').addClass('btn-light')
-				$('#email_group').show()
-			}
-			
-			register = !login
-		}
-		
-		//submit form
-		function submit_login_register() {
-			if (register) {
-				console.log('TODO create new account and send confirmation email')
-			}
-			else if (login) {
-				console.log('TODO log into existing account')
-			}
-		}	
-	</script>
-		
-	<div class="modal-dialog" role="document">
+<div id="login_modal" class="modal fade" tabindex="-1" role="dialog">	
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 		<div class="modal-content border-0 rounded-0">
 			<div class="modal-header text-center font-title-xlg text-light bg-dark rounded-0">
-				Welcome aboard!
+				<span id="login_title">Welcome back!</span>
+				<span id="register_title" style="display:none;">Welcome aboard!</span>
 			</div>
 			<div class="modal-body text-left bg-slight">
 				<form class="font-content-lg">
 					<div class="form-group text-right">
 						<div class="btn-group" role="group">
-						  <button id="login_button" type="button" class="btn btn-dark font-navigation-md" onclick="toggle_login_register('login');">Login</button>
-						  <button id="register_button" type="button" class="btn btn-light font-navigation-md" onclick="toggle_login_register('register');">Register</button>
+						  <button id="login_button" type="button" class="btn btn-dark font-navigation-md" onclick="toggle_login_register('login')">Login</button>
+						  <button id="register_button" type="button" class="btn btn-light font-navigation-md" onclick="toggle_login_register('register')">Register</button>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="username_input">Username</label>
-						<input type="text" class="form-control font-content-lg" id="username_input" placeholder="call me... username">
+						<label for="username_input" class="font-navigation-md">Username</label>
+						<input type="text" class="form-control font-content-lg" id="username_input" placeholder="call me... username" required/>
+						<div class="invalid-feedback">
+							Sorry, that username is already taken (or is blank).
+						</div>
 					</div>
 					<div class="form-group">
-						<label for="password_input">Password</label>
-						<input type="password" class="form-control font-content-lg" id="password_input" placeholder="P455w0Rd">
+						<label for="password_input" class="font-navigation-md">Password</label>
+						<input type="password" class="form-control font-content-lg" id="password_input" placeholder="open-sesame" required/>
+						<div class="invalid-feedback">
+							Password is required and must be between 8 and 64 characters.
+						</div>
 					</div>
 					<div id="email_group" class="form-group" style="display:none;">
-						<label for="email_input">Email</label>
-						<input type="text" class="form-control font-content-lg" id="email_input" placeholder="someone@somewhere.com" aria-describedby="email_help">
+						<label for="email_input" class="font-navigation-md">Email</label>
+						<input type="text" class="form-control font-content-lg" id="email_input" placeholder="someone@somewhere.com" aria-describedby="email_help"/>
+						<div class="invalid-feedback">
+							Please input a valid email address.
+						</div>
 						<small id="email_help" class="form-text text-muted text-center">We'll send you a confirmation email to activate your account.</small>
+					</div>
+					<div id="subscribe_group" class="row px-3 py-1" style="display:none;">
+						<input id="subscribe_check" type="checkbox" class="col-auto mt-2"/>
+						<label class="col font-content-md" for="subscribe_check">I'd like to receive email notifications when new textiles are published, please!</label>
 					</div>
 				</form>
 			</div>
 			<div class="modal-footer text-center font-navigation-lg bg-slight border-top-0">
-				<button type="button" class="btn btn-outline-dark font-navigation-md" data-dismiss="modal">Submit</button>
+				<button type="button" class="btn btn-outline-dark font-navigation-md" onclick="submit_login_register()">Submit</button>
 			</div>
 		</div>
 	</div>
+	
+	<script type="text/javascript" src="js/login.js"></script>
 </div>

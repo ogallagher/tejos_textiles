@@ -128,15 +128,16 @@ exports.get_query = function(endpoint, args) {
 		}
 		else {
 			let entry = api[endpoint]
-			let params = entry.params //array of parameters to be replaced in query
-			let query = entry.query //sql query to be assembled
-	
-			for (var i=0; i<params.length; i++) {
-				query = query.replace(params[i],args[i])
-			}
-			//console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
 			
-			if (query != null && query.length != 0) {
+			if (entry) {
+				let params = entry.params //array of parameters to be replaced in query
+				let query = entry.query //sql query to be assembled
+				
+				for (var i=0; i<params.length; i++) {
+					query = query.replace(params[i],args[i])
+				}
+				//console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
+				
 				resolve({sql: query})
 			}
 			else {

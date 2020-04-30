@@ -21,15 +21,19 @@
   },
 	"login": {
 		"params": ["?username?","?password?"],
-		"query": "call authenticate_person(?username?,?password?)"
+		"query": "call authenticate_person('?username?','?password?')"
+	},
+	"user_exists": {
+		"params": ["?username?"],
+		"query": "select exists(select 1 from people where username='?username?' limit 1) as taken"
 	},
   "fetch_user": {
     "params": ["?username?"],
-    "query": "select username,enabled,admin from users where username=?username?"
+    "query": "select username,enabled,admin from people where username='?username?'"
   },
 	"fetch_user_details": {
 		"params": ["?username?"],
-		"query": "select * from users where username=?username?"
+		"query": "select * from people where username='?username?'"
 	}
 }
 
