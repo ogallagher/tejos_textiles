@@ -10,13 +10,13 @@ Owen Gallagher
 const COOKIE_EXPIRATION = 24 * 60 * 60 * 1000
 
 //cookies expire in 1 day
-exports.set = function(key,val) {
+function cookis_set(key,val) {
     var date = new Date();
     date.setTime(date.getTime() + COOKIE_EXPIRATION);
     document.cookie = key + '=' + val + '; expires=' + date.toUTCString() + '; path=/';
 }
 
-exports.get = function(key) {
+function cookies_get(key) {
     var key_eq = key + '=';
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
@@ -32,11 +32,11 @@ exports.get = function(key) {
     return null;
 }
 
-exports.delete = function(key) {
+function cookies_delete(key) {
     document.cookie = key + '=; expires=-1; path=/';
 }
 
-exports.update = function(key,val) {
+function cookies_update(key,val) {
     if (val != null) {
         cookie_set(key,val);
 		return val;

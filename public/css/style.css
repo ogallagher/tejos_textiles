@@ -81,7 +81,7 @@ Custom classes
 	background-color: #457E62;
 }
 .bg-olive-dark {
-	background-color: #294939;
+	background-color: #294939; /* contact page */
 }
 .bg-sand {
 	background-color: #F0EEB6;
@@ -99,7 +99,7 @@ Custom classes
 	background-color: #CE89AF;
 }
 .bg-peach {
-	background-color: #AA7639; /* contact page */
+	background-color: #AA7639;
 }
 .bg-sea {
 	background-color: #2B4C6F; /* about page */

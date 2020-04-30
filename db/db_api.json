@@ -19,9 +19,17 @@
     "params": ["?likes?"],
     "query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles where ?likes?"
   },
+	"login": {
+		"params": ["?username?","?password?"],
+		"query": "call authenticate_person(?username?,?password?)"
+	},
   "fetch_user": {
-    "params": ["?id?"],
-    "query": "select username,email,thumbnail,bio from users where id=?id?"
-  }
+    "params": ["?username?"],
+    "query": "select username,enabled,admin from users where username=?username?"
+  },
+	"fetch_user_details": {
+		"params": ["?username?"],
+		"query": "select * from users where username=?username?"
+	}
 }
 

@@ -5,6 +5,7 @@ Owen Gallagher
 */
 
 let featured_puzzle
+let account //see sessionclient:Account class
 
 window.onload = function() {
 	//fetch puzzles from db and insert into page
@@ -18,6 +19,15 @@ window.onload = function() {
 	//import navbar and footer
 	html_imports('navbar','#import_navbar')
 	html_imports('footer','#import_footer')
+	
+	//import login modal
+	html_imports('login','#import_login', function() {
+		//load account
+		sessionclient_get_account(function(account_info) {
+			account = account_info
+			toggle_nav_account(account == null)
+		})
+	})
 }
 
 //when a puzzle is loaded from dbclient, add it to the document and make it interactive

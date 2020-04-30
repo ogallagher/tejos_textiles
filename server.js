@@ -98,8 +98,25 @@ try {
 	//expose sessions
 	app
 		.route('/sessions')
-		.get(function (req,res) {
-			//TODO handle sessions
+		.post(function (req,res) {
+			let endpoint = req.body.endpoint
+			let args = req.body.args
+			
+			sessionserver.handle_request(endpoint, args)
+				.then(function(data) {
+					res.json({success: data})
+				})
+				.catch(function(err) {
+					if (err == sessionserver_STATUS_CREATE_ERR) {
+						res.json({error: 'create'})
+					}
+					else if (err == sessionserver_STATUS_NO_SESSION) {
+						res.json({error: 'null'})
+					}
+					else if (err == sessionserver_STATUS_EXPIRE) {
+						res.json({error: 'expired'})
+					}
+				})
 		})
 }
 catch (err) {

@@ -21,7 +21,9 @@
 	    "links": "links",
 	    "subscription": "description",
 	    "bio": "bio",
-	    "photo": "photo"
+	    "photo": "photo",
+			"admin": "admin",
+			"enabled": "enabled"
 	},
 	"works": {
 		"id": "id",
@@ -50,5 +52,15 @@
 	"fragments": {
 		"puzzle_id": "puzzle_id",
 		"work_id": "work_id"
+	},
+	"add_rating": {
+		"//description": "procedure to submit new ratings; checks that account is enabled, whether rating exists, and that rating is in range [1,5]",
+		"args": ["username", "puzzle_id", "rating"],
+		"returns": ["success","error:disabled","error:illegal"]
+	},
+	"update_puzzle_rating": {
+		"//description": "procedure to update a puzzle's calculated average rating; called from ratings triggers",
+		"args": ["puzzle_id"],
+		"returns": []
 	}
 }
