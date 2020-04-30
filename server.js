@@ -24,7 +24,7 @@ try {
 	//enable cross-origin requests for same origin html imports
 	const cors = require('cors')
 	const origins = [
-		'https://localhost:5000', 					//for local testing
+		'http://localhost:5000', 					//for local testing
 		'https://textilesjournal.herokuapp.com',	//english site url
 		'https://revistatejos.herokuapp.com'		//spanish site url
 	]
@@ -100,21 +100,27 @@ try {
 		.route('/sessions')
 		.post(function (req,res) {
 			let endpoint = req.body.endpoint
-			let args = req.body.args
+			let args = req.body['args[]']
 			
-			sessionserver.handle_request(endpoint, args)
+			sessionserver.handle_request(endpoint, args, dbserver)
 				.then(function(data) {
 					res.json({success: data})
 				})
 				.catch(function(err) {
-					if (err == sessionserver_STATUS_CREATE_ERR) {
+					if (err == sessionserver.STATUS_CREATE_ERR) {
 						res.json({error: 'create'})
 					}
-					else if (err == sessionserver_STATUS_NO_SESSION) {
+					else if (err == sessionserver.STATUS_NO_SESSION) {
 						res.json({error: 'null'})
 					}
-					else if (err == sessionserver_STATUS_EXPIRE) {
+					else if (err == sessionserver.STATUS_EXPIRE) {
 						res.json({error: 'expired'})
+					}
+					else if (err == sessionserver.STATUS_LOGIN_WRONG) {
+						res.json({error: 'login'})
+					}
+					else {
+						res.json({error: 'endpoint'})
 					}
 				})
 		})

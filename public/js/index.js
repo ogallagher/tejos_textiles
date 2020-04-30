@@ -22,12 +22,23 @@ window.onload = function() {
 	
 	//import login modal
 	html_imports('login','#import_login', function() {
+		//assign login callback
+		login_on_login = index_on_login
+		
 		//load account
-		sessionclient_get_account(function(account_info) {
-			account = account_info
-			toggle_nav_account(account == null)
-		})
+		sessionclient_get_account(index_on_login)
 	})
+}
+
+function index_on_login(account_info) {
+	account = account_info
+	
+	//toggle nav account button as account page link or login form
+	toggle_nav_account((account == null))
+	
+	if (account) {
+		console.log('index: account set to ' + account.username)
+	}
 }
 
 //when a puzzle is loaded from dbclient, add it to the document and make it interactive

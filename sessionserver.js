@@ -13,10 +13,19 @@ const SESSION_TTL = 1000*60*60*24*7		// sessions expire in 1 week, specified in 
 const SESSIONS_PATH = './sessions/'		// sessions are stored in this directory
 
 //global vars
-const sessionserver_SUCCESS =			0
-const sessionserver_STATUS_NO_SESSION =	1
-const sessionserver_STATUS_EXPIRE =		2
-const sessionserver_STATUS_CREATE_ERR =	3
+const SUCCESS =				0
+const STATUS_NO_SESSION =	1
+const STATUS_EXPIRE =		2
+const STATUS_CREATE_ERR =	3
+const STATUS_ENDPOINT_ERR =	4
+const STATUS_LOGIN_WRONG = 	5
+
+exports.SUCCESS =				SUCCESS
+exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
+exports.STATUS_EXPIRE =			STATUS_EXPIRE
+exports.STATUS_CREATE_ERR =		STATUS_CREATE_ERR
+exports.STATUS_ENDPOINT_ERR =	STATUS_ENDPOINT_ERR
+exports.STATUS_LOGIN_WRONG =	STATUS_LOGIN_WRONG
 
 //private vars
 const ENDPOINT_CREATE = 'create'
@@ -38,94 +47,118 @@ exports.init = function() {
 	}	
 }
 
-exports.handle_request = function(endpoint, args) {
-	switch (endpoint) {
-		case ENDPOINT_VALIDATE:
-			console.log('validating session ' + args.id)
-			break
+exports.handle_request = function(endpoint, args, dbserver) {
+	return new Promise(function(resolve,reject) {
+		switch (endpoint) {
+			case ENDPOINT_VALIDATE:
+				console.log('validating session ' + args)
+				get_session(args)
+					.then(function(session) {
+						resolve(session)
+					})
+					.catch(function(error_code) {
+						reject(error_code)
+					})
+				break
 			
-		case ENDPOINT_CREATE:
-			//authenticate user
-			console.log('logging in user ' + args.username)
-			return new Promise(function(resolve,reject) {
+			case ENDPOINT_CREATE:
+				//authenticate user
+				console.log('logging in user ' + args[0])
 				dbserver
-					.get_query('login', [args.username, args.password])
-					.then(function(query) {
-						dbserver.send_query(query, function(err, res) {
-							if (err) {
-								reject(sessionserver_CREATE_ERR)
-							}
-							else {
-								console.log('login result:')
-								console.log(res)
+					.get_query('login', [args[0], args[1]])
+					.then(function(action) {
+						if (action.sql) {
+							dbserver.send_query(action.sql, function(err, res) {
+								if (err) {
+									console.log(err)
+									reject(STATUS_CREATE_ERR)
+								}
+								else {
+									let results = res[0][0].result
+									
+									if (results == 'success') {
+										//create session
+										create_session(args[2])
+											.then(function(session) {
+												console.log('login success')
+												resolve(session)
+											})
+											.catch(function(err) {
+												console.log('error: session write failed')
+												reject(STATUS_CREATE_ERR)
+											})
+									}
+									else {
+										console.log('login failed')
+										reject(STATUS_LOGIN_WRONG)
+									}
+								}
+							})
+						}
+						else {
 							
-								//create session
-								create_session(args.username)
-									.then(function(session) {
-										resolve(session)
-									})
-									.catch(function(err) {
-										reject(err)
-									})
-							}
-						})
+						}
 					})
 					.catch(function(err) {
-						reject(err)
+						reject(STATUS_CREATE_ERR)
 					})
-			})
 			
-			break
+				break
 			
-		case ENDPOINT_DELETE:
-			break
-	}
+			case ENDPOINT_DELETE:
+				reject(STATUS_NO_SESSION)
+				break
+				
+			default:
+				reject(STATUS_ENDPOINT_ERR)
+		}
+	})
 }
 
 function get_session(id) {
 	let session_file = SESSIONS_PATH + id
 	
-	fs.readFile(session_file, function(err,data) {
-		if (err) {
-			//session does not exist
-			return sessionserver_STATUS_NO_SESSION
-		}
-		else {
-			let session = JSON.parse(data)
-						
-			if (expired(session)) {
-				//session expired; delete session and notify
-				delete_session(id, function(err) {
-					if (err) {
-						console.log(err)
-					}
-				})
-				
-				return sessionserver_STATUS_EXPIRE
+	return new Promise(function(resolve,reject) {
+		fs.readFile(session_file, function(err,data) {
+			if (err) {
+				//session does not exist
+				reject(STATUS_NO_SESSION)
 			}
 			else {
-				//session exists and is still valid; update timestamp and return session info
-				update_session(id, session, function(err) {
-					if (err) {
-						console.log(err)
-					}
-				})
-							
-				return session
+				let session = JSON.parse(data)
+						
+				if (expired(session)) {
+					//session expired; delete session and notify
+					delete_session(id, function(err) {
+						if (err) {
+							console.log(err)
+						}
+					})
+				
+					reject(STATUS_EXPIRE)
+				}
+				else {
+					//session exists and is still valid; update timestamp and return session info
+					update_session(id, session, function(err) {
+						if (err) {
+							console.log(err)
+						}
+					})
+					
+					resolve(session)
+				}
 			}
-		}
+		})
 	})
 }
-exports.get_session = get_session
 
-//assumes that the user has already been authenticated successfully
-function create_session(callback) {
+function create_session(session_id,callback) {
 	let session = {
 		login: new Date().getTime()
 	}
 	
 	return new Promise(function(resolve,reject) {
-		fs.writeFile(SESSIONS_PATH + id, JSON.stringify(session), function(err) {
+		fs.writeFile(SESSIONS_PATH + session_id, JSON.stringify(session), function(err) {
 			if (err) {
 				reject(sessionserver_STATUS_CREATE_ERR)
 			}
@@ -135,7 +168,6 @@ function create_session(callback) {
 		})
 	})
 }
-exports.create_session = create_session
 
 function delete_session(id,callback) {
 	fs.unlink(SESSION_PATH + id, function(err) {
@@ -158,10 +190,10 @@ function delete_session(id,callback) {
 		}
 	})
 }
-exports.delete_session = delete_session
 
 //local methods
 function clean_sessions() {
+	console.log('cleaning sessions')
 	//delete all expired sessions
 	fs.readdir(SESSIONS_PATH, function(err,files) {
 		if (err) {
@@ -170,7 +202,7 @@ function clean_sessions() {
 		else {
 			files.forEach(function(file_name,index) {
 				//read session to check if expired
-				fs.readFile(file_name, function(err,data) {
+				fs.readFile(SESSIONS_PATH + file_name, function(err,data) {
 					if (err) {
 						console.log('error: could not check expiration of ' + file_name)
 					}

@@ -12,6 +12,7 @@ const PASSWORD_MIN = 8
 const PASSWORD_MAX = 64
 
 let login = true
+let login_on_login //callback that passes execution to page on login
 
 $('#username_input').focusout(function(e) {
 	validate_username()
@@ -55,7 +56,21 @@ function submit_login_register() {
 			if (login) {
 				$('#login_modal').modal('hide')
 				console.log('logging into account ' + username)
-				sessionclient_login(username,password)
+				/*
+				Sends session create request to server, which authenticates and then
+				creates a session file. When the session client receives a success
+				response, the session and username cookies are created.
+				*/
+				sessionclient_create(username,password)
+					.then(function(account) {
+						//TODO handle login success
+						if (login_on_login) {
+							login_on_login(account)
+						}
+					})
+					.catch(function() {
+						//TODO handle login failure
+					})
 			}
 			else if (validate_email()) {
 				let email = $('#email_input').val()

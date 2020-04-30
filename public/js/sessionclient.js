@@ -44,7 +44,7 @@ function sessionclient_get_account(callback) {
 	
 	if (session && username) {
 		//check if expired
-		session_client_validate(session)
+		sessionclient_validate(session)
 			.then(function(last_login) {
 				//session is valid; return account info
 				callback(new Account(session, username))
@@ -74,11 +74,11 @@ function sessionclient_create(username,password) {
 			url: URL_SESSIONS,
 			data: {
 				endpoint: ENDPOINT_CREATE,
-				args: {
-					username: username,
-					password: password,
-					id: id
-				}
+				args: [
+					username,
+					password,
+					id
+				]
 			},
 			success: function(data) {
 				if (data.error) {
@@ -87,40 +87,39 @@ function sessionclient_create(username,password) {
 				}
 				else {
 					console.log('session ' + id + ' created successfully')
-					cookie_set(SESSION_COOKIE_KEY, id)
-					cookie_set(USERNAME_COOKIE_KEY, username)
+					cookies_set(SESSION_COOKIE_KEY, id)
+					cookies_set(USERNAME_COOKIE_KEY, username)
 					
-					resolve(id)
+					resolve(new Account(id, username))
 				}
 			},
 			error: function(err) {
-				console.log('session creation failed:' + err.responseJSON.message)
+				console.log('session creation failed:' + err.responseText)
 				reject()
 			}
 		})
 	})
 }
 
-function sessionclient_login(username,password) {
-	
-}
-
 function sessionclient_validate(id) {
 	return new Promise(function(resolve,reject) {
 		$.post({
-			url: URL_VALIDATE,
+			url: URL_SESSIONS,
 			data: {
-				id: id
+				endpoint: ENDPOINT_VALIDATE,
+				args: [
+					id
+				]
 			},
 			success: function(data) {
-				if (data.error) {
-					console.log('session validation failed: ' + data.error)
-					reject(data.error)
-				}
-				else {
-					let session = JSON.parse(data)
+				if (data.success) {
+					let session = data.success
 					console.log('session valid: last login = ' + session.login)
 					resolve(session.login)
+				}
+				else {
+					console.log('session validation failed: ' + data.error)
+					reject(data.error)
 				}
 			},
 			error: function(err) {
@@ -140,8 +139,8 @@ function sessionclient_logout(id) {
 				id: id
 			},
 			success: function(data) {
-				cookie_delete(SESSION_COOKIE_KEY)
-				cookie_delete(USERNAME_COOKIE_KEY)
+				cookies_delete(SESSION_COOKIE_KEY)
+				cookies_delete(USERNAME_COOKIE_KEY)
 				console.log('session deleted from server and cookies')
 				
 				resolve()

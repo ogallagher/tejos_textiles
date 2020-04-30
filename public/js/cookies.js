@@ -10,7 +10,7 @@ Owen Gallagher
 const COOKIE_EXPIRATION = 24 * 60 * 60 * 1000
 
 //cookies expire in 1 day
-function cookis_set(key,val) {
+function cookies_set(key,val) {
     var date = new Date();
     date.setTime(date.getTime() + COOKIE_EXPIRATION);
     document.cookie = key + '=' + val + '; expires=' + date.toUTCString() + '; path=/';
