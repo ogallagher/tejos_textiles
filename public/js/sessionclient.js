@@ -44,10 +44,14 @@ function sessionclient_get_account(callback) {
 	
 	if (session && username) {
 		//check if expired
-		sessionclient_validate(session)
-			.then(function(last_login) {
+		sessionclient_validate(session,username)
+			.then(function(account_summary) {
 				//session is valid; return account info
-				callback(new Account(session, username))
+				let account = new Account(session, username)
+				account.enabled = account_summary.enabled
+				account.admin = account_summary.admin
+				
+				callback(account)
 			})
 			.catch(function(err) {
 				//session is invalid/expired; clean cookies
@@ -83,39 +87,49 @@ function sessionclient_create(username,password) {
 			success: function(data) {
 				if (data.error) {
 					console.log('session creation failed: ' + data.error)
-					reject()
+					reject(data.error)
 				}
 				else {
 					console.log('session ' + id + ' created successfully')
 					cookies_set(SESSION_COOKIE_KEY, id)
 					cookies_set(USERNAME_COOKIE_KEY, username)
 					
-					resolve(new Account(id, username))
+					let account_info = data.success
+					
+					let account = new Account(id, username)
+					account.enabled = account_info.enabled.data[0]
+					account.admin = account_info.admin.data[0]
+					
+					resolve(account)
 				}
 			},
 			error: function(err) {
-				console.log('session creation failed:' + err.responseText)
-				reject()
+				console.log('session creation failed: ' + err.responseText)
+				reject(err.responseText)
 			}
 		})
 	})
 }
 
-function sessionclient_validate(id) {
+function sessionclient_validate(id,username) {
 	return new Promise(function(resolve,reject) {
 		$.post({
 			url: URL_SESSIONS,
 			data: {
 				endpoint: ENDPOINT_VALIDATE,
 				args: [
-					id
+					id,
+					username
 				]
 			},
 			success: function(data) {
 				if (data.success) {
-					let session = data.success
-					console.log('session valid: last login = ' + session.login)
-					resolve(session.login)
+					let account_summary = data.success
+					
+					resolve({
+						enabled: account_summary.enabled.data[0],
+						admin: account_summary.admin.data[0]
+					})
 				}
 				else {
 					console.log('session validation failed: ' + data.error)

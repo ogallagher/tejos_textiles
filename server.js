@@ -119,6 +119,9 @@ try {
 					else if (err == sessionserver.STATUS_LOGIN_WRONG) {
 						res.json({error: 'login'})
 					}
+					else if (err == sessionserver.STATUS_DB_ERR) {
+						res.json({error: 'db'})
+					}
 					else {
 						res.json({error: 'endpoint'})
 					}
@@ -126,6 +129,7 @@ try {
 		})
 }
 catch (err) {
+	console.log(err)
 	console.log('Error: please run the `npm install` command to get needed node modules first')
 	process.exit(1)
 }

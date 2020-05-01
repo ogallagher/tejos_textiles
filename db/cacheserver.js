@@ -26,9 +26,9 @@ exports.init = function(callback) {
 		config.pass = process.env.MEMCACHEDCLOUD_PASSWORD
 	}
 	else {
-		config.host = 'memcached-12580.c10.us-east-1-3.ec2.cloud.redislabs.com:12580'	//TODO remove this
-		config.user = 'memcached-app140929017'
-		config.pass = '2R5u4FsY7FhnlzqVWCdRZKleFXI7IySj'
+		config.host = 'memcached-10973.c11.us-east-1-3.ec2.cloud.redislabs.com:10973'	//TODO remove this
+		config.user = 'mc-B0z3T'
+		config.pass = 'mTQyojfzPN9JnNiQsuBjv0h9APJcB1bx'
 	}
 	
 	cache = memjs.Client.create(config.host, {

@@ -38,6 +38,11 @@ function index_on_login(account_info) {
 	
 	if (account) {
 		console.log('index: account set to ' + account.username)
+		
+		//update featured puzzle rating to reflect this account's opinion
+		if (featured_puzzle) {
+			
+		}
 	}
 }
 

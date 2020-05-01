@@ -19,6 +19,7 @@ const STATUS_EXPIRE =		2
 const STATUS_CREATE_ERR =	3
 const STATUS_ENDPOINT_ERR =	4
 const STATUS_LOGIN_WRONG = 	5
+const STATUS_DB_ERR =		6
 
 exports.SUCCESS =				SUCCESS
 exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
@@ -26,6 +27,7 @@ exports.STATUS_EXPIRE =			STATUS_EXPIRE
 exports.STATUS_CREATE_ERR =		STATUS_CREATE_ERR
 exports.STATUS_ENDPOINT_ERR =	STATUS_ENDPOINT_ERR
 exports.STATUS_LOGIN_WRONG =	STATUS_LOGIN_WRONG
+exports.STATUS_DB_ERR =			STATUS_DB_ERR
 
 //private vars
 const ENDPOINT_CREATE = 'create'
@@ -51,10 +53,30 @@ exports.handle_request = function(endpoint, args, dbserver) {
 	return new Promise(function(resolve,reject) {
 		switch (endpoint) {
 			case ENDPOINT_VALIDATE:
-				console.log('validating session ' + args)
-				get_session(args)
+				let session_id = args[0]
+				let username = args[1]
+				console.log('validating session ' + session_id + ' for ' + username)
+				
+				get_session(session_id)
 					.then(function(session) {
-						resolve(session)
+						//return account summary for login
+						dbserver
+							.get_query('fetch_user', [username])
+							.then(function(action) {
+								dbserver.send_query(action.sql, function(err, res) {
+									if (err) {
+										console.log(err)
+										reject(STATUS_DB_ERR)
+									}
+									else {
+										resolve(res[0])
+									}
+								})
+							})
+							.catch(function(err) {
+								console.log('error: failed to fetch user summary')
+								reject(STATUS_DB_ERR)
+							})
 					})
 					.catch(function(error_code) {
 						reject(error_code)
@@ -64,40 +86,56 @@ exports.handle_request = function(endpoint, args, dbserver) {
 			case ENDPOINT_CREATE:
 				//authenticate user
 				console.log('logging in user ' + args[0])
+				
 				dbserver
-					.get_query('login', [args[0], args[1]])
+					.get_query('login', [args[0],args[1]])
 					.then(function(action) {
-						if (action.sql) {
-							dbserver.send_query(action.sql, function(err, res) {
-								if (err) {
-									console.log(err)
-									reject(STATUS_CREATE_ERR)
+						dbserver.send_query(action.sql, function(err, res) {
+							if (err) {
+								console.log(err)
+								reject(STATUS_CREATE_ERR)
+							}
+							else {
+								let results = res[0][0].result
+								
+								if (results == 'success') {
+									//create session
+									create_session(args[2])
+										.then(function(session) {
+											console.log('login success')
+											
+											//return account summary
+											
+											dbserver
+												.get_query('fetch_user', [args[0]])
+												.then(function(action) {
+													dbserver.send_query(action.sql, function(err, res) {
+														if (err) {
+															console.log(err)
+															reject(STATUS_DB_ERR)
+														}
+														else {
+															console.log('got user summary')
+															resolve(res[0])
+														}
+													})
+												})
+												.catch(function(err) {
+													console.log('error: failed to fetch user summary')
+													reject(STATUS_DB_ERR)
+												})
+										})
+										.catch(function() {
+											console.log('error: session write failed')
+											reject(STATUS_CREATE_ERR)
+										})
 								}
 								else {
-									let results = res[0][0].result
-									
-									if (results == 'success') {
-										//create session
-										create_session(args[2])
-											.then(function(session) {
-												console.log('login success')
-												resolve(session)
-											})
-											.catch(function(err) {
-												console.log('error: session write failed')
-												reject(STATUS_CREATE_ERR)
-											})
-									}
-									else {
-										console.log('login failed')
-										reject(STATUS_LOGIN_WRONG)
-									}
+									console.log('login failed')
+									reject(STATUS_LOGIN_WRONG)
 								}
-							})
-						}
-						else {
-							
-						}
+							}
+						})
 					})
 					.catch(function(err) {
 						reject(STATUS_CREATE_ERR)
@@ -106,10 +144,13 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				break
 			
 			case ENDPOINT_DELETE:
+				//TODO support session deletion on logout
+				console.log('deleting session')
 				reject(STATUS_NO_SESSION)
 				break
 				
 			default:
+				console.log('error: invalid session endpoint ' + endpoint)
 				reject(STATUS_ENDPOINT_ERR)
 		}
 	})
@@ -128,7 +169,7 @@ function get_session(id) {
 				let session = JSON.parse(data)
 						
 				if (expired(session)) {
-					//session expired; delete session and notify
+					//session expired; delete session and notify to reauthenticate
 					delete_session(id, function(err) {
 						if (err) {
 							console.log(err)
@@ -152,7 +193,7 @@ function get_session(id) {
 	})
 }
 
-function create_session(session_id,callback) {
+function create_session(session_id) {
 	let session = {
 		login: new Date().getTime()
 	}
@@ -160,7 +201,8 @@ function create_session(session_id,callback) {
 	return new Promise(function(resolve,reject) {
 		fs.writeFile(SESSIONS_PATH + session_id, JSON.stringify(session), function(err) {
 			if (err) {
-				reject(sessionserver_STATUS_CREATE_ERR)
+				console.log(err)
+				reject()
 			}
 			else {
 				resolve(session)

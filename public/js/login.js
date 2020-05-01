@@ -54,22 +54,32 @@ function submit_login_register() {
 			let password = $('#password_input').val()
 		
 			if (login) {
-				$('#login_modal').modal('hide')
 				console.log('logging into account ' + username)
 				/*
 				Sends session create request to server, which authenticates and then
 				creates a session file. When the session client receives a success
-				response, the session and username cookies are created.
+				response, the session and username cookies are created and an account
+				object is created.
 				*/
 				sessionclient_create(username,password)
 					.then(function(account) {
-						//TODO handle login success
+						$('#login_failed').hide()
+						$('#login_modal').modal('hide')
+						
 						if (login_on_login) {
 							login_on_login(account)
 						}
 					})
-					.catch(function() {
-						//TODO handle login failure
+					.catch(function(reason) {
+						if (reason == 'login') {
+							//incorrect credentials
+							$('#login_failed').show()
+							clear_login_form()
+						}
+						else {
+							//server error
+							alert('Login failed due to a server error!')
+						}
 					})
 			}
 			else if (validate_email()) {
@@ -81,6 +91,11 @@ function submit_login_register() {
 			}
 		}
 	})
+}
+
+function clear_login_form() {
+	$('#username_input').val('').removeClass('is-valid').removeClass('is-invalid')
+	$('#password_input').val('').removeClass('is-valid').removeClass('is-invalid')
 }
 
 //validate username
