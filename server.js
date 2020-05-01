@@ -76,9 +76,10 @@ try {
 			})
 			.catch(function(problem) {
 				console.log('error in conversion from endpoint to sql: ' + problem)
-			});
+				res.json({error: 'endpoint error'})
+			})
 	}
-
+	
 	//expose database
 	app
 		.route('/db')

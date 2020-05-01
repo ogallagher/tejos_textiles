@@ -37,6 +37,31 @@ function dbclient_fetch_puzzle_paths(id,callback) {
 	})
 }
 
+function dbclient_fetch_puzzle(id, callback) {
+	console.log('fetching puzzle[' + id + ']')
+	
+	let req = {
+		endpoint: 'fetch_puzzle',
+		args: [id]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('error: failed to fetch puzzle: ' + err.responseText)
+			}
+			else {
+				callback(data[0])
+			}
+		},
+		error: function(err) {
+			console.log('error: failed to fetch puzzle: ' + err.responseText)
+		}
+	})
+}
+
 //TODO this is just a placeholder until collections are actually implemented
 function dbclient_fetch_collection(collection,callback) {
 	console.log('fetching collection ' + collection + '...')

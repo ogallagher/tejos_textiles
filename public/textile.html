@@ -1,5 +1,153 @@
 <!doctype html>
 
 <html>
+    <head>
+        <meta charset="utf-8"/>
+        <!--scales viewport depending on worldspace device width-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="description" content="An online literary journal, presenting written word in a new medium"/>
+        <meta name="author" content="Owen Gallagher"/>
+        
+        <title id="title">Untitled</title>
+        
+        <!-- js external -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        
+        <!-- js internal -->
+        <script src="js/html_imports.js"></script>
+        <script src="js/dbclient.js"></script>
+        <script src="js/shape.js"></script>
+        <script src="js/puzzle.js"></script>
+		<script src="js/cookies.js"></script>
+		<script src="js/toggle_nav_account.js"></script>
+		<script src="js/sessionclient.js"></script>
+        <script src="js/textile.js"></script>
+        
+        <!-- css external -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        
+        <!-- css internal -->
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+    </head>
+	
+	<body>
+		<div id="import_login"></div>
+		
+        <header>
+            <div id="import_navbar"></div>
+        </header>
+		
+		<article class="container-fluid mb-3">
+			<!-- featured puzzle -->
+            <div class="mx-2">
+                <div class="py-1">
+                   <div class="display-4 font-title text-center text-uppercase bg-dark text-light" id="featured_title">
+					   Untitled
+                   </div>
+                </div>
+                <div>
+                    <div id="featured_container">
+						<div id="featured_placeholder" 
+							 class="overlap-1-center text-center d-flex flex-column font-navigation-lg">
+							<div>
+								Loading textile...
+							</div>
+						</div>
+                        <canvas id="featured_puzzle" class="puzzle-canvas border border-dark" style="width:100%;height:100vh;"></canvas>
+                    </div>
+                </div>
+                <div class="font-navigation">
+                    <!--authors-->
+                    <div class="input-group my-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text rounded-0">
+                                authors
+                            </div>
+                        </div>
+                        <div class="input-group-append ml-auto" id="featured_authors">
+                            <button class="btn btn-outline-secondary rounded-0" type="button">
+                                Adam Ankles
+                            </button>
+                            <button class="btn btn-outline-secondary rounded-0" type="button">
+                                Bailey Bunches
+                            </button>
+                            <button class="btn btn-outline-secondary rounded-0" type="button">
+                                Candice Charleston
+                            </button>
+                            <button class="btn btn-outline-secondary rounded-0" type="button">
+                                Daniel Durham
+                            </button>
+                        </div>
+                    </div>
+                    <!--date-->
+                    <div class="input-group my-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text rounded-0">
+                                date
+                            </div>
+                        </div>
+                        <div class="input-group-append ml-auto">
+                            <button class="btn btn-outline-secondary rounded-0" type="button" id="featured_date">
+                                unknown
+                            </button>
+                        </div>
+                    </div>
+                    <!--rating-->
+                    <div class="input-group my-2">
+                        <div class="input-group-prepend">
+							<div class="input-group-text rounded-0">
+								rating
+							</div>
+                        </div>
+                        <div class="input-group-append ml-auto">
+                            <button class="btn btn-outline-secondary rounded-0" type="button" id="featured_rating">
+								<span class="oi oi-star text-gray" id="featured_rating_1"></span>
+								<span class="oi oi-star text-gray" id="featured_rating_2"></span>
+								<span class="oi oi-star text-gray" id="featured_rating_3"></span>
+								<span class="oi oi-star text-gray" id="featured_rating_4"></span>
+								<span class="oi oi-star text-gray" id="featured_rating_5"></span>
+                            </button>
+                        </div>
+                    </div>
+					<div id="rate_login_toast" class="toast fade hide" role="alert">
+						<div class="toast-body">
+							<div class="row">
+								<div class="col my-auto font-navigation text-raspberry">
+									Log in or register to rate this textile.
+								</div>
+								<div class="col-2">
+									<button type="button" class="btn btn-sm" data-dismiss="toast">
+										<small class="oi oi-x"></small>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="rate_enable_toast" class="toast fade hide" role="alert">
+						<div class="toast-body">
+							<div class="row">
+								<div class="col my-auto font-navigation text-raspberry">
+									Looks like you haven't verified your account yet! Check your email for
+									a message from us with an activation link.
+								</div>
+								<div class="col-2">
+									<button type="button" class="btn btn-sm" data-dismiss="toast">
+										<small class="oi oi-x"></small>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+                </div>
+            </div>
+		</article>
+		
+        <footer>
+			<div id="import_footer"></div>
+        </footer>
+	</body>
 </html>
-

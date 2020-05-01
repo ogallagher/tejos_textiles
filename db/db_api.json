@@ -3,6 +3,10 @@
 		"params": [],
 		"query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles"
 	},
+	"fetch_puzzle": {
+		"params": ["?puzzle_id?"],
+		"query": "select title,date,forecolor,backcolor,textcolor,preview from puzzles where id=?puzzle_id?"
+	},
 	"fetch_puzzle_paths": {
 		"params": ["?puzzle_id?"],
 		"query": "select text,shapes_outline,shapes_inline from puzzles where id=?puzzle_id?"
