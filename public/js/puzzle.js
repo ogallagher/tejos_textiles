@@ -22,6 +22,7 @@ function Puzzle(dbdata) {
 	this.id = dbdata.id
 	this.title = dbdata.title
 	this.date = dbdata.date
+	this.rating = dbdata.rating //TODO debug this
 	
 	this.paper = new paper.PaperScope()
 	
@@ -159,59 +160,61 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontai
 	
 	return new Promise(function(resolve,reject) {
 		dbclient_fetch_puzzle_paths(self.id, function(data) {
-			//foreground solid
-			var fc = self.forecolor
-			self.foreground.fillColor = new paper.Color(fc[0],fc[1],fc[2])
-			self.foregroundCaps.fillColor = self.foreground.fillColor;
+			if (data) {
+				//foreground solid
+				var fc = self.forecolor
+				self.foreground.fillColor = new paper.Color(fc[0],fc[1],fc[2])
+				self.foregroundCaps.fillColor = self.foreground.fillColor;
 
-			//background solid
-			var bc = self.backcolor
-			self.background.fillColor = new paper.Color(bc[0],bc[1],bc[2]);
+				//background solid
+				var bc = self.backcolor
+				self.background.fillColor = new paper.Color(bc[0],bc[1],bc[2]);
 
-			//background text
-			var textVector = new paper.CompoundPath(data.text)
-			textVector.scale(self.scale)
-			textVector.position = textVector.position.multiply(self.scale)
-			var tc = self.textcolor
-			textVector.fillColor = new paper.Color(tc[0],tc[1],tc[2])
+				//background text
+				var textVector = new paper.CompoundPath(data.text)
+				textVector.scale(self.scale)
+				textVector.position = textVector.position.multiply(self.scale)
+				var tc = self.textcolor
+				textVector.fillColor = new paper.Color(tc[0],tc[1],tc[2])
 		
-			self.text = textVector.rasterize(PUZZLE_DPI)
-			self.textP = self.text.position
-			self.textS = self.text.bounds.size
+				self.text = textVector.rasterize(PUZZLE_DPI)
+				self.textP = self.text.position
+				self.textS = self.text.bounds.size
 
-			textVector.remove()
-			textVector = null
+				textVector.remove()
+				textVector = null
 
-			self.shapes = []
-			var shapesOut = data.shapes_outline.split(';;')
-			var shapesIn = data.shapes_inline.split(';;')
+				self.shapes = []
+				var shapesOut = data.shapes_outline.split(';;')
+				var shapesIn = data.shapes_inline.split(';;')
 
-			if (shapesOut.length == shapesIn.length) {
-				var holeClips = new paper.Group()
-				var capClips = new paper.Group()
-				var shape
-				for (var i=0; i<shapesOut.length; i++) {
-					shape = new Shape(shapesOut[i],shapesIn[i],self)
+				if (shapesOut.length == shapesIn.length) {
+					var holeClips = new paper.Group()
+					var capClips = new paper.Group()
+					var shape
+					for (var i=0; i<shapesOut.length; i++) {
+						shape = new Shape(shapesOut[i],shapesIn[i],self)
 		
-					self.shapes.push(shape)
+						self.shapes.push(shape)
 		
-					holeClips.addChild(shape.hole)
-					capClips.addChild(shape.cap)
+						holeClips.addChild(shape.hole)
+						capClips.addChild(shape.cap)
+					}
+	
+					var holes = new paper.Group(holeClips, self.background, self.text)
+					holes.clipped = true
+					var caps = new paper.Group(capClips, self.foregroundCaps)
+					caps.clipped = true;
+	
+					self.updateGraphics();
+	
+					console.log('finished loading graphics for ' + self.title)
+					resolve()
 				}
-	
-				var holes = new paper.Group(holeClips, self.background, self.text)
-				holes.clipped = true
-				var caps = new paper.Group(capClips, self.foregroundCaps)
-				caps.clipped = true;
-	
-				self.updateGraphics();
-	
-				console.log('finished loading graphics for ' + self.title)
-				resolve()
-			}
-			else {
-				console.log('error loading ' + self.title + ': shapes_outline.length != shapes_inline.length')
-				reject()
+				else {
+					console.log('error loading ' + self.title + ': shapes_outline.length != shapes_inline.length')
+					reject()
+				}
 			}
 		})
 	})

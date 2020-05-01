@@ -30,10 +30,24 @@ function dbclient_fetch_puzzle_paths(id,callback) {
 		args: [id]
 	}
 	
-	$.get('/db', req, function(data) {
-		console.log('fetched paths for ' + data.length + ' puzzle(s) from db')
-		
-		callback(data[0])
+	$.get({
+		url: '/db', 
+		data: req, 
+		success: function(data) {
+			if (data.error) {
+				console.log('paths fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				console.log('fetched paths for ' + data.length + ' puzzle(s) from db')
+			
+				callback(data[0])
+			}
+		},
+		error: function(err) {
+			console.log('paths fetch failed: ' + err.responseText)
+			callback(null)
+		}
 	})
 }
 
@@ -164,6 +178,36 @@ function dbclient_rate(username,puzzle_id,rating,callback) {
 		error: function(err) {
 			console.log('puzzle rating failed: ' + err.responseText)
 			callback(false)
+		}
+	})
+}
+
+function dbclient_fetch_user_rating(username,puzzle_id,callback) {
+	console.log('fetching ' + username + '\'s rating of ' + puzzle_id)
+	
+	let req = {
+		endpoint: 'fetch_rating',
+		args: [
+			username,
+			puzzle_id
+		]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('rating fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				callback(data[0])
+			}
+		},
+		error: function(err) {
+			console.log('rating fetch failed: ' + err.responseText)
+			callback(null)
 		}
 	})
 }

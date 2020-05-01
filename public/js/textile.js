@@ -10,9 +10,19 @@ Main entrypoint for textile.html
 
 let account
 let puzzle
+let user_rating
 
 window.onload = function() {
-	textile_load_puzzle()
+	textile_load_puzzle(function() {
+		//import login modal
+		html_imports('login','#import_login', function() {
+			//assign login callback
+			login_on_login = textile_on_login
+		
+			//load account
+			sessionclient_get_account(textile_on_login)
+		})
+	})
 	
 	//enable featured card widgets
 	textile_authors()
@@ -22,15 +32,6 @@ window.onload = function() {
 	//import navbar and footer
 	html_imports('navbar','#import_navbar')
 	html_imports('footer','#import_footer')
-	
-	//import login modal
-	html_imports('login','#import_login', function() {
-		//assign login callback
-		login_on_login = textile_on_login
-		
-		//load account
-		sessionclient_get_account(textile_on_login)
-	})
 }
 
 function textile_on_login(account_info) {
@@ -44,12 +45,17 @@ function textile_on_login(account_info) {
 		
 		//update featured puzzle rating to reflect this account's opinion
 		if (puzzle) {
-			
+			dbclient_fetch_user_rating(account.username, puzzle.id, function(data) {
+				if (data) {
+					user_rating = data.rating
+					$('#featured_rating').mouseleave()
+				}
+			})
 		}
 	}
 }
 
-function textile_load_puzzle() {
+function textile_load_puzzle(callback) {
 	let url_params = window.location.search.substring(1) //ignore initial question mark
 	let puzzle_id
 	
@@ -89,16 +95,18 @@ function textile_load_puzzle() {
 			puzzle = new Puzzle(dbdata)
 			
 			//load graphics
-			/*
-			puzzle.feature(
-				puzzle_title,
-				puzzle_date,
-				puzzle_canvas,
-				puzzle_author,
-				puzzle_rating,
-				puzzle_container
-			)
-			*/
+			puzzle.feature(puzzle_title,puzzle_date,puzzle_canvas,puzzle_author,puzzle_rating,puzzle_container)
+				.then(function() {
+					$('#featured_placeholder').remove()
+					console.log('feature success')
+				})
+				.catch(function() {
+					console.log('feature failed')
+				})
+				.finally(function() {
+					callback()
+				})
+			
 		})
 	}
 	else {
@@ -125,7 +133,6 @@ function textile_stars() {
 	let four = $('#featured_rating_4')
 	let five = $('#featured_rating_5')
 	let r = 0
-	let user_rating
 	
 	//select stars from one until the one under the cursor
 	rating.mousemove(function(event) {

@@ -6,6 +6,7 @@ Owen Gallagher
 
 let featured_puzzle
 let account //see sessionclient:Account class
+let user_rating
 
 window.onload = function() {
 	//fetch puzzles from db and insert into page
@@ -41,7 +42,12 @@ function index_on_login(account_info) {
 		
 		//update featured puzzle rating to reflect this account's opinion
 		if (featured_puzzle) {
-			
+			dbclient_fetch_user_rating(account.username, featured_puzzle.id, function(data) {
+				if (data) {
+					user_rating = data.rating
+					$('#featured_rating').mouseleave()
+				}
+			})
 		}
 	}
 }
@@ -79,13 +85,14 @@ function puzzles_onload(dbdata) {
 			featured_puzzle = puzzle
 			
 			featured_puzzle.feature(ftitle,fdate,fcanvas,fauthor,frating,fcontainer)
-			.then(function() {
-				$('#featured_placeholder').remove()
-				console.log('feature success')
-			})
-			.catch(function() {
-				console.log('feature failed')
-			})		
+				.then(function() {
+					$('#featured_placeholder').remove()
+					$('#featured_url').attr('href','textile.html?puzzle_id=' + featured_puzzle.id)
+					console.log('feature success')
+				})
+				.catch(function() {
+					console.log('feature failed')
+				})		
 			
 			window.onresize = function() {
 				featured_puzzle.resize(fcontainer)
@@ -105,7 +112,6 @@ function index_featured_stars() {
 	let four = $('#featured_rating_4')
 	let five = $('#featured_rating_5')
 	let r = 0
-	let user_rating
 	
 	//select stars from one until the one under the cursor
 	rating.mousemove(function(event) {

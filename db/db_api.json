@@ -1,11 +1,11 @@
 {
 	"fetch_puzzles": {
 		"params": [],
-		"query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles"
+		"query": "select id,title,date,forecolor,backcolor,textcolor,preview,rating from puzzles"
 	},
 	"fetch_puzzle": {
 		"params": ["?puzzle_id?"],
-		"query": "select title,date,forecolor,backcolor,textcolor,preview from puzzles where id=?puzzle_id?"
+		"query": "select id,title,date,forecolor,backcolor,textcolor,preview,rating from puzzles where id=?puzzle_id?"
 	},
 	"fetch_puzzle_paths": {
 		"params": ["?puzzle_id?"],
@@ -26,6 +26,10 @@
 	"rate": {
 		"params": ["?username?","?puzzle_id?","?rating?"],
 		"query": "call add_rating('?username?','?puzzle_id?',?rating?)"
+	},
+	"fetch_rating": {
+		"params": ["?username?","?puzzle_id?"],
+		"query": "select rating from ratings where username='?username?' and puzzle_id=?puzzle_id?"
 	},
 	"login": {
 		"params": ["?username?","?password?"],
