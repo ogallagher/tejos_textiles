@@ -105,6 +105,7 @@ function index_featured_stars() {
 	let four = $('#featured_rating_4')
 	let five = $('#featured_rating_5')
 	let r = 0
+	let user_rating
 	
 	//select stars from one until the one under the cursor
 	rating.mousemove(function(event) {
@@ -132,12 +133,56 @@ function index_featured_stars() {
 	
 	rating.mouseleave(function() {
 		r = 0
+		
 		stars.removeClass('text-warning').addClass('text-gray')
+		
+		if (user_rating) {
+			one.removeClass('text-gray').addClass('text-warning')
+			if (user_rating > 1) {
+				two.removeClass('text-gray').addClass('text-warning')
+			}
+			if (user_rating > 2) {
+				three.removeClass('text-gray').addClass('text-warning')
+			}
+			if (user_rating > 3) {
+				four.removeClass('text-gray').addClass('text-warning')
+			}
+			if (user_rating > 4) {
+				five.removeClass('text-gray').addClass('text-warning')
+			}
+		}
 	})
 	
 	//TODO update db tables with new rating
+	let login_toast = $('#rate_login_toast').toast({
+		delay: 4000
+	})
+	let enable_toast = $('#rate_enable_toast').toast({
+		delay: 4000
+	})
+	
 	rating.click(function(event) {
-		alert('TODO rating = ' + Math.floor(r+1))
+		let star_count = Math.floor(r+1)
+		
+		if (account) {
+			if (account.enabled) {
+				dbclient_rate(account.username, featured_puzzle.id, star_count, function(rated) {
+					if (rated) {
+						user_rating = star_count
+					}
+					else {
+						alert('Error: rating failed!')
+					}
+				})
+			}
+			else {
+				//TODO toast to verify account to rate
+				enable_toast.toast('show')
+			}
+		}
+		else {
+			login_toast.toast('show')
+		}
 	})
 }
 
@@ -165,5 +210,11 @@ function index_featured_date() {
 
 //TODO handle puzzle completion
 function index_puzzle_on_complete(puzzle) {
+	console.log('puzzle completed!')
 	
+	//if not logged in, store play cookie and toast to login to save progress
+	
+	//update db.plays submit username,puzzle,duration
+	
+	//load fragment reader; shows literature contained in the puzzle
 }

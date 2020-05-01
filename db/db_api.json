@@ -19,6 +19,10 @@
     "params": ["?likes?"],
     "query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles where ?likes?"
   },
+	"rate": {
+		"params": ["?username?","?puzzle_id?","?rating?"],
+		"query": "call add_rating('?username?','?puzzle_id?',?rating?)"
+	},
 	"login": {
 		"params": ["?username?","?password?"],
 		"query": "call authenticate_person('?username?','?password?')"

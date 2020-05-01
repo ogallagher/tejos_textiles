@@ -110,3 +110,35 @@ function dbclient_user_exists(username,callback) {
 		}
 	})
 }
+
+function dbclient_rate(username,puzzle_id,rating,callback) {
+	console.log('rating puzzle ' + puzzle_id + ' as ' + rating)
+	
+	let req = {
+		endpoint: 'rate',
+		args: [
+			username,
+			puzzle_id,
+			rating
+		]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			let result = data[0][0].result
+			
+			if (result == 'success') {
+				callback(true)
+			}
+			else {
+				callback(false)
+			}
+		},
+		error: function(err) {
+			console.log('puzzle rating failed: ' + err.responseText)
+			callback(false)
+		}
+	})
+}
