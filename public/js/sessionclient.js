@@ -11,10 +11,10 @@ dependencies:
 */
 
 //config
-const SESSION_ID_LEN = 10
-const SESSION_ID_CHAR_MIN = 65
-const SESSION_ID_CHAR_MAX = 90
-const SESSION_ID_CHAR_RANGE = SESSION_ID_CHAR_MAX - SESSION_ID_CHAR_MIN
+const SESSION_ID_LEN = 8
+const SESSION_ID_CHAR_MIN = 33	//!
+const SESSION_ID_CHAR_MAX = 126 //~
+const SESSION_ID_CHAR_RANGE = SESSION_ID_CHAR_MAX - SESSION_ID_CHAR_MIN //includes punctuation and alphanumeric chars
 
 const SESSION_COOKIE_KEY = 'session_id'
 const USERNAME_COOKIE_KEY = 'username'
@@ -68,10 +68,7 @@ function sessionclient_get_account(callback) {
 }
 
 function sessionclient_create(username,password) {
-	let id = new Date().getTime()
-	for (let i=0; i<SESSION_ID_LEN; i++) {
-		id += String.fromCharCode(Math.floor(Math.random() * SESSION_ID_CHAR_RANGE) + SESSION_ID_CHAR_MIN)
-	}
+	let id = sessionclient_generate_session_id()
 	
 	return new Promise(function(resolve,reject) {
 		$.post({
@@ -166,4 +163,15 @@ function sessionclient_logout(id) {
 			}
 		})
 	})
+}
+
+//returns a timestamp concatenated with a randomly generated 8-char string
+function sessionclient_generate_session_id() {
+	let session_id = new Date().getTime()
+	
+	for (let i=0; i<SESSION_ID_LEN; i++) {
+		session_id += String.fromCharCode(Math.floor(Math.random() * SESSION_ID_CHAR_RANGE) + SESSION_ID_CHAR_MIN)
+	}
+	
+	return session_id
 }
