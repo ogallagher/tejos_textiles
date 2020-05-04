@@ -88,10 +88,10 @@ function textile_load_puzzle(callback) {
 			
 			let puzzle_title = $('#featured_title')
 			let puzzle_date = $('#featured_date')
-			let puzzle_canvas = $('#featured_puzzle')
+			let puzzle_canvas = $('#featured_puzzle')[0]
 			let puzzle_author = $('#featured_author')
 			let puzzle_rating = $('#featured_rating')
-			let puzzle_container = $('#featured_container')
+			let puzzle_container = $('#featured_container')[0]
 			
 			//load metadata
 			puzzle = new Puzzle(dbdata)

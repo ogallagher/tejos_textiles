@@ -47,7 +47,7 @@ function Puzzle(dbdata) {
 	this.dragBegin = new paper.Point()
 	this.anchor = new paper.Point()
 	
-	this.onComplete //callback for when the puzzle is completed
+	this.onComplete = function(){} //callback for when the puzzle is completed
 }
 
 Puzzle.prototype.updateGraphics = function() {
@@ -117,14 +117,14 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontai
 		if (selectedShape != null) {
 			//shapes dragged, check for puzzle completion
 			let complete = true
-			for (let shape of this.shapes) {
-				if (!shape.complete()) {
+			for (let shape of self.shapes) {
+				if (!shape.isComplete) {
 					complete = false
 				}
 			}
 			
 			if (complete) {
-				this.complete()
+				self.complete()
 			}
 		}
 		

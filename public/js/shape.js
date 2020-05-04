@@ -14,8 +14,10 @@ function Shape(hole,cap,puzzle) {
 	
 	this.hole = new paper.Path(hole)
 	this.hole.scale(puzzle.scale)
-	this.holeP = this.hole.position.multiply(puzzle.scale)
-	this.holeS = this.hole.bounds.size
+	this.holeP = this.hole.position.multiply(puzzle.scale)	//current position
+	this.holeS = this.hole.bounds.size						//current size
+	
+	this.isComplete = false
 	
 	this.cap = null	
 	this.hasCap = false
@@ -30,12 +32,19 @@ function Shape(hole,cap,puzzle) {
 	this.holeAnchor
 	this.capAnchor
 	this.anchor
-	this.drag = new paper.Point()
+	
+	//randomize user drag
+	let bounds = puzzle.paper.view.bounds
+	
+	this.drag = new paper.Point(
+		(Math.random() * bounds.width) + bounds.x - this.holeP.x, 
+		(Math.random() * bounds.height) + bounds.y - this.holeP.y
+	)
 }
 
 Shape.prototype.move = function() {
-	var z = this.puzzle.zoom
-	var p = this.puzzle.pan
+	let z = this.puzzle.zoom
+	let p = this.puzzle.pan
 	
 	this.hole.bounds.size.set(this.holeS.multiply(z))
 	this.hole.position.set(this.holeP.add(this.drag).add(p).multiply(z))
@@ -63,8 +72,13 @@ Shape.prototype.throwAnchor = function() {
 Shape.prototype.dragTo = function(point) {
 	this.drag = this.anchor.add(point)
 	this.move()
+	this.complete()
 }
 
 Shape.prototype.complete = function() {
-	
+	if (this.drag.length < SHAPE_COMPLETION_MAX_DIST) {
+		this.drag.set(0,0)
+		this.move()
+		this.isComplete = true
+	}
 }
