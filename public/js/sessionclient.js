@@ -144,28 +144,31 @@ function sessionclient_validate(id,username) {
 }
 
 function sessionclient_logout(id) {
-	return new Promise(function(resolve,reject) {
-		$.post({
-			url: URL_SESSIONS,
-			data: {
-				endpoint: ENDPOINT_DELETE,
-				args: [
-					id
-				]
-			},
-			success: function(data) {
-				cookies_delete(SESSION_COOKIE_KEY)
-				cookies_delete(USERNAME_COOKIE_KEY)
-				console.log('session deleted from server and cookies')
+	return new Promise(function(resolve) {
+		if (id) {
+			$.post({
+				url: URL_SESSIONS,
+				data: {
+					endpoint: ENDPOINT_DELETE,
+					args: [
+						id
+					]
+				},
+				success: function(data) {
+					cookies_delete(SESSION_COOKIE_KEY)
+					cookies_delete(USERNAME_COOKIE_KEY)
+					console.log('session deleted from server and cookies')
 				
-				resolve()
-			},
-			error: function(err) {
-				console.log('session delete failed: ' + err.responseJSON.message)
-				
-				reject()
-			}
-		})
+					resolve()
+				},
+				error: function(err) {
+					console.log('session delete failed: ' + err.responseJSON.message)
+				}
+			})
+		}
+		else {
+			cookies_delete(USERNAME_COOKIE_KEY)
+		}
 	})
 }
 
@@ -221,7 +224,12 @@ function sessionclient_generate_session_id() {
 	let session_id = new Date().getTime()
 	
 	for (let i=0; i<SESSION_ID_LEN; i++) {
-		session_id += String.fromCharCode(Math.floor(Math.random() * SESSION_ID_CHAR_RANGE) + SESSION_ID_CHAR_MIN)
+		let char = String.fromCharCode(Math.floor(Math.random() * SESSION_ID_CHAR_RANGE) + SESSION_ID_CHAR_MIN)
+		
+		if (char != '/' && char != '\\') {
+			//char is valid; is not a path delimiter
+			session_id += char
+		}
 	}
 	
 	return session_id

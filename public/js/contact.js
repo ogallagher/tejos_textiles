@@ -6,7 +6,7 @@ Owen Gallagher
 
 window.onload = function() {
 	html_imports('navbar', '#import_navbar', function() {
-		show_nav_page('contact')
+		navbar_onload('contact')
 	})
 	
 	html_imports('footer','#import_footer')

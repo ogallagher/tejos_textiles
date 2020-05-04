@@ -127,6 +127,9 @@ try {
 					else if (err == sessionserver.STATUS_DB_ERR) {
 						res.json({error: 'db'})
 					}
+					else if (err = sessionserver.STATUS_DELETE_ERR) {
+						res.json({error: 'delete'})
+					}
 					else {
 						res.json({error: 'endpoint'})
 					}

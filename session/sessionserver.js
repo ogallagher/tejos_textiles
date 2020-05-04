@@ -20,6 +20,7 @@ const STATUS_CREATE_ERR =	3
 const STATUS_ENDPOINT_ERR =	4
 const STATUS_LOGIN_WRONG = 	5
 const STATUS_DB_ERR =		6
+const STATUS_DELETE_ERR =	7
 
 exports.SUCCESS =				SUCCESS
 exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
@@ -28,6 +29,7 @@ exports.STATUS_CREATE_ERR =		STATUS_CREATE_ERR
 exports.STATUS_ENDPOINT_ERR =	STATUS_ENDPOINT_ERR
 exports.STATUS_LOGIN_WRONG =	STATUS_LOGIN_WRONG
 exports.STATUS_DB_ERR =			STATUS_DB_ERR
+exports.STATUS_DELETE_ERR = 	STATUS_DELETE_ERR
 
 //private vars
 const ENDPOINT_CREATE = 'create'
@@ -191,7 +193,19 @@ exports.handle_request = function(endpoint, args, dbserver) {
 			
 			case ENDPOINT_DELETE:
 				//TODO support session deletion on logout
+				session_id = args[0]
+				
 				console.log('deleting session')
+				
+				delete_session(session_id, function(err) {
+					if (err) {
+						console.log(err)
+						reject(STATUS_DELETE_ERR)
+					}
+					else {
+						resolve(session_id)
+					}
+				})
 				reject(STATUS_NO_SESSION)
 				break
 				

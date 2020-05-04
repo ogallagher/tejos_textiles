@@ -12,7 +12,8 @@ const PASSWORD_MIN = 8
 const PASSWORD_MAX = 64
 
 let login = true
-let login_on_login //callback that passes execution to page on login
+let login_on_login	//callback that passes execution to page on login
+let login_on_logout	//callback that passes execution to page on logout
 
 $('#username_input').focusout(function(e) {
 	validate_username()
@@ -63,6 +64,7 @@ function submit_login_register() {
 				*/
 				sessionclient_create(username,password)
 					.then(function(account) {
+						//hide and reset login form
 						$('#login_failed').hide()
 						$('#login_modal').modal('hide')
 						

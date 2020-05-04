@@ -1,7 +1,7 @@
 /*
 dbclient.js
 Owen Gallagher
-26 july 2019
+26 July 2019
 
 Handles connection and queries to the database by communicating with server.js 
 via HTTP requests.

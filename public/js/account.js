@@ -18,7 +18,7 @@ window.onload = function() {
 	
 	//load navbar and footer components
 	html_imports('navbar', '#import_navbar', function() {
-		show_nav_page('account')
+		navbar_onload('account')
 	})
 	html_imports('footer','#import_footer')
 }

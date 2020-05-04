@@ -16,8 +16,18 @@
                 <a id="nav_about" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="about.html">ABOUT</a>
                 <a id="nav_contribute" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="contribute.html">CONTRIBUTE</a>
                 <a id="nav_gallery" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="gallery.html">GALLERY</a>
-                <a id="nav_account" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="account.html">ACCOUNT</a>
+				
+				<div class="dropdown pr-2">
+	                <button id="nav_account" class="btn btn-outline-dark font-navigation ml-2 my-1" type="button" data-toggle="dropdown">ACCOUNT</button>
+					
+					<div id="nav_account_dropdown" class="dropdown-menu dropdown-menu-right font-navigation text-center p-0 d-none">
+						<button id="nav_account_profile" class="dropdown-item bg-dark-hover clickable text-dark-nohover text-light-hover">PROFILE</button>
+						<button id="nav_account_logout" class="dropdown-item bg-dark-hover clickable text-dark-nohover text-light-hover">LOGOUT</button>
+					</div>
+				</div>
             </ul>
         </div>
     </div>
+	
+	<script type="text/javascript" src="js/navbar.js"></script>
 </nav>

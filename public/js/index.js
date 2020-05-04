@@ -1,7 +1,7 @@
 /*
 index.js
 Owen Gallagher
-26 july 2019
+26 July 2019
 */
 
 let featured_puzzle
@@ -18,24 +18,27 @@ window.onload = function() {
 	index_featured_stars()
 	
 	//import navbar and footer
-	html_imports('navbar','#import_navbar')
-	html_imports('footer','#import_footer')
-	
-	//import login modal
-	html_imports('login','#import_login', function() {
-		//assign login callback
-		login_on_login = index_on_login
+	html_imports('navbar','#import_navbar', function() {
+		//import login modal
+		html_imports('login','#import_login', function() {
+			navbar_onload()
+			
+			//assign login callbacks
+			login_on_login = index_on_login
+			login_on_logout = index_on_logout
 		
-		//load account
-		sessionclient_get_account(index_on_login)
+			//load account
+			sessionclient_get_account(index_on_login)
+		})
 	})
+	html_imports('footer','#import_footer')
 }
 
 function index_on_login(account_info) {
 	account = account_info
 	
 	//toggle nav account button as account page link or login form
-	toggle_nav_account((account == null))
+	navbar_toggle_account(account)
 	
 	if (account) {
 		console.log('index: account set to ' + account.username)
@@ -50,6 +53,12 @@ function index_on_login(account_info) {
 			})
 		}
 	}
+}
+
+function index_on_logout() {
+	account = null
+	user_rating = null
+	$('#featured_rating').mouseleave()
 }
 
 //when a puzzle is loaded from dbclient, add it to the document and make it interactive

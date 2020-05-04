@@ -22,7 +22,7 @@ let puzzle_list
 window.onload = function() {
 	//load navbar
 	html_imports('navbar', '#import_navbar', function() {
-		show_nav_page('gallery')
+		navbar_onload('gallery')
 	})
 	
 	//load footer

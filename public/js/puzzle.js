@@ -1,9 +1,12 @@
 /*
+
 puzzle.js
 Owen Gallagher
 25 july 2019
 
-uses paperjs, a graphics library that builds ontop of the HTML canvas element
+uses paperjs, a graphics library that uses the HTML canvas element as its
+graphics context.
+
 */
 
 //puzzles
@@ -183,7 +186,7 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontai
 
 				textVector.remove()
 				textVector = null
-
+				
 				self.shapes = []
 				var shapesOut = data.shapes_outline.split(';;')
 				var shapesIn = data.shapes_inline.split(';;')
