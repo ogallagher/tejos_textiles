@@ -133,12 +133,12 @@ exports.get_query = function(endpoint, args, is_external) {
 				if (!is_external || entry.external) {
 					let params = entry.params //array of parameters to be replaced in query
 					let query = entry.query //sql query to be assembled
-				
-					for (var i=0; i<params.length; i++) {
-						query = query.replace(params[i],args[i])
+					
+					for (let i=0; i<params.length; i++) {
+						query = query.replace(params[i],db.escape(args[i]))
 					}
 					//console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
-				
+					
 					resolve({sql: query})
 				}
 				else {
@@ -195,4 +195,3 @@ function try_cache(endpoint, args) {
 			})
 	}
 }
-

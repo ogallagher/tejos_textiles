@@ -31,32 +31,32 @@
   },
 	"rate": {
 		"params": ["?username?","?puzzle_id?","?rating?"],
-		"query": "call add_rating('?username?','?puzzle_id?',?rating?)",
+		"query": "call add_rating(?username?,?puzzle_id?,?rating?)",
 		"external": false
 	},
 	"fetch_rating": {
 		"params": ["?username?","?puzzle_id?"],
-		"query": "select rating from ratings where username='?username?' and puzzle_id=?puzzle_id?",
+		"query": "select rating from ratings where username=?username? and puzzle_id=?puzzle_id?",
 		"external": false
 	},
 	"login": {
 		"params": ["?username?","?password?"],
-		"query": "call authenticate_person('?username?','?password?')",
+		"query": "call authenticate_person(?username?,?password?)",
 		"external": false
 	},
 	"user_exists": {
 		"params": ["?username?"],
-		"query": "select exists(select 1 from people where username='?username?' limit 1) as taken",
+		"query": "select exists(select 1 from people where username=?username? limit 1) as taken",
 		"external": false
 	},
   "fetch_user": {
     "params": ["?username?"],
-    "query": "select username,enabled,admin from people where username='?username?'",
+    "query": "select username,enabled,admin from people where username=?username?",
 		"external": false
   },
 	"fetch_user_details": {
 		"params": ["?username?"],
-		"query": "select * from people where username='?username?'",
+		"query": "select * from people where username=?username?",
 		"external": false
 	}
 }
