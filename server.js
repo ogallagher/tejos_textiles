@@ -15,7 +15,8 @@ try {
 	
 	const enums = require('./enums')
 	const dbserver = require('./db/dbserver')
-	const sessionserver = require('./sessionserver')
+	const sessionserver = require('./session/sessionserver')
+	const emailserver = require('./email/emailserver')
 	
 	const SITE = enums.site.TEXTILES; //select database to connect to
 
@@ -51,13 +52,16 @@ try {
 	
 		console.log('enabling sessions...')
 		sessionserver.init()
+		
+		console.log('enabling email notifications...')
+		emailserver.init()
 	})
 
 	function handle_db(endpoint,args,res) {
 		console.log('db: ' + endpoint + ' [' + args + ']')
-	
+		
 		dbserver
-			.get_query(endpoint, args)
+			.get_query(endpoint, args, true)
 			.then(function(action) {
 			    if (action.cached) {
 			    	res.json(action.cached)
@@ -86,7 +90,7 @@ try {
 		.get(function (req,res) {
 			let endpoint = req.query.endpoint //db api endpoint
 			let args = req.query.args //inputs for compiled sql string
-		
+			
 			handle_db(endpoint,args,res)
 		})
 		.post(function (req,res) {

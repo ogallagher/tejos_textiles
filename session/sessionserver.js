@@ -10,7 +10,7 @@ const fs = require('fs')
 
 //config
 const SESSION_TTL = 1000*60*60*24*7		// sessions expire in 1 week, specified in ms
-const SESSIONS_PATH = './sessions/'		// sessions are stored in this directory
+const SESSIONS_PATH = 'session/sessions/'		// sessions are stored in this directory, accessed from root directory
 
 //global vars
 const SUCCESS =				0
@@ -33,6 +33,7 @@ exports.STATUS_DB_ERR =			STATUS_DB_ERR
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
+const ENDPOINT_DB = 'db' //user wants to access database, but is doing an action that requires authentication
 
 //global methods
 exports.init = function() {
@@ -50,11 +51,18 @@ exports.init = function() {
 }
 
 exports.handle_request = function(endpoint, args, dbserver) {
+	//variables for all switch cases
+	let session_id
+	let username
+	let password
+	let db_endpoint
+	let db_args
+	
 	return new Promise(function(resolve,reject) {
 		switch (endpoint) {
 			case ENDPOINT_VALIDATE:
-				let session_id = args[0]
-				let username = args[1]
+				session_id = args[0]
+				username = args[1]
 				console.log('validating session ' + session_id + ' for ' + username)
 				
 				get_session(session_id)
@@ -85,10 +93,14 @@ exports.handle_request = function(endpoint, args, dbserver) {
 			
 			case ENDPOINT_CREATE:
 				//authenticate user
-				console.log('logging in user ' + args[0])
+				username = args[0]
+				password = args[1]
+				session_id = args[2]
+				
+				console.log('logging in user ' + username)
 				
 				dbserver
-					.get_query('login', [args[0],args[1]])
+					.get_query('login', [username,password])
 					.then(function(action) {
 						dbserver.send_query(action.sql, function(err, res) {
 							if (err) {
@@ -100,14 +112,13 @@ exports.handle_request = function(endpoint, args, dbserver) {
 								
 								if (results == 'success') {
 									//create session
-									create_session(args[2])
+									create_session(session_id)
 										.then(function(session) {
 											console.log('login success')
 											
 											//return account summary
-											
 											dbserver
-												.get_query('fetch_user', [args[0]])
+												.get_query('fetch_user', [username])
 												.then(function(action) {
 													dbserver.send_query(action.sql, function(err, res) {
 														if (err) {
@@ -141,6 +152,41 @@ exports.handle_request = function(endpoint, args, dbserver) {
 						reject(STATUS_CREATE_ERR)
 					})
 			
+				break
+					
+			case ENDPOINT_DB:
+				session_id = args[0]
+				db_endpoint = args[1]
+				db_args = []
+				for (let i=2; i<args.length; i++) {
+					db_args.push(args[i])
+				}
+				
+				console.log('checking credential ' + session_id + ' for db --> ' + db_endpoint)
+				
+				get_session(session_id)
+					.then(function(session) {
+						//pass request through to dbserver
+						dbserver.get_query(db_endpoint, db_args)
+							.then(function(action) {
+								dbserver.send_query(action.sql, function(err, res) {
+									if (err) {
+										console.log(err)
+										reject(STATUS_DB_ERR)
+									}
+									else {
+										resolve(res)
+									}
+								})
+							})
+							.catch(function(err) {
+								console.log(err.responseText)
+								reject(STATUS_DB_ERR)
+							})
+					})
+					.catch(function(error_core) {
+						reject(error_code)
+					})
 				break
 			
 			case ENDPOINT_DELETE:
@@ -272,7 +318,7 @@ function update_session(id,data_old,callback) {
 	let data_new = data_old
 	data_new.login = new Date().getTime()
 	
-	fs.writeFile('sessions/' + id, JSON.stringify(data_new), function(err) {
+	fs.writeFile(SESSIONS_PATH + id, JSON.stringify(data_new), function(err) {
 		if (err) {
 			let message = 'error: could not update login for session ' + id
 			

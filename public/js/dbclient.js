@@ -153,19 +153,8 @@ function dbclient_user_exists(username,callback) {
 function dbclient_rate(username,puzzle_id,rating,callback) {
 	console.log('rating puzzle ' + puzzle_id + ' as ' + rating)
 	
-	let req = {
-		endpoint: 'rate',
-		args: [
-			username,
-			puzzle_id,
-			rating
-		]
-	}
-	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
+	sessionclient_db_request('rate', [username,puzzle_id,rating])
+		.then(function(data) {
 			let result = data[0][0].result
 			
 			if (result == 'success') {
@@ -174,29 +163,18 @@ function dbclient_rate(username,puzzle_id,rating,callback) {
 			else {
 				callback(false)
 			}
-		},
-		error: function(err) {
-			console.log('puzzle rating failed: ' + err.responseText)
+		})
+		.catch(function(err) {
+			console.log('puzzle rating failed: ' + err) //TODO switch-case on err
 			callback(false)
-		}
-	})
+		})
 }
 
 function dbclient_fetch_user_rating(username,puzzle_id,callback) {
 	console.log('fetching ' + username + '\'s rating of ' + puzzle_id)
 	
-	let req = {
-		endpoint: 'fetch_rating',
-		args: [
-			username,
-			puzzle_id
-		]
-	}
-	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
+	sessionclient_db_request('fetch_rating', [username,puzzle_id])
+		.then(function(data) {
 			if (data.error) {
 				console.log('rating fetch failed: ' + data.error)
 				callback(null)
@@ -204,10 +182,9 @@ function dbclient_fetch_user_rating(username,puzzle_id,callback) {
 			else {
 				callback(data[0])
 			}
-		},
-		error: function(err) {
+		})
+		.catch(function(err) {
 			console.log('rating fetch failed: ' + err.responseText)
 			callback(null)
-		}
-	})
+		})
 }

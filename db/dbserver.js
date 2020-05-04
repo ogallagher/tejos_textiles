@@ -118,7 +118,7 @@ exports.init = function(site) {
 	})
 }
 
-exports.get_query = function(endpoint, args) {
+exports.get_query = function(endpoint, args, is_external) {
 	return new Promise(function(resolve,reject) {
 		let cached = try_cache(endpoint, args)
 		
@@ -130,15 +130,21 @@ exports.get_query = function(endpoint, args) {
 			let entry = api[endpoint]
 			
 			if (entry) {
-				let params = entry.params //array of parameters to be replaced in query
-				let query = entry.query //sql query to be assembled
+				if (!is_external || entry.external) {
+					let params = entry.params //array of parameters to be replaced in query
+					let query = entry.query //sql query to be assembled
 				
-				for (var i=0; i<params.length; i++) {
-					query = query.replace(params[i],args[i])
+					for (var i=0; i<params.length; i++) {
+						query = query.replace(params[i],args[i])
+					}
+					//console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
+				
+					resolve({sql: query})
 				}
-				//console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
-				
-				resolve({sql: query})
+				else {
+					console.log('suspicious: blocked external attempt to access endpoint ' + endpoint)
+					reject('no query for endpoint')
+				}
 			}
 			else {
 				reject('no query for endpoint')

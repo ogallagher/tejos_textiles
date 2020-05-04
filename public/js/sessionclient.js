@@ -23,6 +23,7 @@ const URL_SESSIONS = '/sessions'
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
+const ENDPOINT_DB = 'db'
 
 function Account(session,username) {
 	this.session = session		//session cookie
@@ -145,9 +146,12 @@ function sessionclient_validate(id,username) {
 function sessionclient_logout(id) {
 	return new Promise(function(resolve,reject) {
 		$.post({
-			url: URL_DELETE,
+			url: URL_SESSIONS,
 			data: {
-				id: id
+				endpoint: ENDPOINT_DELETE,
+				args: [
+					id
+				]
 			},
 			success: function(data) {
 				cookies_delete(SESSION_COOKIE_KEY)
@@ -162,6 +166,53 @@ function sessionclient_logout(id) {
 				reject()
 			}
 		})
+	})
+}
+
+/*
+some database actions require passing through the session server for authentication against the session_id
+before the db can be accessed
+*/
+function sessionclient_db_request(db_endpoint, db_args) {
+	return new Promise(function(resolve,reject) {
+		let session_id = cookies_get(SESSION_COOKIE_KEY)
+	
+		if (session_id) {
+			let args = [session_id, db_endpoint]
+			for (let db_arg of db_args) {
+				args.push(db_arg)
+			}
+			
+			$.post({
+				url: URL_SESSIONS,
+				data: {
+					endpoint: ENDPOINT_DB,
+					args: args
+				},
+				success: function(data) {
+					if (data.success) {
+						resolve(data.success)
+					}
+					else {
+						if (data.error == 'null' || data.error == 'expired') {
+							//no valid session found for this user on the server; login again
+							cookies_delete(SESSION_COOKIE_KEY)
+							cookies_delete(USERNAME_COOKIE_KEY)
+							reject('login')
+						}
+						else {
+							reject(data.error)
+						}
+					}
+				},
+				error: function(err) {
+					reject('http')
+				}
+			})
+		}
+		else {
+			reject('login')
+		}
 	})
 }
 
