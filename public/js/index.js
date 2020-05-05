@@ -43,13 +43,38 @@ function index_on_login(account_info) {
 	if (account) {
 		console.log('index: account set to ' + account.username)
 		
-		//update featured puzzle rating to reflect this account's opinion
-		if (featured_puzzle) {
+		if (featured_puzzle) {			
+			//chain fetches to prevent issues with the sessionserver reading+writing a session at the same time
+			//update featured puzzle rating to reflect this account's opinion
 			dbclient_fetch_user_rating(account.username, featured_puzzle.id, function(data) {
 				if (data) {
 					user_rating = data.rating
 					$('#featured_rating').mouseleave()
 				}
+				
+				//add tags for account play stats: number of plays, fastest solve
+				dbclient_fetch_user_plays(account.username, featured_puzzle.id, function(data) {
+					if (data) {
+						//add new user stats
+						let featured_tags = $('#featured_tags')
+						html_imports('featured_tag', function(jtemplate) {
+							//plays tag
+							let jstring = jtemplate
+											.replace('?key?', account.username + ' plays')
+											.replace('?value?', data.times)
+						
+							featured_tags.append(jstring)
+						
+						
+							//fastest solve
+							jstring = jtemplate
+										.replace('?key?', account.username + ' fastest solve')
+										.replace('?value?', data.fastest)
+						
+							featured_tags.append(jstring)
+						})
+					}
+				})
 			})
 		}
 	}
@@ -59,6 +84,9 @@ function index_on_logout() {
 	account = null
 	user_rating = null
 	$('#featured_rating').mouseleave()
+	
+	//remove user stats tags
+	$('.featured_tag').remove()
 }
 
 //when a puzzle is loaded from dbclient, add it to the document and make it interactive

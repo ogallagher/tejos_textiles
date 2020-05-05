@@ -14,21 +14,21 @@
 		"query": "select text,shapes_outline,shapes_inline from puzzles where id=?puzzle_id?",
 		"external": true
 	},
-  "fetch_collection_top_rated": {
-    "params": [],
-    "query": "",
+	"fetch_collection_top_rated": {
+		"params": [],
+		"query": "",
 		"external": true
-  },
-  "fetch_collection_editors_choice": {
-    "params": [],
-    "query": "",
+	},
+	"fetch_collection_editors_choice": {
+		"params": [],
+		"query": "",
 		"external": true
-  },
-  "search_puzzles": {
-    "params": ["?likes?"],
-    "query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles where ?likes?",
+	},
+	"search_puzzles": {
+		"params": ["?likes?"],
+		"query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles where ?likes?",
 		"external": true
-  },
+	},
 	"rate": {
 		"params": ["?username?","?puzzle_id?","?rating?"],
 		"query": "call add_rating(?username?,?puzzle_id?,?rating?)",
@@ -49,14 +49,19 @@
 		"query": "select exists(select 1 from people where username=?username? limit 1) as taken",
 		"external": false
 	},
-  "fetch_user": {
-    "params": ["?username?"],
-    "query": "select username,enabled,admin from people where username=?username?",
+ 	"fetch_user": {
+    	"params": ["?username?"],
+		"query": "select username,enabled,admin from people where username=?username?",
 		"external": false
-  },
+	},
 	"fetch_user_details": {
 		"params": ["?username?"],
 		"query": "select * from people where username=?username?",
+		"external": false
+	},
+	"fetch_user_plays": {
+		"params": ["?username?","?puzzle_id?"],
+		"query": "select count(*) as times, min(duration) as fastest from plays where username=?username? and puzzle_id=?puzzle_id?",
 		"external": false
 	}
 }

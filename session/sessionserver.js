@@ -21,6 +21,7 @@ const STATUS_ENDPOINT_ERR =	4
 const STATUS_LOGIN_WRONG = 	5
 const STATUS_DB_ERR =		6
 const STATUS_DELETE_ERR =	7
+const STATUS_FAST =			8
 
 exports.SUCCESS =				SUCCESS
 exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
@@ -30,12 +31,15 @@ exports.STATUS_ENDPOINT_ERR =	STATUS_ENDPOINT_ERR
 exports.STATUS_LOGIN_WRONG =	STATUS_LOGIN_WRONG
 exports.STATUS_DB_ERR =			STATUS_DB_ERR
 exports.STATUS_DELETE_ERR = 	STATUS_DELETE_ERR
+exports.STATUS_FAST =			STATUS_FAST
 
 //private vars
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
 const ENDPOINT_DB = 'db' //user wants to access database, but is doing an action that requires authentication
+
+const AUTH_ATTEMPT_MAX = 5
 
 //global methods
 exports.init = function() {
@@ -186,13 +190,13 @@ exports.handle_request = function(endpoint, args, dbserver) {
 								reject(STATUS_DB_ERR)
 							})
 					})
-					.catch(function(error_core) {
+					.catch(function(error_code) {
 						reject(error_code)
 					})
+					
 				break
 			
 			case ENDPOINT_DELETE:
-				//TODO support session deletion on logout
 				session_id = args[0]
 				
 				console.log('deleting session')
@@ -226,27 +230,33 @@ function get_session(id) {
 				reject(STATUS_NO_SESSION)
 			}
 			else {
-				let session = JSON.parse(data)
-						
-				if (expired(session)) {
-					//session expired; delete session and notify to reauthenticate
-					delete_session(id, function(err) {
-						if (err) {
-							console.log(err)
-						}
-					})
-				
-					reject(STATUS_EXPIRE)
-				}
-				else {
-					//session exists and is still valid; update timestamp and return session info
-					update_session(id, session, function(err) {
-						if (err) {
-							console.log(err)
-						}
-					})
+				try {
+					//TODO sometimes this fails if same session is read and updated too quickly
+					let session = JSON.parse(data)
 					
-					resolve(session)
+					if (expired(session)) {
+						//session expired; delete session and notify to reauthenticate
+						delete_session(id, function(err) {
+							if (err) {
+								console.log(err)
+							}
+						})
+				
+						reject(STATUS_EXPIRE)
+					}
+					else {
+						//session exists and is still valid; update timestamp and return session info
+						update_session(id, session, function(err) {
+							if (err) {
+								console.log(err)
+							}
+						})
+					
+						resolve(session)
+					}
+				}
+				catch(err) {
+					reject(STATUS_FAST)
 				}
 			}
 		})

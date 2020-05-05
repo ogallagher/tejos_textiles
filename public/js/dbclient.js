@@ -188,3 +188,22 @@ function dbclient_fetch_user_rating(username,puzzle_id,callback) {
 			callback(null)
 		})
 }
+
+function dbclient_fetch_user_plays(username,puzzle_id,callback) {
+	console.log('fetching ' + username + '\'s play data of ' + puzzle_id)
+	
+	sessionclient_db_request('fetch_user_plays', [username,puzzle_id])
+		.then(function(data) {
+			if (data.error) {
+				console.log('user plays fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				callback(data[0])
+			}
+		})
+		.catch(function(err) {
+			console.log('user plays fetch failed: ' + err.responseText)
+			callback(null)
+		})
+}
