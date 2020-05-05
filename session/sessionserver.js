@@ -6,11 +6,18 @@ Owen Gallagher
 
 */
 
+//dependencies
 const fs = require('fs')
 
+//local libraries
+const enums = require('../enums.js')
+
 //config
-const SESSION_TTL = 1000*60*60*24*7		// sessions expire in 1 week, specified in ms
-const SESSIONS_PATH = 'session/sessions/'		// sessions are stored in this directory, accessed from root directory
+const SESSIONS_PATH = 'session/sessions/'		//sessions are stored in this directory, accessed from root directory
+const SESSION_TTL = enums.time.WEEK				//session expiration
+const SESSION_CLEANER_DELAY = enums.time.WEEK	//session cleaner runs once per __
+const SESSION_SAVER_DELAY = enums.time.HOUR		//session saver runs once per __
+const SESSION_CACHE_MAX = 15					//max number of session objects in session_cache
 
 //global vars
 const SUCCESS =				0
@@ -41,11 +48,15 @@ const ENDPOINT_DB = 'db' //user wants to access database, but is doing an action
 
 const AUTH_ATTEMPT_MAX = 5
 
+let session_cache		//see issue https://github.com/ogallagher/tejos_textiles/issues/14 for more info
+let session_cleaner
+let session_saver
+
 //global methods
 exports.init = function() {
 	//create sessions dir
 	if (!fs.existsSync(SESSIONS_PATH)) {
-	    fs.mkdirSync(SESSIONS_PATH);
+	    fs.mkdirSync(SESSIONS_PATH)
 		console.log('created sessions directory at ' + SESSIONS_PATH)
 	}
 	else {
@@ -53,7 +64,15 @@ exports.init = function() {
 		
 		//remove expired sessions
 		clean_sessions()
-	}	
+	}
+	
+	//set up session cleaner
+	session_cleaner = setInterval(clean_sessions, SESSION_CLEANER_DELAY)
+	
+	//set up session saver
+	session_saver = setInterval(save_sessions, SESSION_SAVER_DELAY)
+	
+	session_cache = []
 }
 
 exports.handle_request = function(endpoint, args, dbserver) {
@@ -220,10 +239,28 @@ exports.handle_request = function(endpoint, args, dbserver) {
 	})
 }
 
+//local methods
 function get_session(id) {
-	let session_file = SESSIONS_PATH + id
-	
 	return new Promise(function(resolve,reject) {
+		//check session_cache
+		for (let i=session_cache.length-1; i>=0; i--) {
+			if (session_cache[i].id == id) {
+				let session = session_cache[i]
+				
+				if (expired(session.data)) {
+					delete_session(id) //remove session file
+					session_cache.splice(i,1) //remove from cache
+					reject(STATUS_EXPIRE)
+				}
+				else {
+					session.data.login = new Date().getTime() //update session
+					resolve(session.data)
+				}
+			}
+		}
+		
+		//check session file
+		let session_file = SESSIONS_PATH + id
 		fs.readFile(session_file, function(err,data) {
 			if (err) {
 				//session does not exist
@@ -231,27 +268,27 @@ function get_session(id) {
 			}
 			else {
 				try {
-					//TODO sometimes this fails if same session is read and updated too quickly
 					let session = JSON.parse(data)
 					
 					if (expired(session)) {
 						//session expired; delete session and notify to reauthenticate
-						delete_session(id, function(err) {
-							if (err) {
-								console.log(err)
-							}
-						})
-				
+						delete_session(id)
 						reject(STATUS_EXPIRE)
 					}
 					else {
-						//session exists and is still valid; update timestamp and return session info
-						update_session(id, session, function(err) {
-							if (err) {
-								console.log(err)
-							}
+						//session exists and is still valid; update timestamp
+						update_session(id, session)
+						
+						//add to session_cache, don't exceed SESSION_CACHE_MAX
+						session_cache.push({
+							id: id,
+							data: session
 						})
-					
+						while (session_cache.length > SESSION_CACHE_MAX) {
+							session_cache.shift() //removes first (oldest) element
+						}
+						
+						//return session info
 						resolve(session)
 					}
 				}
@@ -286,7 +323,7 @@ function delete_session(id,callback) {
 		if (err) {
 			let message = 'error: session for ' + id + ' failed to be deleted'
 			
-			if (callback != null) {
+			if (callback) {
 				callback(message)
 			}
 			else {
@@ -303,7 +340,27 @@ function delete_session(id,callback) {
 	})
 }
 
-//local methods
+function update_session(id,data_old,callback) {
+	let data_new = data_old
+	data_new.login = new Date().getTime()
+	
+	fs.writeFile(SESSIONS_PATH + id, JSON.stringify(data_new), function(err) {
+		if (err) {
+			let message = 'error: could not update login for session ' + id
+			
+			if (callback) {
+				callback(message)
+			}
+			else {
+				console.log(message)
+			}
+		}
+		else {
+			console.log('updated session_' + id + '.login = ' + data_new.login)
+		}
+	})
+}
+
 function clean_sessions() {
 	console.log('cleaning sessions')
 	//delete all expired sessions
@@ -319,17 +376,22 @@ function clean_sessions() {
 						console.log('error: could not check expiration of ' + file_name)
 					}
 					else {
-						let session = JSON.parse(data)
+						try {
+							let session = JSON.parse(data)
 						
-						if (expired(session)) {
-							fs.unlink(file_name, function(err) {
-								if (err) {
-									console.log('error: failed to remove expired session ' + file_name)
-								}
-								else {
-									console.log('removed expired session ' + file_name)
-								}
-							})
+							if (expired(session)) {
+								fs.unlink(SESSIONS_PATH + file_name, function(err) {
+									if (err) {
+										console.log('error: failed to remove expired session ' + file_name)
+									}
+									else {
+										console.log('removed expired session ' + file_name)
+									}
+								})
+							}
+						}
+						catch (err) {
+							console.log('skipping candidate session file ' + file_name)
 						}
 					}
 				})
@@ -338,24 +400,9 @@ function clean_sessions() {
 	})
 }
 
-function update_session(id,data_old,callback) {
-	let data_new = data_old
-	data_new.login = new Date().getTime()
-	
-	fs.writeFile(SESSIONS_PATH + id, JSON.stringify(data_new), function(err) {
-		if (err) {
-			let message = 'error: could not update login for session ' + id
-			
-			if (callback != null) {
-				callback(message)
-			}
-			else {
-				console.log(message)
-			}
-		}
-		else {
-			console.log('updated session_' + id + '.login = ' + data_new.login)
-		}
+function save_sessions() {
+	session_cache.forEach(function(session,index) {
+		update_session(session.id, session.data)
 	})
 }
 

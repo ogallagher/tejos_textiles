@@ -16,10 +16,10 @@ const emailserver_EMAIL_NEW_PUZZLE		= 1
 const emailserver_EMAIL_CONTRIBUTION	= 2
 const emailserver_EMAIL_CUSTOM			= 3
 
-exports.emailserver_EMAIL_REGISTER = emailserver_EMAIL_REGISTER
-exports.emailserver_EMAIL_NEW_PUZZLE = emailserver_EMAIL_NEW_PUZZLE
-exports.emailserver_EMAIL_CONTRIBUTION = emailserver_EMAIL_CONTRIBUTION
-exports.emailserver_EMAIL_CUSTOM = emailserver_EMAIL_CUSTOM
+exports.EMAIL_REGISTER = emailserver_EMAIL_REGISTER
+exports.EMAIL_NEW_PUZZLE = emailserver_EMAIL_NEW_PUZZLE
+exports.EMAIL_CONTRIBUTION = emailserver_EMAIL_CONTRIBUTION
+exports.EMAIL_CUSTOM = emailserver_EMAIL_CUSTOM
 
 //local constants
 const PATH_EMAIL_TEMPLATES = 'email/email_templates.json'
@@ -93,22 +93,22 @@ exports.email = function(dest_email, type, content) {
 	return new Promise(function(resolve) {
 		switch (type) {
 			case emailserver_EMAIL_REGISTER:
-				console.log('sending registration email to ' + username)
-			
+				console.log('sending registration email to ' + dest_email)
+				
 				break
 			
 			case emailserver_EMAIL_NEW_PUZZLE:
-				console.log('sending new textile email to ' + username)
+				console.log('sending new textile email to ' + dest_email)
 			
 				break
 			
 			case emailserver_EMAIL_CONTRIBUTION:
-				console.log('sending curation confirmation email to ' + username)
+				console.log('sending curation confirmation email to ' + dest_email)
 			
 				break
 			
 			case emailserver_EMAIL_CUSTOM:
-				console.log('sending custom email to ' + username)
+				console.log('sending custom email to ' + dest_email)
 			
 				break
 			
@@ -121,15 +121,15 @@ exports.email = function(dest_email, type, content) {
 			to: dest_email,
 			subject: "Hello There", // Subject line
 			text: "Hello world?", // plain text body
-			html: "<b>Hello world?</b>" // html body
+			html: "<html><strong>Hello world?</strong></html>" // html body
 		}
 		
-		transporter.sendMail(message, function(err) {
-			if (err, info) {
+		sender.sendMail(message, function(err, info) {
+			if (err) {
 				console.log('message send failed: ' + err)
 			}
 			else {
-				console.log('message ' + info.messageId + ' sent')
+				console.log('message sent, viewable at:\n' + nodemailer.getTestMessageUrl(info))
 				resolve()
 			}
 		})

@@ -62,16 +62,19 @@ function index_on_login(account_info) {
 							let jstring = jtemplate
 											.replace('?key?', account.username + ' plays')
 											.replace('?value?', data.times)
+							let jtag = $(jstring).attr('data-tag-type','user-stats')
+							featured_tags.append(jtag)
 						
-							featured_tags.append(jstring)
-						
-						
+							
 							//fastest solve
-							jstring = jtemplate
-										.replace('?key?', account.username + ' fastest solve')
-										.replace('?value?', data.fastest)
+							if (data.fastest) {
+								jstring = jtemplate
+											.replace('?key?', account.username + ' fastest solve')
+											.replace('?value?', data.fastest)
+								jtag = $(jstring).attr('data-tag-type','user-stats')
 						
-							featured_tags.append(jstring)
+								featured_tags.append(jtag)
+							}
 						})
 					}
 				})
@@ -86,7 +89,8 @@ function index_on_logout() {
 	$('#featured_rating').mouseleave()
 	
 	//remove user stats tags
-	$('.featured_tag').remove()
+	console.log($('.featured-tag[data-tag-type="user-stats"]'))
+	$('.featured-tag[data-tag-type="user-stats"]').remove() //TODO this is not working
 }
 
 //when a puzzle is loaded from dbclient, add it to the document and make it interactive
@@ -142,6 +146,7 @@ function puzzles_onload(dbdata) {
 function index_featured_stars() {
 	//list of star buttons
 	let rating = $('#featured_rating')
+	let rating_key = $('#featured_rating_key')
 	let stars = rating.children()
 	let one = $('#featured_rating_1')
 	let two = $('#featured_rating_2')
@@ -180,6 +185,8 @@ function index_featured_stars() {
 		stars.removeClass('text-warning').addClass('text-gray')
 		
 		if (user_rating) {
+			rating_key.html(account.username + ' rating')
+			
 			one.removeClass('text-gray').addClass('text-warning')
 			if (user_rating > 1) {
 				two.removeClass('text-gray').addClass('text-warning')
@@ -193,6 +200,9 @@ function index_featured_stars() {
 			if (user_rating > 4) {
 				five.removeClass('text-gray').addClass('text-warning')
 			}
+		}
+		else {
+			rating_key.html('rating')
 		}
 	})
 	

@@ -54,7 +54,13 @@ try {
 		sessionserver.init()
 		
 		console.log('enabling email notifications...')
-		emailserver.init()
+		emailserver.init().then(function() {
+			//TODO remove email testing
+			emailserver.email('owengall@icloud.com',emailserver.EMAIL_REGISTER,'Extra Content')
+				.then(function() {
+					console.log('email test successful')
+				})
+		})
 	})
 
 	function handle_db(endpoint,args,res) {
