@@ -13,14 +13,13 @@ const enums = require('../enums')
 
 const cacheserver = require('./cacheserver')
 
-const PATH_DB_SCHEME = 'db/db_scheme.json' //accessed from server.js = from root dir
-const PATH_DB_API = 'db/db_api.json'
+const PATH_DB_API = 'db/db_api.json'		 //accessed from server.js = from root dir
+const PATH_DB_SCHEME = 'db/db_scheme.json'
 
 const DB_TEJOS = 'db_revistatejos'
 const DB_TEXTILES = 'db_textilesjournal'
 
 var db //database connection object
-var scheme //database scheme object
 var api //database api, for hiding actual sql from the client
 
 exports.init = function(site) {	
@@ -56,38 +55,27 @@ exports.init = function(site) {
 		console.log('error: database credentials environment variables not found')
 	}
 	
-	//init db connection
-	fs.readFile(PATH_DB_SCHEME, function(err,data) {
-		if (err) {
-			console.log('error: read from db scheme file failed: ' + err)
-		}
-		else {
-			//store scheme
-			scheme = JSON.parse(data)
-			
-			//connect to database
-			if (config != null) {
-				console.log('connecting to ' + config.name + '...')
-				
-				db = mysql.createConnection({
-					host: config.host,
-					user: config.user,
-					password: config.pass,
-					database: config.db
-				})
-				
-				db.connect(function(err) {
-					if (err) {
-						console.log('error: failed to connect to ' + config.host)
-						console.log(err)
-					}
-					else {
-						console.log('database connected')
-					}
-				})
+	//connect to database
+	if (config != null) {
+		console.log('connecting to ' + config.name + '...')
+		
+		db = mysql.createConnection({
+			host: config.host,
+			user: config.user,
+			password: config.pass,
+			database: config.db
+		})
+		
+		db.connect(function(err) {
+			if (err) {
+				console.log('error: failed to connect to ' + config.host)
+				console.log(err)
 			}
-		}
-	})
+			else {
+				console.log('database connected')
+			}
+		})
+	}
 	
 	//init db api
 	fs.readFile(PATH_DB_API, function(err,data) {
@@ -134,11 +122,37 @@ exports.get_query = function(endpoint, args, is_external) {
 					let params = entry.params //array of parameters to be replaced in query
 					let query = entry.query //sql query to be assembled
 					
-					for (let i=0; i<params.length; i++) {
-						query = query.replace(params[i],db.escape(args[i]))
+					if (entry.special) {
+						//handle endpoints with special implementations
+						if (endpoint == 'search_puzzles') {
+							//build where clause from compound regexp with relevant columns
+							let columns = ['title']
+							let regexps = []
+							
+							for (let column of columns) {
+								//col regexp '.*((term_1)|(term_2)|...).*'
+								let regexp = column + " regexp '.*("
+								
+								let terms = []
+								for (let term of args) {
+									terms.push('(' + term + ')')
+								}
+								
+								regexp += terms.join('|') + ").*'"
+								regexps.push(regexp)
+							}
+							
+							query = query.replace('?regexps?', regexps.join(' or '))
+						}
 					}
-					//console.log('endpoint(' + endpoint + ') --> query(' + query + ')') //TODO remove this
+					else {
+						//handle general endpoints by inserting escaped params into the query directly
+						for (let i=0; i<params.length; i++) {
+							query = query.replace(params[i],db.escape(args[i]))
+						}
+					}
 					
+					//console.log(endpoint + ' --> ' + query) //TODO remove this
 					resolve({sql: query})
 				}
 				else {

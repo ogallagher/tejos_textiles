@@ -104,22 +104,18 @@ function dbclient_fetch_search(terms,callback) {
 	
 	let req = {
 		endpoint: 'search_puzzles',
-		args: []
+		args: terms
 	}
 	
-	let where = ''
-	
-	//compile compound where clause
-	terms.forEach(function(term) {
-		where += 'title like \'%' + term + '%\' or '
-	})
-	
-	//remove last or
-	req.args.push(where.replace(/\s*or\s*$/,''))
-	
 	$.get('/db', req, function(data) {
-		console.log('fetched ' + data.length + ' puzzles from db')
-		callback(data)
+		if (data.error) {
+			console.log('error: puzzle search failed: ' + data.error)
+			callback(false)
+		}
+		else {
+			console.log('fetched ' + data.length + ' puzzles from db')
+			callback(data)
+		}
 	})
 }
 

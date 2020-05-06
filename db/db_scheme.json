@@ -1,5 +1,5 @@
 {
-	"//description": "defines the database tables and fields, more for reference than anything else",
+	"//description": "outline of the database tables and fields, more for reference than anything else",
 	"puzzles": {
 		"id": "id",
 		"title": "title",

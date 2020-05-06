@@ -25,9 +25,10 @@
 		"external": true
 	},
 	"search_puzzles": {
-		"params": ["?likes?"],
-		"query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles where ?likes?",
-		"external": true
+		"params": [],
+		"query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles where ?regexps?",
+		"external": true,
+		"special": true
 	},
 	"rate": {
 		"params": ["?username?","?puzzle_id?","?rating?"],
