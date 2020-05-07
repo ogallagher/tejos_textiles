@@ -22,7 +22,15 @@ exports.EMAIL_CONTRIBUTION = emailserver_EMAIL_CONTRIBUTION
 exports.EMAIL_CUSTOM = emailserver_EMAIL_CUSTOM
 
 //local constants
-const PATH_EMAIL_TEMPLATES = 'email/email_templates.json'
+const PATH_EMAIL_TEMPLATES = 'email/email_templates/'
+
+const PATH_EMAIL_REGISTER = PATH_EMAIL_TEMPLATES + 'register'
+const PATH_EMAIL_NEW_PUZZLE = PATH_EMAIL_TEMPLATES + 'new_puzzle'
+const PATH_EMAIL_CONTRIBUTION = PATH_EMAIL_TEMPLATES + 'contribution'
+const PATH_EMAIL_CUSTOM = PATH_EMAIL_TEMPLATES + 'custom'
+
+const PATH_EMAIL_CSS = PATH_EMAIL_TEMPLATES + 'email_style.css'
+const EMAIL_CSS_PLACEHOLDER = '<!--?email_style.css?-->'
 
 //local vars
 let account
@@ -36,6 +44,7 @@ exports.init = function() {
 	return new Promise(function(resolve,reject) {
 		//load email templates			
 		console.log('creating email templates')
+		/*
 		fs.readFile(PATH_EMAIL_TEMPLATES, function(err,data) {
 			if (err) {
 				console.log('error: read from email templates file failed: ' + err)
@@ -52,6 +61,7 @@ exports.init = function() {
 				}
 			}
 		})
+		*/
 		
 		nodemailer.createTestAccount()
 			.then(function(credentials) {
@@ -89,33 +99,36 @@ exports.init = function() {
 	})
 }
 
-exports.email = function(dest_email, type, content) {
+exports.email = function(dest_email, type, args) {
 	return new Promise(function(resolve) {
+		let out = 'sending '
 		switch (type) {
 			case emailserver_EMAIL_REGISTER:
-				console.log('sending registration email to ' + dest_email)
+				out += 'registration'
 				
 				break
 			
 			case emailserver_EMAIL_NEW_PUZZLE:
-				console.log('sending new textile email to ' + dest_email)
+				out += 'new textile'
 			
 				break
 			
 			case emailserver_EMAIL_CONTRIBUTION:
-				console.log('sending curation confirmation email to ' + dest_email)
+				out += 'curation confirmation'
 			
 				break
 			
 			case emailserver_EMAIL_CUSTOM:
-				console.log('sending custom email to ' + dest_email)
+				out += 'custom'
 			
 				break
 			
 			default:
-				console.log('error: cannot send email of unknown type')
+				out += 'cannot send email of unknown type'
 				break
 		}
+		out += ' email to ' + dest_email;
+		console.log(out)
 		
 		let message = {
 			to: dest_email,

@@ -54,13 +54,14 @@ try {
 		sessionserver.init()
 		
 		console.log('enabling email notifications...')
-		emailserver.init().then(function() {
-			//TODO remove email testing
-			emailserver.email('owengall@icloud.com',emailserver.EMAIL_REGISTER,'Extra Content')
-				.then(function() {
-					console.log('email test successful')
-				})
-		})
+		emailserver
+			.init()
+			.then(function() {
+				console.log('email server initialized')
+			})
+			.catch(function() {
+				console.log('email server failed')
+			})
 	})
 
 	function handle_db(endpoint,args,res) {
@@ -116,14 +117,18 @@ try {
 			sessionserver.handle_request(endpoint, args, dbserver)
 				.then(function(data) {
 					if (endpoint == sessionserver.ENDPOINT_CREATE) {
+						//args = [username, password, session_id, email, subscribed]
 						//create activation code
 						sessionserver
-							.request_activate(data.session_id)
+							.request_activate(args[2])
 							.then(function(activation_code) {
 								res.json({success: data})
 								
-								//send activation email
-								
+								//send registration/activation email
+								emailserver.email(args[3], emailserver.EMAIL_REGISTER, {
+									username: args[0],
+									subscribed: args[4]
+								})
 							})
 							.catch(function() {
 								res.json({error: 'activation'})

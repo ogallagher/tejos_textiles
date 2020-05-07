@@ -55,13 +55,12 @@ const AUTH_ATTEMPT_MAX = 5
 const ACTIVATION_CODE_LEN = 6
 const NUM_MIN = 48								//0
 const NUM_MAX = 57								//9
-const NUM_UPPER_GAP = UPPER_MIN-NUM_MAX
 const UPPER_MIN = 65							//A
 const UPPER_MAX = 90							//Z
-const UPPER_LOWER_GAP = LOWER_MIN-UPPER_MAX
 const LOWER_MIN = 97							//a
 const LOWER_MAX = 122							//z
-const LOWER_RANGE = LOWER_MAX-LOWER_MIN
+const NUM_UPPER_GAP = UPPER_MIN-NUM_MAX
+const UPPER_LOWER_GAP = LOWER_MIN-UPPER_MAX
 const ACTIVATION_CODE_MIN = NUM_MIN
 const ACTIVATION_CODE_RANGE = (NUM_MAX-NUM_MIN) + (UPPER_MAX-UPPER_MIN) + (LOWER_MAX-LOWER_MIN) - NUM_UPPER_GAP - UPPER_LOWER_GAP
 
@@ -169,12 +168,10 @@ exports.handle_request = function(endpoint, args, dbserver) {
 														}
 														else {
 															console.log('got user summary')
-															let result = res[0]
 															/*
-															send back session id for creating activation code and sending 
-															activation request to client email
-															*/
-															result.session_id = session_id
+															server.js will take care of delegation for creating activation code (sessionserver) 
+															and sending activation request to client email (emailserver)
+															*/															
 															resolve(res[0])
 														}
 													})
@@ -433,7 +430,7 @@ function save_sessions() {
 function request_activate(session_id) {
 	//create activation code
 	let activation_code = ''
-	for (int i=0; i<ACTIVATION_CODE_LEN; i++) {
+	for (let i=0; i<ACTIVATION_CODE_LEN; i++) {
 		let char = Math.floor(Math.random() * ACTIVATION_CODE_RANGE) + ACTIVATION_CODE_MIN
 		
 		if (char >= UPPER_MAX) {

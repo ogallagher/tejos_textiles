@@ -1,8 +1,0 @@
-{
-	"register": {
-		"text": "You just registered! Welcome aboard.",
-		"html": "<html>You just registered! Welcome aboard</html>"
-	},
-	"new_puzzle": "A new Textile is available! Come check it out.",
-	"contribution": "Thank you for contributing in an undetermined way."
-}

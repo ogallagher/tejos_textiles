@@ -81,7 +81,7 @@ function login_register(username, password, email, subscribed) {
 			//hide and reset login form
 			$('#login_failed').hide()
 			$('#login_modal').modal('hide')
-		
+			
 			if (login_on_login) {
 				login_on_login(account)
 			}

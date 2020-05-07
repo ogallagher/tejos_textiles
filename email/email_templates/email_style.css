@@ -1,38 +1,35 @@
-/*
-style.css
+/* override elements */
+header {
+	
+}
 
-Owen Gallagher
-28 July 2019
+article {
+	
+}
 
-Main style sheet for Revista Tejos and Textiles Journal.
+h1 {
+	
+}
 
-DEPENDENCIES
-bootstrap
+p {
+	
+}
 
-*/
+strong {
+	
+}
 
-/* 
+ul {
+	list-style-type: none;
+	list-style-position: outside;
+}
 
-Import font families from Google Fonts. 
+li span {
+	margin-left: 8px;
+}
 
-titles = font-family: 'Poiret One', cursive;
-navigation = font-family: 'Lato', sans-serif;
-content = font-family: 'Darker Grotesque', sans-serif;
-
-*/
-@import url('https://fonts.googleapis.com/css?family=Darker+Grotesque|Lato:300|Poiret+One&display=swap');
-
-/*
-
-html tag overrides
-
-*/
-
-/* 
-
-Custom classes 
-
-*/
+/* custom classes */
+/* fonts */
 .font-title-xlg {
 	font-family: 'Poiret One', cursive;
 	font-size: xx-large;
@@ -77,11 +74,7 @@ Custom classes
 	font-family: 'Darker Grotesque', sans-serif;
 }
 
-.puzzle-canvas {
-	display: block;
-	max-height: 100%;
-}
-
+/* colors */
 .bg-olive {
 	background-color: #457E62;
 }
@@ -158,66 +151,8 @@ Custom classes
 }
 
 .text-raspberry {
-	color: #8A2E60; /* account page */
+	color: #8A2E60;
 }
-.text-olive-dark {
-	color: #294939; /* contact page */
+.text-raspberry-light {
+	color: #CE89AF;
 }
-.text-copper {
-	color: #7A780E; /* contribute page */
-}
-.text-sea {
-	color: #2B4C6F; /* about page */
-}
-
-.layers-container {
-	position: relative;
-}
-
-.overlap-1-left {
-	z-index: 1;
-	position: absolute;
-	top: 0%;
-	left: 0%;
-	height: 100%;
-}
-
-.overlap-1-right {
-	z-index: 1;
-	position: absolute;
-	top: 0%;
-	right: 0%;
-	height: 100%;
-}
-
-.overlap-1-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 50%;
-  height: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.clickable {
-	cursor: pointer;
-}
-
-.unselectable {
-	-moz-user-select: -moz-none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
-   
-	/*
-	Introduced in IE 10.
-	See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-	*/
-	-ms-user-select: none;
-	user-select: none;
-}
-
-/*
-
-id-specific styles
-
-*/

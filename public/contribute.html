@@ -5,7 +5,7 @@
         <meta charset="utf-8"/>
         <!--scales viewport depending on worldspace device width-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <meta name="description" content="Help keep Textiles Journal alive and kicking!"/>
+        <meta name="description" content="Share your literary works with Textiles Journal as material for future textiles."/>
         <meta name="author" content="Owen Gallagher"/>
         
         <title>Contribute to Textiles Journal</title>
@@ -58,18 +58,120 @@
 						<div class="form-group">
 							<label for="title">Your Work</label>
 							<input type="text" class="form-control mb-1" id="title" placeholder="Title">
-							<textarea rows="10" class="form-control" id="content" placeholder="Once upon two times..."></textarea>
+							<textarea rows="18" class="form-control" id="content" placeholder="Once upon two times..."></textarea>
+						</div>
+						<div class="form-group">
+							<label for="description">Description</label>
+							<textarea rows="4" class="form-control" id="description" 
+								placeholder="This is my most interesting grocery list. Note how I use alliteration for fruits and personification for vegetables..."></textarea>
 						</div>
 					</div>
 
 					<div class="col-lg">
 						<div class="form-group">
-						<label for="description">Description</label>
-						<textarea rows="2" class="form-control" id="description" placeholder="Description"></textarea>
-						</div>
-						<div class="form-group">
-						<label for="notes_conditions">Notes / Conditions</label>
-						<textarea rows="6" class="form-control" id="notes_conditions" placeholder="How do you want to be credited? Which fragments of your work"></textarea>
+							<label for="copyright">Copyright: Creative Commons</label>
+							<input id="focus_me" class="d-none"/>
+							<div id="copyright" class="form-group p-1 pl-3 font-navigation">
+								<details id="cc_0_details" class="form-check-copyright">
+									<summary>
+										<label for="cc_0">
+											No Rights Reserved (CC 0)
+										</label>
+									</summary>
+									<p>
+										I release this to public domain; use it as you please and no need to mention I wrote it.
+										<span class="font-italic">
+											(We at Textiles Journal will still give credit regardless.)
+										</span>
+									</p>
+								</details>
+								<details id="cc_by_details" class="form-check-copyright">
+									<summary>
+										<label for="cc_by">
+											Attribution (CC BY)
+										</label>
+									</summary>
+									<p>
+										Unrestricted use, as long as I’m credited as the author.
+									</p>
+								</details>
+								<details id="cc_by_sa_details" class="form-check-copyright text-copper font-weight-bold" open>
+									<summary>
+										<label for="cc_by_sa">
+											Attribution-Share-Alike (CC BY-SA)
+										</label>
+									</summary>
+									<p>
+										Use this as you will, but be sure to credit me as the author and don’t change how
+										it can be shared.
+									</p>
+								</details>
+								<details id="cc_by_nd_details" class="form-check-copyright">
+									<summary>
+										<label for="cc_by_nd">
+											Attribution-No-Derivatives (CC BY-ND)
+										</label>
+									</summary>
+									<p>
+										Free to copy and distribute, but credit me as the author and don’t modify it.
+										<span class="font-italic">
+											Only include this work in a textile in its entirety, or not at all.
+										</span>
+									</p>
+								</details>
+								<details id="cc_by_nc_details" class="form-check-copyright">
+									<summary>
+										<label for="cc_by_nc">
+											Attribution-NonCommercial (CC BY-NC)
+										</label>
+									</summary>
+									<p>
+										Free to copy, distribute, and modify, but you must credit me as the author and
+										cannot sell it to anyone.
+									</p>
+								</details>
+								<details id="cc_by_nc_sa_details" class="form-check-copyright">
+									<summary>
+										<label for="cc_by_nc_sa">
+											Attribution-NonCommercial-Share-Alike (CC BY-NC-SA)
+										</label>											
+									</summary>
+									<p>
+										Free to copy, distribute, and modify, but you must credit me as the author, cannot sell it,
+										and must share with the same license.
+									</p>
+								</details>
+								<details id="cc_by_nc_nd_details" class="form-check-copyright">
+									<summary>
+										<label for="cc_by_nc_nd">
+											Attribution-NonCommercial-No-Derivatives (CC BY-NC-ND)
+										</label>
+									</summary>
+									<p>
+										This work can only be shared exactly as I’ve published it with no modification, with the
+										same license, and with credit to me as the author.
+										<span class="font-italic">
+											Only include this work in a textile in its entirety, or not at all.
+										</span>
+									</p>
+								</details>
+							</div>
+							
+							<label for="attribution">Attribution</label>
+							<div id="attribution" class="form-group p-1 pl-3">
+								<div class="form-check">
+									<input type="radio" class="form-check-input" id="credit_username" value="credit_username" name="credit" checked/>
+									<label class="form-check-label" for="credit_username">
+										Credit my username
+									</label>
+								</div>
+								<div class="form-check">
+									<input type="radio" class="form-check-input" id="credit_anonymous" value="credit_anonymous" name="credit"/>
+									<label class="form-check-label" for="credit_anonymous">
+										Credit to Anonymous
+									</label>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
