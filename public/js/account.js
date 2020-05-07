@@ -7,6 +7,8 @@ Owen Gallagher
 let account
 
 window.onload = function() {
+	force_https()
+	
 	//TODO check cookies
 	console.log('TODO check cookies for account/session info')
 	

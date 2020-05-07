@@ -9,6 +9,8 @@ let account //see sessionclient:Account class
 let user_rating
 
 window.onload = function() {
+	force_https()
+	
 	//fetch puzzles from db and insert into page
 	dbclient_fetch_puzzles(puzzles_onload)
 	

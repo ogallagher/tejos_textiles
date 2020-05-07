@@ -5,6 +5,8 @@ Owen Gallagher
 */
 
 window.onload = function() {
+	force_https()
+	
 	html_imports('navbar', '#import_navbar', function() {
 		navbar_onload('contact')
 	})

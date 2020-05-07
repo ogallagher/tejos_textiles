@@ -13,6 +13,8 @@ let puzzle
 let user_rating
 
 window.onload = function() {
+	force_https()
+	
 	textile_load_puzzle(function() {
 		//import navbar
 		html_imports('navbar','#import_navbar', function() {
