@@ -40,13 +40,30 @@ exports.STATUS_DB_ERR =			STATUS_DB_ERR
 exports.STATUS_DELETE_ERR = 	STATUS_DELETE_ERR
 exports.STATUS_FAST =			STATUS_FAST
 
-//private vars
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
 const ENDPOINT_DB = 'db' //user wants to access database, but is doing an action that requires authentication
 
+exports.ENDPOINT_CREATE = ENDPOINT_CREATE
+exports.ENDPOINT_VALIDATE = ENDPOINT_VALIDATE
+exports.ENDPOINT_DELETE = ENDPOINT_DELETE
+exports.ENDPOINT_DB = ENDPOINT_DB
+
+//private vars
 const AUTH_ATTEMPT_MAX = 5
+const ACTIVATION_CODE_LEN = 6
+const NUM_MIN = 48								//0
+const NUM_MAX = 57								//9
+const NUM_UPPER_GAP = UPPER_MIN-NUM_MAX
+const UPPER_MIN = 65							//A
+const UPPER_MAX = 90							//Z
+const UPPER_LOWER_GAP = LOWER_MIN-UPPER_MAX
+const LOWER_MIN = 97							//a
+const LOWER_MAX = 122							//z
+const LOWER_RANGE = LOWER_MAX-LOWER_MIN
+const ACTIVATION_CODE_MIN = NUM_MIN
+const ACTIVATION_CODE_RANGE = (NUM_MAX-NUM_MIN) + (UPPER_MAX-UPPER_MIN) + (LOWER_MAX-LOWER_MIN) - NUM_UPPER_GAP - UPPER_LOWER_GAP
 
 let session_cache		//see issue https://github.com/ogallagher/tejos_textiles/issues/14 for more info
 let session_cleaner
@@ -152,6 +169,12 @@ exports.handle_request = function(endpoint, args, dbserver) {
 														}
 														else {
 															console.log('got user summary')
+															let result = res[0]
+															/*
+															send back session id for creating activation code and sending 
+															activation request to client email
+															*/
+															result.session_id = session_id
 															resolve(res[0])
 														}
 													})
@@ -306,6 +329,7 @@ function create_session(session_id) {
 	}
 	
 	return new Promise(function(resolve,reject) {
+		//create session file
 		fs.writeFile(SESSIONS_PATH + session_id, JSON.stringify(session), function(err) {
 			if (err) {
 				console.log(err)
@@ -403,6 +427,50 @@ function clean_sessions() {
 function save_sessions() {
 	session_cache.forEach(function(session,index) {
 		update_session(session.id, session.data)
+	})
+}
+
+function request_activate(session_id) {
+	//create activation code
+	let activation_code = ''
+	for (int i=0; i<ACTIVATION_CODE_LEN; i++) {
+		let char = Math.floor(Math.random() * ACTIVATION_CODE_RANGE) + ACTIVATION_CODE_MIN
+		
+		if (char >= UPPER_MAX) {
+			char += NUM_UPPER_GAP
+			
+			if (char >= LOWER_MAX) {
+				//lowercase
+				char += UPPER_LOWER_GAP
+			}
+			//else, uppercase
+		}
+		//else, number
+		
+		activation_code += String.fromCharCode(char)
+	}
+	
+	return new Promise(function(resolve,reject) {
+		//get session
+		get_session(session_id)
+			.then(function(session) {
+				//update session new activation code
+				session.code = activation_code
+				update_session(session_id, session, function(err) {
+					if (err) {
+						console.log(err)
+						reject(STATUS_CREATE_ERR)
+					}
+					else {
+						console.log('activation code for ' + session_id + ' = ' + activation_code)
+						resolve(activation_code)
+					}
+				})
+			})
+			.catch(function(err) {
+				console.log('session fetch for activation failed: ' + err)
+				reject(err)
+			})
 	})
 }
 

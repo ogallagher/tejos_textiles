@@ -68,19 +68,23 @@ function sessionclient_get_account(callback) {
 	}
 }
 
-function sessionclient_create(username,password) {
+function sessionclient_create(username,password,email,subscribed) {
 	let id = sessionclient_generate_session_id()
+	
+	let args = [username,password,id]
+	if (email) {
+		//register
+		args.push(email)
+		args.push(subscribed)
+	}
+	//else, log in
 	
 	return new Promise(function(resolve,reject) {
 		$.post({
 			url: URL_SESSIONS,
 			data: {
 				endpoint: ENDPOINT_CREATE,
-				args: [
-					username,
-					password,
-					id
-				]
+				args: args
 			},
 			success: function(data) {
 				if (data.error) {

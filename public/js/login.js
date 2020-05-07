@@ -56,43 +56,47 @@ function submit_login_register() {
 		
 			if (login) {
 				console.log('logging into account ' + username)
-				/*
-				Sends session create request to server, which authenticates and then
-				creates a session file. When the session client receives a success
-				response, the session and username cookies are created and an account
-				object is created.
-				*/
-				sessionclient_create(username,password)
-					.then(function(account) {
-						//hide and reset login form
-						$('#login_failed').hide()
-						$('#login_modal').modal('hide')
-						
-						if (login_on_login) {
-							login_on_login(account)
-						}
-					})
-					.catch(function(reason) {
-						if (reason == 'login') {
-							//incorrect credentials
-							$('#login_failed').show()
-							clear_login_form()
-						}
-						else {
-							//server error
-							alert('Login failed due to a server error!')
-						}
-					})
+				login_register(username,password)
 			}
 			else if (validate_email()) {
 				let email = $('#email_input').val()
 				let subscribed = $('#subscribe_check').prop('checked')
-			
-				$('#login_modal').modal('hide')
+				
 				console.log('creating new account ' + username)
+				login_register(username,password,email,subscribed)
 			}
 		}
 	})
+}
+
+/*
+Sends session create request to server, which authenticates and then
+creates a session file. When the session client receives a success
+response, the session and username cookies are created and an account
+object is created.
+*/
+function login_register(username, password, email, subscribed) {
+	sessionclient_create(username,password,email,subscribed)
+		.then(function(account) {
+			//hide and reset login form
+			$('#login_failed').hide()
+			$('#login_modal').modal('hide')
+		
+			if (login_on_login) {
+				login_on_login(account)
+			}
+		})
+		.catch(function(reason) {
+			if (reason == 'login') {
+				//incorrect credentials
+				$('#login_failed').show()
+				clear_login_form()
+			}
+			else {
+				//server error
+				alert('Login failed due to a server error!')
+			}
+		})
 }
 
 function clear_login_form() {

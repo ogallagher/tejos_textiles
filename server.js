@@ -115,7 +115,20 @@ try {
 			
 			sessionserver.handle_request(endpoint, args, dbserver)
 				.then(function(data) {
-					res.json({success: data})
+					if (endpoint == sessionserver.ENDPOINT_CREATE) {
+						//create activation code
+						sessionserver
+							.request_activate(data.session_id)
+							.then(function(activation_code) {
+								res.json({success: data})
+								
+								//send activation email
+								
+							})
+							.catch(function() {
+								res.json({error: 'activation'})
+							})
+					}
 				})
 				.catch(function(err) {
 					if (err == sessionserver.STATUS_CREATE_ERR) {
