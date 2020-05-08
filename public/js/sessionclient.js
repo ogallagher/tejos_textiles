@@ -24,6 +24,7 @@ const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
 const ENDPOINT_DB = 'db'
+const ENDPOINT_ACTIVATE = 'activate'
 
 function Account(session,username) {
 	this.session = session		//session cookie
@@ -100,7 +101,6 @@ function sessionclient_create(username,password,email,subscribed) {
 					
 					let account = new Account(id, username)
 					
-					console.log(data)
 					if (account_info.register) {
 						//register info from sessionserver
 						account.enabled = false
@@ -110,7 +110,6 @@ function sessionclient_create(username,password,email,subscribed) {
 					else {
 						//login info from dbserver
 						account.enabled = account_info.enabled.data[0]
-						account.email = account_info.email.data[0]
 						account.admin = account_info.admin.data[0]
 					}
 					
@@ -231,6 +230,39 @@ function sessionclient_db_request(db_endpoint, db_args) {
 		}
 		else {
 			reject('login')
+		}
+	})
+}
+
+function sessionclient_activate(activation_code) {
+	return new Promise(function(resolve,reject) {
+		let session_id = cookies_get(SESSION_COOKIE_KEY)
+		let username = cookies_get(USERNAME_COOKIE_KEY)
+		
+		if (session_id && username) {
+			let args = [session_id, username, activation_code]
+			
+			$.post({
+				url: URL_SESSIONS,
+				data: {
+					endpoint: ENDPOINT_VALIDATE,
+					args: args
+				},
+				success: function(data) {
+					if (data.success) {
+						resolve()
+					}
+					else {
+						reject('code')
+					}
+				},
+				error: function(err) {
+					reject('http')
+				}
+			})
+		}
+		else {
+			reject('session')
 		}
 	})
 }

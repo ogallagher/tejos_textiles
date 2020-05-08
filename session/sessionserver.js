@@ -29,6 +29,7 @@ const STATUS_LOGIN_WRONG = 	5
 const STATUS_DB_ERR =		6
 const STATUS_DELETE_ERR =	7
 const STATUS_FAST =			8
+const STATUS_ACTIVATION =	9
 
 exports.SUCCESS =				SUCCESS
 exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
@@ -39,16 +40,19 @@ exports.STATUS_LOGIN_WRONG =	STATUS_LOGIN_WRONG
 exports.STATUS_DB_ERR =			STATUS_DB_ERR
 exports.STATUS_DELETE_ERR = 	STATUS_DELETE_ERR
 exports.STATUS_FAST =			STATUS_FAST
+exports.STATUS_ACTIVATION =		STATUS_ACTIVATION
 
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
 const ENDPOINT_DB = 'db' //user wants to access database, but is doing an action that requires authentication
+const ENDPOINT_ACTIVATE = 'activate'
 
 exports.ENDPOINT_CREATE = ENDPOINT_CREATE
 exports.ENDPOINT_VALIDATE = ENDPOINT_VALIDATE
 exports.ENDPOINT_DELETE = ENDPOINT_DELETE
 exports.ENDPOINT_DB = ENDPOINT_DB
+exports.ENDPOINT_ACTIVATE = ENDPOINT_ACTIVATE
 
 //private vars
 const AUTH_ATTEMPT_MAX = 5
@@ -279,6 +283,28 @@ exports.handle_request = function(endpoint, args, dbserver) {
 					}
 				})
 				reject(STATUS_NO_SESSION)
+				break
+				
+			case ENDPOINT_ACTIVATE:
+				session_id = args[0]
+				username = args[1]
+				
+				console.log('attempting to activate account ' + username)
+				
+				get_session(session_id)
+					.then(function(session) {
+						if (session.code == args[2]) {
+							console.log(username + ' activation successful!')
+							resolve(true)
+						}
+						else {
+							reject(STATUS_ACTIVATION)
+						}
+					})
+					.catch(function(error_code) {
+						reject(error_code)
+					})
+				
 				break
 				
 			default:
