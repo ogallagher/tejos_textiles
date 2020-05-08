@@ -53,7 +53,7 @@ function submit_login_register() {
 		if (validate_password()) {
 			let username = $('#username_input').val()
 			let password = $('#password_input').val()
-		
+			
 			if (login) {
 				console.log('logging into account ' + username)
 				login_register(username,password)
@@ -76,7 +76,7 @@ response, the session and username cookies are created and an account
 object is created.
 */
 function login_register(username, password, email, subscribed) {
-	sessionclient_create(username,password,email,subscribed)
+	sessionclient_create(username, password, email, subscribed)
 		.then(function(account) {
 			//hide and reset login form
 			$('#login_failed').hide()

@@ -91,7 +91,6 @@ function index_on_logout() {
 	$('#featured_rating').mouseleave()
 	
 	//remove user stats tags
-	console.log($('.featured-tag[data-tag-type="user-stats"]'))
 	$('.featured-tag[data-tag-type="user-stats"]').remove() //TODO this is not working
 }
 

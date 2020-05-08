@@ -40,12 +40,16 @@ try {
 			}
 		}
 	}))
-
+	
 	//serve the website from public/
 	app.use(express.static('public'))
 
 	app.listen(app.get('port'), function() {
-		console.log('tejos//textiles server is running at <host>:' + app.get('port'))
+		let site_name = 'textiles'
+		if (SITE == enums.site.TEJOS) {
+			site_name = 'tejos'
+		}
+		console.log(site_name + ' server is running at <host>:' + app.get('port'))
 	
 		console.log('connecting to database...')
 		dbserver.init(SITE)
@@ -60,7 +64,7 @@ try {
 				console.log('email server initialized')
 			})
 			.catch(function() {
-				console.log('email server failed')
+				console.log('error: email server failed')
 			})
 	})
 
@@ -116,7 +120,8 @@ try {
 			
 			sessionserver.handle_request(endpoint, args, dbserver)
 				.then(function(data) {
-					if (endpoint == sessionserver.ENDPOINT_CREATE) {
+					if (endpoint == sessionserver.ENDPOINT_CREATE && args[3]) {
+						console.log('requesting activation')
 						//args = [username, password, session_id, email, subscribed]
 						//create activation code
 						sessionserver
@@ -127,12 +132,16 @@ try {
 								//send registration/activation email
 								emailserver.email(args[3], emailserver.EMAIL_REGISTER, {
 									username: args[0],
-									subscribed: args[4]
+									subscribed: args[4],
+									activation_code: activation_code
 								})
 							})
 							.catch(function() {
 								res.json({error: 'activation'})
 							})
+					}
+					else {
+						res.json({success: data})
 					}
 				})
 				.catch(function(err) {

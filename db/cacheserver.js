@@ -18,7 +18,7 @@ let config = {
 let cache
 let saved_key
 
-exports.init = function(callback) {
+exports.init = function() {
 	//get config from heroku env vars
 	if (process.env.MEMCACHEDCLOUD_SERVERS) {
 		config.host = process.env.MEMCACHEDCLOUD_SERVERS
@@ -36,20 +36,36 @@ exports.init = function(callback) {
 		password: config.pass
 	})
 	
-	if (cache) {
-		callback()
-	}
-	else {
-		console.log('error: cache server initialization failed')
-	}
+	return new Promise(function(resolve,reject) {
+		if (cache) {
+			exports.set('test_key', 'test_value', function(err) {
+				if (err) {
+					console.log('error: cache server failed to set test_key')
+					console.log(err)
+					cache = null
+					reject()
+				}
+				else {
+					resolve()
+				}
+			})
+		}
+		else {
+			console.log('error: cache server connection failed')
+			reject()
+		}
+	})
 }
 
-exports.set = function(key,value) {
-	if (key) {
+exports.set = function(key,value,callback) {
+	if (key && cache) {
 		cache.set(key,value, {
 			expires: 600
 		}, function(err) {
-			if (err) {
+			if (callback) {
+				callback(err)
+			}
+			else if (err) {
 				console.log('error: cache server could not add entry for ' + key)
 				console.log(err)
 			}
@@ -65,18 +81,23 @@ exports.set = function(key,value) {
 
 exports.get = function(key) {
 	return new Promise(function(resolve,reject) {
-		if (key) {
-			cache.get(key, function(err, value) {
-				if (err || !value) {
-					reject('cache server did not find an entry for ' + key)
-				}
-				else {
-					resolve(value)
-				}
-			})
+		if (cache) {
+			if (key) {
+				cache.get(key, function(err, value) {
+					if (err || !value) {
+						reject('cache server did not find an entry for ' + key)
+					}
+					else {
+						resolve(value)
+					}
+				})
+			}
+			else {
+				reject('error: cache server cannot get null key')
+			}
 		}
 		else {
-			reject('error: cache server cannot get null key')
+			reject('error: cache server never connected')
 		}
 	})
 }

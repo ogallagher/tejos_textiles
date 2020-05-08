@@ -48,11 +48,16 @@
 	"user_exists": {
 		"params": ["?username?"],
 		"query": "select exists(select 1 from people where username=?username? limit 1) as taken",
+		"external": true
+	},
+	"register": {
+		"params": ["?username?","?password?","?email?","?subscribed?"],
+		"query": "insert into people(username,`password`,email,subscription) values (?username?,?password?,?email?,?subscribed?)",
 		"external": false
 	},
  	"fetch_user": {
     	"params": ["?username?"],
-		"query": "select username,enabled,admin from people where username=?username?",
+		"query": "select username,enabled,admin,email from people where username=?username?",
 		"external": false
 	},
 	"fetch_user_details": {

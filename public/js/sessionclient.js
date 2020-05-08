@@ -30,7 +30,7 @@ function Account(session,username) {
 	this.username = username
 	this.email
 	this.links = []
-	this.subscription = false
+	this.subscribed = false
 	this.bio = ''
 	this.photo
 	this.enabled = false
@@ -99,8 +99,20 @@ function sessionclient_create(username,password,email,subscribed) {
 					let account_info = data.success
 					
 					let account = new Account(id, username)
-					account.enabled = account_info.enabled.data[0]
-					account.admin = account_info.admin.data[0]
+					
+					console.log(data)
+					if (account_info.register) {
+						//register info from sessionserver
+						account.enabled = false
+						account.email = account_info.email
+						account.subscribed = account_info.subscribed
+					}
+					else {
+						//login info from dbserver
+						account.enabled = account_info.enabled.data[0]
+						account.email = account_info.email.data[0]
+						account.admin = account_info.admin.data[0]
+					}
 					
 					resolve(account)
 				}

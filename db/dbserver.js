@@ -89,21 +89,13 @@ exports.init = function(site) {
 	})
 	
 	//init cache server
-	cacheserver.init(function() {
-		console.log('cache server connected')
-		
-		console.log('cacheserver.test: test_key,test_value')
-		cacheserver
-			.get('test_key')
-			.then(function(val) {
-				console.log('test_key -> ' + val)
-			})
-			.catch(function(err) {
-				console.log(err)
-				
-				cacheserver.set('test_key','test_value')
-			})
-	})
+	cacheserver.init()
+		.then(function() {
+			console.log('cache server initialized')
+		})
+		.catch(function() {
+			console.log('error: cache server failed')
+		})
 }
 
 exports.get_query = function(endpoint, args, is_external) {

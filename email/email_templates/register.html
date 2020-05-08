@@ -6,17 +6,19 @@
 				
 		<title>Textiles Journal Account Registration</title>
 		
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
 		<!--below gets replaced with stylesheet common to all emails-->
 		<!--?email_style.css?-->
+		<link rel="stylesheet" href="email_style.css"/>
 	</head>
-	<body>
+	<body class="container pt-3">
 		<header>
 			<h1 class="font-title">
 				You successfully registered an account with
-				<strong>Textiles Journal<strong>!
+				<strong class="font-navigation">Textiles Journal</strong>!
 			</h1>
 		</header>
-		
+		<hr>
 		<article class="font-content">
 			<div id="greeting">
 				Hello ?username?,
@@ -24,14 +26,14 @@
 			
 			<div id="content">
 				<p>
-					Thank you for joining the <strong>Textiles</strong> community! With an account you'll be
+					Thank you for joining the <strong class="font-navigation">Textiles</strong> community! With an account you'll be
 					able to take advantage of all the features of our site, including textile solve stats and
 					records, contribution of new literature or textile ideas, and giving textile ratings.
 				</p>
 				<p>
 					Your activation code is ?activation_code?.
 					<br>
-					<a>Activate account</a>
+					<a href="https://textilesjournal.org/activate.html">Activate account</a>
 				</p>
 				<p>
 					Here are your current <a href="https://textilesjournal.org/account.html">account settings</a>:
@@ -50,21 +52,22 @@
 			
 			<div id="signature">
 				<p>
-					<a href="https://textilesjournal.org">Textiles Journal</a>
+					Keep on reading and keep on playing,
 				</p>
-				<p>
+				<p class="font-navigation">
+					<a href="https://textilesjournal.org">Textiles Journal</a><br>
 					<a href="mailto:contact@textilesjournal.org">contact@textilesjournal.org</a>
 				</p>
 			</div>
 		</article>
-		
+		<hr>
 		<footer class="font-content">
 			<p>
-				Don't remember creating any accounts with us?
+				Don't remember creating any accounts with us?<br>
 				<a href="https://textilesjournal.org/account.html#delete_account">Delete this account.</a>
 			</p>
 			<p>
-				Want to update your account preferences or bio information (including subscription status)?
+				Want to update your account preferences or bio information (including subscription status)?<br>
 				<a href="https://textilesjournal.org/account.html">Visit your account page.</a>
 			</p>
 		</footer>

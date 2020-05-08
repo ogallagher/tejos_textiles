@@ -138,9 +138,37 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				password = args[1]
 				session_id = args[2]
 				
-				console.log('logging in user ' + username)
-				
-				dbserver
+				if (args[3]) {
+					console.log('registering account for user ' + username)
+					
+					let email = args[3]
+					let subscribed = args[4]
+					
+					dbserver
+					.get_query('register', [username,password,email,subscribed])
+					.then(function(action) {
+						dbserver.send_query(action.sql, function(err, res) {
+							if (err) {
+								console.log(err)
+								reject(STATUS_CREATE_ERR)
+							}
+							else {
+								resolve({
+									register: true,
+									email: email,
+									subscribed: subscribed
+								})
+							}
+						})
+					})
+					.catch(function(err) {
+						reject(STATUS_CREATE_ERR)
+					})
+				}
+				else {
+					console.log('logging in user ' + username)
+					
+					dbserver
 					.get_query('login', [username,password])
 					.then(function(action) {
 						dbserver.send_query(action.sql, function(err, res) {
@@ -150,13 +178,13 @@ exports.handle_request = function(endpoint, args, dbserver) {
 							}
 							else {
 								let results = res[0][0].result
-								
+							
 								if (results == 'success') {
 									//create session
 									create_session(session_id)
 										.then(function(session) {
 											console.log('login success')
-											
+										
 											//return account summary
 											dbserver
 												.get_query('fetch_user', [username])
@@ -196,6 +224,7 @@ exports.handle_request = function(endpoint, args, dbserver) {
 					.catch(function(err) {
 						reject(STATUS_CREATE_ERR)
 					})
+				}
 			
 				break
 					
@@ -256,6 +285,39 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				console.log('error: invalid session endpoint ' + endpoint)
 				reject(STATUS_ENDPOINT_ERR)
 		}
+	})
+}
+
+exports.request_activate = function(session_id) {
+	//create activation code
+	let activation_code = ''
+	for (let i=0; i<ACTIVATION_CODE_LEN; i++) {
+		let char = Math.floor(Math.random() * ACTIVATION_CODE_RANGE) + ACTIVATION_CODE_MIN
+		
+		if (char > NUM_MAX) {
+			char += NUM_UPPER_GAP
+			
+			if (char > UPPER_MAX) {
+				//lowercase
+				char += UPPER_LOWER_GAP
+			}
+			//else, uppercase
+		}
+		//else, number
+		activation_code += String.fromCharCode(char)
+	}
+	
+	return new Promise(function(resolve,reject) {
+		//create session with new activation code
+		create_session(session_id, activation_code)
+			.then(function(session) {
+				console.log('[' + session_id + '].code = ' + session.code)
+				resolve(activation_code)
+			})
+			.catch(function(err) {
+				console.log('failed to create session ' + session_id + ': ' + err)
+				reject(STATUS_CREATE_ERR)
+			})
 	})
 }
 
@@ -320,9 +382,12 @@ function get_session(id) {
 	})
 }
 
-function create_session(session_id) {
+function create_session(session_id, activation_code) {
 	let session = {
 		login: new Date().getTime()
+	}
+	if (activation_code) {
+		session.code = activation_code
 	}
 	
 	return new Promise(function(resolve,reject) {
@@ -377,7 +442,7 @@ function update_session(id,data_old,callback) {
 			}
 		}
 		else {
-			console.log('updated session_' + id + '.login = ' + data_new.login)
+			console.log('updated session ' + id + '.login = ' + data_new.login)
 		}
 	})
 }
@@ -424,50 +489,6 @@ function clean_sessions() {
 function save_sessions() {
 	session_cache.forEach(function(session,index) {
 		update_session(session.id, session.data)
-	})
-}
-
-function request_activate(session_id) {
-	//create activation code
-	let activation_code = ''
-	for (let i=0; i<ACTIVATION_CODE_LEN; i++) {
-		let char = Math.floor(Math.random() * ACTIVATION_CODE_RANGE) + ACTIVATION_CODE_MIN
-		
-		if (char >= UPPER_MAX) {
-			char += NUM_UPPER_GAP
-			
-			if (char >= LOWER_MAX) {
-				//lowercase
-				char += UPPER_LOWER_GAP
-			}
-			//else, uppercase
-		}
-		//else, number
-		
-		activation_code += String.fromCharCode(char)
-	}
-	
-	return new Promise(function(resolve,reject) {
-		//get session
-		get_session(session_id)
-			.then(function(session) {
-				//update session new activation code
-				session.code = activation_code
-				update_session(session_id, session, function(err) {
-					if (err) {
-						console.log(err)
-						reject(STATUS_CREATE_ERR)
-					}
-					else {
-						console.log('activation code for ' + session_id + ' = ' + activation_code)
-						resolve(activation_code)
-					}
-				})
-			})
-			.catch(function(err) {
-				console.log('session fetch for activation failed: ' + err)
-				reject(err)
-			})
 	})
 }
 

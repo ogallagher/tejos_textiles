@@ -1,23 +1,4 @@
 /* override elements */
-header {
-	
-}
-
-article {
-	
-}
-
-h1 {
-	
-}
-
-p {
-	
-}
-
-strong {
-	
-}
 
 ul {
 	list-style-type: none;
@@ -31,19 +12,19 @@ li span {
 /* custom classes */
 /* fonts */
 .font-title-xlg {
-	font-family: 'Poiret One', cursive;
+	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 	font-size: xx-large;
 }
 .font-title-lg {
-	font-family: 'Poiret One', cursive;
+	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 	font-size: x-large;
 }
 .font-title-md {
-	font-family: 'Poiret One', cursive;
+	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 	font-size: large;
 }
 .font-title {
-	font-family: 'Poiret One', cursive;
+	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 }
 
 .font-navigation-lg {
@@ -55,7 +36,7 @@ li span {
 	font-size: large;
 }
 .font-navigation {
-	font-family: 'Lato', sans-serif;
+	font-family: 'Lato', 'Verdana', sans-serif;
 }
 
 .font-content-lg {
@@ -71,7 +52,7 @@ li span {
 	font-size: medium;
 }
 .font-content {
-	font-family: 'Darker Grotesque', sans-serif;
+	font-family: 'Darker Grotesque', 'Helvetica', sans-serif;
 }
 
 /* colors */

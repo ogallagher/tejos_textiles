@@ -37,6 +37,7 @@ let account
 let options
 let sender
 let templates
+let css = ''
 let defaults
 
 //global methods
@@ -44,24 +45,46 @@ exports.init = function() {
 	return new Promise(function(resolve,reject) {
 		//load email templates			
 		console.log('creating email templates')
-		/*
-		fs.readFile(PATH_EMAIL_TEMPLATES, function(err,data) {
+		
+		//load email template stylesheet
+		fs.readFile(PATH_EMAIL_CSS, function(err,data) {
 			if (err) {
-				console.log('error: read from email templates file failed: ' + err)
+				console.log('error: read from email css file failed: ' + err)
 				reject()
 			}
 			else {
-				//read api file
-				try {
-					templates = JSON.parse(data)
-				}
-				catch (err_json) {
-					console.log('error: read from email templates file failed: ' + err_json)
-					reject()
-				}
+				css = data.toString().replace(/\s+/g,' ')
+				
+				templates = {}
+				
+				//register
+				templates.register = {}
+				fs.readFile(PATH_EMAIL_REGISTER + '.html', function(err,data) {
+					if (err) {
+						console.log('error: read from register html template failed: ' + err)
+						reject()
+					}
+					else {
+						templates.register.html = data.toString()
+						.replace(/\s+/g,' ')
+						.replace(EMAIL_CSS_PLACEHOLDER, '<style>' + css + '</style>')
+					}
+				})
+				fs.readFile(PATH_EMAIL_REGISTER + '.txt', function(err, data) {
+					if (err) {
+						console.log('error: read from register txt template failed: ' + err)
+						reject()
+					}
+					else {
+						templates.register.text = data.toString()
+					}
+				})
+				
+				//new puzzle
+				
+				//contribution
 			}
 		})
-		*/
 		
 		nodemailer.createTestAccount()
 			.then(function(credentials) {
@@ -102,10 +125,22 @@ exports.init = function() {
 exports.email = function(dest_email, type, args) {
 	return new Promise(function(resolve) {
 		let out = 'sending '
+		let subject = ''
+		let text = ''
+		let html = ''
+		
 		switch (type) {
 			case emailserver_EMAIL_REGISTER:
 				out += 'registration'
-				
+				subject = 'Textiles Journal account registration'
+				text = templates.register.text
+					.replace('?username?', args.username)
+					.replace('?subscribed?', args.subscribed)
+					.replace('?activation_code?', args.activation_code)
+				html = templates.register.html
+					.replace('?username?', args.username)
+					.replace('?subscribed?', args.subscribed)
+					.replace('?activation_code?', args.activation_code)
 				break
 			
 			case emailserver_EMAIL_NEW_PUZZLE:
@@ -132,9 +167,9 @@ exports.email = function(dest_email, type, args) {
 		
 		let message = {
 			to: dest_email,
-			subject: "Hello There", // Subject line
-			text: "Hello world?", // plain text body
-			html: "<html><strong>Hello world?</strong></html>" // html body
+			subject: subject,
+			text: text,
+			html: html
 		}
 		
 		sender.sendMail(message, function(err, info) {

@@ -1,0 +1,24 @@
+
+You successfully registered an account with Textiles Journal!
+
+Hello ?username?,
+
+Thank you for joining the Textiles community! With an account you'll be able to take advantage of all the features of our site, including textile solve stats and records, contribution of new literature or textile ideas, and giving textile ratings.
+
+Your activation code is ?activation_code?. Visit this link to activate your account: https://textilesjournal.org/activate.html
+
+Here are your current account settings:
+
+	username: ?username?
+	subscribed: ?subscribed?
+
+Keep on reading and keep on playing,
+
+Textiles Journal
+contact@textilesjournal.org
+https://textilesjournal.org/contact.html
+
+
+Don't remember creating any accounts with us? Delete this account: https://textilesjournal.org/account.html#delete_account
+
+Want to update your account preferences or bio information (including subscription status)? Visit your account page: https://textilesjournal.org/account.html
