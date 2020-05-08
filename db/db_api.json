@@ -55,6 +55,11 @@
 		"query": "insert into people(username,`password`,email,subscription) values (?username?,?password?,?email?,?subscribed?)",
 		"external": false
 	},
+	"activate": {
+		"params": ["?username?"],
+		"query": "update people set enabled=true where username=?username?",
+		"external": false
+	},
  	"fetch_user": {
     	"params": ["?username?"],
 		"query": "select username,enabled,admin from people where username=?username?",

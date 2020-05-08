@@ -295,9 +295,27 @@ exports.handle_request = function(endpoint, args, dbserver) {
 					.then(function(session) {
 						if (session.code == args[2]) {
 							console.log(username + ' activation successful!')
-							resolve(true)
+							
+							//update server
+							dbserver.get_query('activate', [username])
+								.then(function(action) {
+									dbserver.send_query(action.sql, function(err) {
+										if (err) {
+											console.log(err)
+											reject(STATUS_DB_ERR)
+										}
+										else {
+											resolve(true)
+										}
+									})
+								})
+								.catch(function(err) {
+									console.log('error: failed to get db-->activate query')
+									reject(STATUS_DB_ERR)
+								})
 						}
 						else {
+							console.log('suspicious: incorrect activation code for ' + username)
 							reject(STATUS_ACTIVATION)
 						}
 					})

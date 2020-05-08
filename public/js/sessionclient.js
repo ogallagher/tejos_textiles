@@ -245,7 +245,7 @@ function sessionclient_activate(activation_code) {
 			$.post({
 				url: URL_SESSIONS,
 				data: {
-					endpoint: ENDPOINT_VALIDATE,
+					endpoint: ENDPOINT_ACTIVATE,
 					args: args
 				},
 				success: function(data) {

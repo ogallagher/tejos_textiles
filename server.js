@@ -163,6 +163,9 @@ try {
 					else if (err = sessionserver.STATUS_DELETE_ERR) {
 						res.json({error: 'delete'})
 					}
+					else if (err == sessionserver.STATUS_ACTIVATION) {
+						res.json({error: 'activation'})
+					}
 					else {
 						res.json({error: 'endpoint'})
 					}

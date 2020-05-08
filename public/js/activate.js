@@ -23,9 +23,9 @@ window.onload = function() {
 					activation_code_input.addClass('text-raspberry')
 					$('#activate').prop('disabled',true)
 					
-					setTimeout(2000, function() {
+					setTimeout(function() {
 						window.location.href = 'account.html'
-					})
+					}, 2000)
 				})
 				.catch(function(err) {
 					//reset form input
@@ -61,6 +61,10 @@ function activate_on_login(account) {
 			activation_code_input.prop('disabled',true)
 			activation_code_input.val('Your account is already activated!')
 			activation_code_input.addClass('text-raspberry')
+			
+			setTimeout(function() {
+				window.location.href = 'account.html'
+			}, 2000)
 		}
 		else {
 			//session cookie is valid; enable activation code entry
