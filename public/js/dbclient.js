@@ -203,3 +203,83 @@ function dbclient_fetch_user_plays(username,puzzle_id,callback) {
 			callback(null)
 		})
 }
+
+function dbclient_fetch_user(username, callback) {
+	console.log('fetching user ' + username)
+	
+	let req = {
+		endpoint: 'fetch_user_details',
+		args: [username]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(res) {
+			if (res.error) {
+				callback(null)
+			}
+			else {
+				let account_details = res[0]
+				
+				let account = new Account(null, username)
+				account.enabled = (account_details.enabled.data[0] == 1)
+				account.admin = (account_details.admin.data[0] == 1)
+				account.bio = account_details.bio
+				account.email = account_details.email
+			
+				account.links = []
+				if (account_details.links) {
+					let link_entries = account_details.links.split('\n')
+					for (let link_entry of link_entries) {
+						let key_value = link_entry.split('=')
+						account.links.push({
+							name: key_value[0],
+							link: key_value[1]
+						})
+					}
+				}
+			
+				account.photo = account_details.photo
+				account.subscribed = (account_details.subscription.data[0] == 1)
+			
+				callback(account)
+			}
+		},
+		error: function(err) {
+			callback(null)
+		}
+	})
+}
+
+function dbclient_fetch_works(username, callback) {
+	console.log('fetching works by ' + username)
+	
+	let req = {
+		endpoint: 'fetch_works',
+		args: [username]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('error: works fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				if (!data[0]) {
+					callback([])
+				}
+				else {
+					callback(data[0])
+				}
+			}
+		},
+		error: function(err) {
+			console.log('error: works fetch failed: ' + err.responseText)
+			callback(null)
+		}
+	})
+}

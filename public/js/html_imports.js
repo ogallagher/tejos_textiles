@@ -22,7 +22,8 @@ const imports = [
 	'textile_thumbnail',
 	'login',
 	'featured_tag',
-	'link_row'
+	'link_row',
+	'work_tile'
 ];
 
 /*

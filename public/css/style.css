@@ -33,6 +33,7 @@ html tag overrides
 Custom classes 
 
 */
+
 .font-title-xlg {
 	font-family: 'Poiret One', cursive;
 	font-size: xx-large;
@@ -136,6 +137,10 @@ Custom classes
 	background-color: #f8f9fa;
 }
 
+.bg-copper-hover:hover {
+	background-color: #7A780E;
+}
+
 .text-light-hover {
 	color: transparent;
 }
@@ -168,6 +173,11 @@ Custom classes
 }
 .text-sea {
 	color: #2B4C6F; /* about page */
+}
+
+.border-copper {
+	border-width: 1px;
+	border-color: #7A780E;
 }
 
 .layers-container {
@@ -214,6 +224,29 @@ Custom classes
 	*/
 	-ms-user-select: none;
 	user-select: none;
+}
+
+.lift-hover:hover {
+	box-shadow: 2px 2px 3px #6c757d;
+	margin-right: 4px;
+	margin-bottom: 4px;
+	margin-left: -4px;
+	margin-top: -4px;
+}
+
+.editable[data-editing="true"] {
+	/*
+	required mention to enable attribute and pseudo
+	selectors simultaneously. See https://stackoverflow.com/a/8988418/10200417
+	*/
+	cursor: pointer;
+	border-width: 1px;
+	border-color: transparent;
+	border-style: solid;
+}
+.editable[data-editing="true"]:hover {
+	border-color: #294939;
+	background-color: #457E62;
 }
 
 /*

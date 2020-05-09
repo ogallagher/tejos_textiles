@@ -16,6 +16,7 @@
         
         <!-- js internal -->
 		<script src="js/force_https.js"></script>
+		<script src="js/url_params.js"></script>
         <script src="js/html_imports.js"></script>
         <script src="js/dbclient.js"></script>
 		<script src="js/cookies.js"></script>
@@ -43,8 +44,11 @@
 				<div id="username" class='display-3 text-center text-raspberry font-content flex-fill'>
 					username
 				</div>
-				<button id="edit_account" class="btn btn-lg text-dark-hover text-secondary-nohover">
+				<button id="edit_account" class="btn btn-lg text-dark-hover text-secondary-nohover" style="display:none;">
 					<span class="oi oi-pencil"></span>
+				</button>
+				<button id="save_account" class="btn btn-lg text-dark-hover text-secondary-nohover" style="display:none;">
+					<span class="oi oi-check"></span>
 				</button>
 			</div>
 			
@@ -57,7 +61,7 @@
 						<a id="email" href="#">username@domain.com</a>
 					</div>
 				</div>
-				<div class="bg-raspberry mx-auto" style="width:256px;height:256px;">
+				<div id="contact_photo" class="bg-raspberry mx-auto editable" data-editing="false" style="width:256px;height:256px;">
 					<img
 						id="photo"
 						src="https://freeiconshop.com/wp-content/uploads/edd/person-outline.png" 
@@ -68,14 +72,14 @@
 			</div>
 			
 			<!-- urls and account status -->
-			<div id="links">
+			<div id="links" class="editable" data-editing="false">
 				<div class="d-flex pb-2">
 					<div id="import_links" class="flex-fill mr-lg-2 font-navigation-md"></div>
 				</div>
 			</div>
 			
 			<!-- bio -->
-			<div id="bio" class="font-content-lg text-justify" style="line-height: 125%;">
+			<div id="bio" class="font-content-lg text-justify editable" data-editing="false" style="line-height: 125%;">
 				<p>
 					If we want biographical information that has enough content to show how the image float is handled, we're going to need to make
 					the sentences both wordy and multiple. It'll probably end up being repetitive too. This should be about enough.
@@ -129,10 +133,19 @@
 			
 			<!-- contribution; works and fragments -->
 			<div id="contributions">
-				
+				<hr>
+				<h3 class="text-dark text-capitalize font-title">Contributions</h3>
+				<div id="import_words" class="row px-2"></div>
+				<div class="row font-navigation p-2">
+					<button id="more_contributions" 
+						class="col btn bg-copper-hover border-copper rounded text-light-hover text-copper text-uppercase" role="button">
+						load more contributions
+					</button>
+				</div>
 			</div>
 			
 			<!-- danger; delete account -->
+			<hr>
 			<div class="p-2">
 				<div class="row">
 					<button id="delete_account" class="btn btn-outline-danger col font-navigation text-uppercase" role="button">delete account</button>

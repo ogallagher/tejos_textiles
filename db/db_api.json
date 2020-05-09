@@ -68,12 +68,17 @@
 	"fetch_user_details": {
 		"params": ["?username?"],
 		"query": "select admin,enabled,bio,email,links,photo,subscription from people where username=?username?",
-		"external": false
+		"external": true
 	},
 	"fetch_user_plays": {
 		"params": ["?username?","?puzzle_id?"],
 		"query": "select count(*) as times, min(duration) as fastest from plays where username=?username? and puzzle_id=?puzzle_id?",
 		"external": false
+	},
+	"fetch_works": {
+		"params": ["?username?"],
+		"query": "select id,title,`text`,`date`,description from works where author=?username? order by `date` desc, title asc",
+		"external": true
 	}
 }
 

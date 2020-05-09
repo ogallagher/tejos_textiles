@@ -60,29 +60,9 @@ function textile_on_login(account_info) {
 }
 
 function textile_load_puzzle(callback) {
-	let url_params = window.location.search.substring(1) //ignore initial question mark
-	let puzzle_id
+	let puzzle_id = url_params_get('puzzle_id')
 	
-	if (url_params.indexOf('&') != -1) {
-		url_params = url_params.split('&')
-		
-		for (let i=0; i<url_params.length && puzzle_id !== undefined; i++) {
-			let entry = url_params[i].split('=')
-		
-			if (entry[0] == 'puzzle_id') {
-				puzzle_id = entry[1]
-			}
-		}
-	}
-	else {
-		let entry = url_params.split('=')
-		
-		if (entry[0] == 'puzzle_id') {
-			puzzle_id = entry[1]
-		}
-	}
-	
-	if (puzzle_id !== undefined) {
+	if (puzzle_id != null) {
 		console.log('loading textile ' + puzzle_id)
 		
 		dbclient_fetch_puzzle(puzzle_id, function(dbdata) {
@@ -110,7 +90,9 @@ function textile_load_puzzle(callback) {
 				.finally(function() {
 					callback()
 				})
-			
+				
+			//assign completion callback
+			puzzle.onComplete = textile_on_complete
 		})
 	}
 	else {
@@ -215,4 +197,15 @@ function textile_stars() {
 			login_toast.toast('show')
 		}
 	})
+}
+
+//TODO handle puzzle completion
+function textile_puzzle_on_complete(puzzle) {
+	console.log('puzzle completed!')
+	
+	//if not logged in, store play cookie and toast to login to save progress
+	
+	//update db.plays submit username,puzzle,duration
+	
+	//load fragment reader; shows literature contained in the puzzle
 }
