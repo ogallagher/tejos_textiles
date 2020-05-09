@@ -5,11 +5,13 @@ Owen Gallagher
 */
 
 let activation_code_input
+let result_output
 
 window.onload = function() {
 	force_https()
 	
 	activation_code_input = $('#activation_code')
+	result_output = $('#result').hide()
 	
 	$('#activate').click(function() {
 		let activation_code = activation_code_input.val()
@@ -30,7 +32,18 @@ window.onload = function() {
 				.catch(function(err) {
 					//reset form input
 					activation_code_input.val('')
-					activation_code_input.prop('placeholder','That activation code was not correct.')
+					
+					console.log('activation error: ' + err)
+					if (err == 'expired') {
+						//session not found/expired; activation code expired
+						activation_code_input.prop('placeholder','That activation code has expired.')
+						result_output.html('Sorry for the inconvenience; the server will send you a new activation code via email momentarily.').show()
+					}
+					else {
+						//activation code incorrect
+						activation_code_input.prop('placeholder','That activation code was not correct.')
+						result_output.hide()
+					}
 				})
 		}
 		else {
@@ -55,9 +68,12 @@ window.onload = function() {
 }
 
 function activate_on_login(account) {
+	result_output.hide()
+	
 	if (account) {
 		if (account.enabled) {
 			$('#activate').prop('disabled',true)
+			
 			activation_code_input.prop('disabled',true)
 			activation_code_input.val('Your account is already activated!')
 			activation_code_input.addClass('text-raspberry')

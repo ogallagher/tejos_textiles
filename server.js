@@ -152,6 +152,43 @@ try {
 						res.json({error: 'null'})
 					}
 					else if (err == sessionserver.STATUS_EXPIRE) {
+						if (endpoint == sessionserver.ENDPOINT_ACTIVATE) {
+							//args = [session_id, username, activation_code]
+							//get dest email
+							let username = args[1]
+							dbserver.get_query('fetch_user',[username])
+								.then(function(action) {
+									dbserver.send_query(action.sql, function(err, data) {
+										if (err) {
+											console.log('error: user ' + username + ' not found in db')
+										}
+										else {
+											let account_info = data[0]
+											let dest_email = account_info.email
+											let subscribed = (account_info.subscription[0] == 1)
+											
+											//send new activation code
+											sessionserver
+												.request_activate(args[0])
+												.then(function(activation_code) {
+													//send new activation email
+													emailserver.email(dest_email, emailserver.EMAIL_REGISTER, {
+														username: username,
+														subscribed: subscribed,
+														activation_code: activation_code
+													})
+												})
+												.catch(function() {
+													console.log('error: unable to create new activation code for ' + username)
+												})
+										}
+									})
+								})
+								.catch(function(err) {
+									console.log('error: unable to find db --> fetch_user')
+								})
+						}
+						
 						res.json({error: 'expired'})
 					}
 					else if (err == sessionserver.STATUS_LOGIN_WRONG) {

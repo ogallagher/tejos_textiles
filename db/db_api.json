@@ -62,7 +62,7 @@
 	},
  	"fetch_user": {
     	"params": ["?username?"],
-		"query": "select username,enabled,admin from people where username=?username?",
+		"query": "select username,enabled,admin,subscription,email from people where username=?username?",
 		"external": false
 	},
 	"fetch_user_details": {

@@ -253,7 +253,7 @@ function sessionclient_activate(activation_code) {
 						resolve()
 					}
 					else {
-						reject('code')
+						reject(data.error)
 					}
 				},
 				error: function(err) {

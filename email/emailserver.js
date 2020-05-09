@@ -134,13 +134,13 @@ exports.email = function(dest_email, type, args) {
 				out += 'registration'
 				subject = 'Textiles Journal account registration'
 				text = templates.register.text
-					.replace('?username?', args.username)
-					.replace('?subscribed?', args.subscribed)
-					.replace('?activation_code?', args.activation_code)
+					.replace(/\?username\?/g, args.username)
+					.replace(/\?subscribed\?/g, args.subscribed)
+					.replace(/\?activation_code\?/g, args.activation_code)
 				html = templates.register.html
-					.replace('?username?', args.username)
-					.replace('?subscribed?', args.subscribed)
-					.replace('?activation_code?', args.activation_code)
+					.replace(/\?username\?/g, args.username)
+					.replace(/\?subscribed\?/g, args.subscribed)
+					.replace(/\?activation_code\?/g, args.activation_code)
 				break
 			
 			case emailserver_EMAIL_NEW_PUZZLE:
