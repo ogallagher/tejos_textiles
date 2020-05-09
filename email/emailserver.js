@@ -31,6 +31,9 @@ const PATH_EMAIL_CUSTOM = PATH_EMAIL_TEMPLATES + 'custom'
 
 const PATH_EMAIL_CSS = PATH_EMAIL_TEMPLATES + 'email_style.css'
 const EMAIL_CSS_PLACEHOLDER = '<!--?email_style.css?-->'
+const EMAIL_USERNAME_PLACEHOLDER = /\?username\?/g
+const EMAIL_SUBSCRIBED_PLACEHOLDER = /\?subscribed\?/g
+const EMAIL_ACTIVATION_CODE_PLACEHOLDER = /\?activation_code\?/g
 
 //local vars
 let account
@@ -128,58 +131,65 @@ exports.email = function(dest_email, type, args) {
 		let subject = ''
 		let text = ''
 		let html = ''
+		let go = true
 		
 		switch (type) {
 			case emailserver_EMAIL_REGISTER:
 				out += 'registration'
-				subject = 'Textiles Journal account registration'
+				subject = 'Account registration'
 				text = templates.register.text
-					.replace(/\?username\?/g, args.username)
-					.replace(/\?subscribed\?/g, args.subscribed)
-					.replace(/\?activation_code\?/g, args.activation_code)
+					.replace(EMAIL_USERNAME_PLACEHOLDER, args.username)
+					.replace(EMAIL_SUBSCRIBED_PLACEHOLDER, args.subscribed)
+					.replace(EMAIL_ACTIVATION_CODE_PLACEHOLDER, args.activation_code)
 				html = templates.register.html
-					.replace(/\?username\?/g, args.username)
-					.replace(/\?subscribed\?/g, args.subscribed)
-					.replace(/\?activation_code\?/g, args.activation_code)
+					.replace(EMAIL_USERNAME_PLACEHOLDER, args.username)
+					.replace(EMAIL_SUBSCRIBED_PLACEHOLDER, args.subscribed)
+					.replace(EMAIL_ACTIVATION_CODE_PLACEHOLDER, args.activation_code)
 				break
 			
 			case emailserver_EMAIL_NEW_PUZZLE:
 				out += 'new textile'
+				subject = 'We published a new textile: ' + args.textile
 			
 				break
 			
 			case emailserver_EMAIL_CONTRIBUTION:
-				out += 'curation confirmation'
+				out += 'contribution use'
+				subject = 'Your work ' + args.work + ' was used in our newest textile!'
 			
 				break
 			
 			case emailserver_EMAIL_CUSTOM:
 				out += 'custom'
+				subject = args.subject
 			
 				break
 			
 			default:
 				out += 'cannot send email of unknown type'
+				go = false
 				break
 		}
 		out += ' email to ' + dest_email;
 		console.log(out)
 		
-		let message = {
-			to: dest_email,
-			subject: subject,
-			text: text,
-			html: html
-		}
+		if (go) {
+			let message = {
+				to: dest_email,
+				subject: subject,
+				text: text,
+				html: html
+			}
 		
-		sender.sendMail(message, function(err, info) {
-			if (err) {
-				console.log('message send failed: ' + err)
-			}
-			else {
-				console.log('message sent, viewable at:\n' + nodemailer.getTestMessageUrl(info))
-				resolve()
-			}
-		})
+			sender.sendMail(message, function(err, info) {
+				if (err) {
+					console.log('message send failed: ' + err)
+				}
+				else {
+					console.log('message sent, viewable at:\n' + nodemailer.getTestMessageUrl(info))
+					resolve()
+				}
+			})
+		}
 	})
 }

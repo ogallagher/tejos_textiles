@@ -69,6 +69,50 @@ function sessionclient_get_account(callback) {
 	}
 }
 
+function sessionclient_get_account_details() {
+	let session = cookies_get(SESSION_COOKIE_KEY)
+	let username = cookies_get(USERNAME_COOKIE_KEY)
+	
+	return new Promise(function(resolve,reject) {
+		sessionclient_db_request('fetch_user_details',[username])
+		.then(function(res) {
+			let account_details = res[0]
+			
+			let account = new Account(session, username)
+			account.enabled = (account_details.enabled.data[0] == 1)
+			account.admin = (account_details.admin.data[0] == 1)
+			account.bio = account_details.bio
+			account.email = account_details.email
+			
+			account.links = []
+			if (account_details.links) {
+				let link_entries = account_details.links.split('\n')
+				for (let link_entry of link_entries) {
+					let key_value = link_entry.split('=')
+					account.links.push({
+						name: key_value[0],
+						link: key_value[1]
+					})
+				}
+			}
+			
+			account.photo = account_details.photo
+			account.subscribed = (account_details.subscription.data[0] == 1)
+			resolve(account)
+		})
+		.catch(function(err) {
+			console.log(err)
+			
+			if (err == 'login') {
+				reject('login')
+			}
+			else {
+				reject('db')
+			}
+		})
+	})
+}
+
 function sessionclient_create(username,password,email,subscribed) {
 	let id = sessionclient_generate_session_id()
 	
@@ -140,8 +184,8 @@ function sessionclient_validate(id,username) {
 					let account_summary = data.success
 					
 					resolve({
-						enabled: account_summary.enabled.data[0],
-						admin: account_summary.admin.data[0]
+						enabled: (account_summary.enabled.data[0] == 1),
+						admin: (account_summary.admin.data[0] == 1)
 					})
 				}
 				else {

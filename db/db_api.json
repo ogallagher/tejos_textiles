@@ -67,7 +67,7 @@
 	},
 	"fetch_user_details": {
 		"params": ["?username?"],
-		"query": "select * from people where username=?username?",
+		"query": "select admin,enabled,bio,email,links,photo,subscription from people where username=?username?",
 		"external": false
 	},
 	"fetch_user_plays": {

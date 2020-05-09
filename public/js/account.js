@@ -9,39 +9,88 @@ let account
 window.onload = function() {
 	force_https()
 	
-	//TODO check cookies
-	console.log('TODO check cookies for account/session info')
-	
-	if (account == null) {
-		account_get_account() //basic account information
-	}
-	
-	account_get_stats() //activity and records
-	
 	//load navbar and footer components
 	html_imports('navbar', '#import_navbar', function() {
-		navbar_onload('account')
+		//import login modal
+		html_imports('login','#import_login', function() {
+			navbar_onload()
+			
+			//assign login callbacks
+			login_on_login = account_on_login
+			login_on_logout = account_on_logout
+			
+			//load account
+			sessionclient_get_account(account_on_login)
+		})
 	})
 	html_imports('footer','#import_footer')
+	
+	$('#warning_toast').toast({
+		autohide: false
+	})
+	$('#delete_account').click(function() {
+		$('#warning_toast_container').show()
+		$('#warning_toast').show().toast('show')
+	})
+	$('#warning_toast_close').click(function() {
+		$('#warning_toast_container').hide()
+	})
 }
 
-function account_get_account() {
-	console.log('TODO get account info')
-	
-	account = {
-		username: 'tbd',
-		email: 'tbd',
-		links: [],
-		subscription: 'tbd',
-		bio: 'tbd',
-		photo: 'tbd'
+function account_on_login(account_info) {
+	if (account_info) {
+		//toggle nav account button as account page link or login form
+		navbar_toggle_account(account_info)
+		
+		//get account details
+		console.log('getting account details for ' + account_info.username)
+		sessionclient_get_account_details()
+			.then(function(account_details) {
+				account = account_details
+				
+				if (account) {
+					account_on_details()
+				}
+			})
+			.catch(function(err) {
+				//this shouldn't really be possible since we just confirmed the session and username
+				console.log('error: details fetch: ' + err)
+				login_on_logout()
+			})
+	}
+	else {
+		console.log('error: no account info')
 	}
 }
 
-function account_get_stats() {
-	console.log('TODO get latest activity')
+function account_on_logout() {
+	console.log('TODO account on logout')
+	account = null
+}
+
+function account_on_details() {
+	//fill account page with db information
+	$('#username').html(account.username)
 	
-	console.log('TODO get all existent records for the user; fastest completion per puzzle')
+	$('#name').hide()
+	
+	$('#phone').hide()
+	
+	$('#email').html(account.email).attr('href','mailto:' + account.email)
+	
+	if (account.links) {
+		html_imports('link_row', function(jstring) {
+			let links = $('#import_links')
+			
+			for (let link of account.links) {
+				let jlink = $(jstring)
+				jlink.find('.link-name').html(link.name)
+				jlink.find('.link-link').html(link.link).attr('href',link.link)
+				
+				links.append(jlink)
+			}
+		})
+	}
 }
 
 function account_puzzle_on_complete() {

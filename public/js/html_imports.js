@@ -15,7 +15,15 @@ Imports elements defined in other pages
 */
 
 const imports_dir = 'components/'
-const imports = ['navbar','footer','textile_row','textile_thumbnail','login','featured_tag'];
+const imports = [
+	'navbar',
+	'footer',
+	'textile_row',
+	'textile_thumbnail',
+	'login',
+	'featured_tag',
+	'link_row'
+];
 
 /*
 

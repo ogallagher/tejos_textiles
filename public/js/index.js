@@ -91,7 +91,7 @@ function index_on_logout() {
 	$('#featured_rating').mouseleave()
 	
 	//remove user stats tags
-	$('.featured-tag[data-tag-type="user-stats"]').remove() //TODO this is not working
+	$('.featured-tag[data-tag-type="user-stats"]').remove()
 }
 
 //when a puzzle is loaded from dbclient, add it to the document and make it interactive

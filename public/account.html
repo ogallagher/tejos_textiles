@@ -18,6 +18,8 @@
 		<script src="js/force_https.js"></script>
         <script src="js/html_imports.js"></script>
         <script src="js/dbclient.js"></script>
+		<script src="js/cookies.js"></script>
+		<script src="js/sessionclient.js"></script>
         <script src="js/account.js"></script>
         
         <!-- css external -->
@@ -29,6 +31,8 @@
     </head>
     
     <body>
+		<div id="import_login"></div>
+		
         <header>
             <div id="import_navbar"></div>
         </header>
@@ -37,21 +41,23 @@
 			<!-- header -->
 			<div class="mb-4 border-bottom border-dark d-flex flex-sm-row flex-column">
 				<div id="username" class='display-3 text-center text-raspberry font-content flex-fill'>
-					bluelagoon_55
+					username
 				</div>
-				<button id="edit_username" class="btn btn-lg text-dark-hover text-secondary-nohover">
+				<button id="edit_account" class="btn btn-lg text-dark-hover text-secondary-nohover">
 					<span class="oi oi-pencil"></span>
 				</button>
 			</div>
 			
 			<!-- contact card -->
-            <div class="float-sm-left mr-3 mb-3">
-				<div id="contact" class="text-right font-navigation border-bottom mb-1">
+            <div class="float-sm-left mr-3 mb-3 float-none">
+				<div id="contact" class="text-md-right text-center font-navigation border-bottom mb-1">
 					<div id="name">First Last</div>
-					<div id="phone">9174942955</div>
-					<div id="email">username@domain.com</div>
+					<div id="phone">0000000000</div>
+					<div>
+						<a id="email" href="#">username@domain.com</a>
+					</div>
 				</div>
-				<div class="bg-raspberry" style="width:256px;height:256px;">
+				<div class="bg-raspberry mx-auto" style="width:256px;height:256px;">
 					<img
 						id="photo"
 						src="https://freeiconshop.com/wp-content/uploads/edd/person-outline.png" 
@@ -62,40 +68,9 @@
 			</div>
 			
 			<!-- urls and account status -->
-			<div id="links_awards">
-				<div class="d-flex flex-lg-row flex-column pb-2 text-lg-left text-right">
-					<div id="links" class="flex-fill mr-lg-2 font-navigation-md">
-						<div class="row">
-							<div class="col-md-auto text-lowercase text-secondary">
-								my apple sauce website
-							</div>
-							<div class="col-md text-md-right">
-								<a href="http://applesauce.com" class="stretched-link">applesauce.com</a>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-auto text-lowercase text-secondary">
-								my banana phone website
-							</div>
-							<div class="col-md text-md-right">
-								<a href="http://bananaphone.com" class="stretched-link">bananaphone.com</a>
-							</div>
-						</div>
-					</div>
-					<div id="awards" class="pl-lg-2 pt-lg-0 pt-3">
-						<div class="card" style="max-width:300px;">
-						  <div class="row no-gutters">
-						    <div class="col-9 my-auto">
-						      <div class="card-body">
-						        <p class="card-text font-navigation">It's been a while since you last did anything, but the history is there.</p>
-						      </div>
-						    </div>
-						    <div class="col-3 my-auto py-3 pr-2">
-						      <img src="https://freeiconshop.com/wp-content/uploads/edd/medal-flat.png" class="card-img" alt="badge">
-						    </div>
-						  </div>
-						</div>
-					</div>
+			<div id="links">
+				<div class="d-flex pb-2">
+					<div id="import_links" class="flex-fill mr-lg-2 font-navigation-md"></div>
 				</div>
 			</div>
 			
@@ -113,7 +88,7 @@
 			</div>
 			
 			<!-- account useage data -->
-			<div id="activity" class="row" style="clear: left;">
+			<div id="activity" class="row" style="clear:left;">
 				<div id="history" class="col-md p-2 font-title-lg">
 					<h3 class="text-dark text-capitalize">History</h3>
 					<div class="bg-slight bg-light-hover mb-2 px-2 clickable">
@@ -147,6 +122,31 @@
 						<div class="row">
 							<div class="col my-auto">barnacle mazes</div>
 							<div class="col my-auto text-raspberry-light text-right text-uppercase">15 min</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- contribution; works and fragments -->
+			<div id="contributions">
+				
+			</div>
+			
+			<!-- danger; delete account -->
+			<div class="p-2">
+				<div class="row">
+					<button id="delete_account" class="btn btn-outline-danger col font-navigation text-uppercase" role="button">delete account</button>
+				</div>
+				<div id="warning_toast_container" class="row justify-content-center pt-3" style="display:none;">
+					<div id="warning_toast" class="toast col" style="display:none;">
+						<div class="toast-header">
+							Are you sure?
+							<button id="warning_toast_close" type="button" class="ml-auto mb-1 close" data-dismiss="toast">
+						      <span aria-hidden="true">&times;</span>
+						    </button>
+						</div>
+						<div class="toast-body font-navigation text-center">
+							<button id="confirm_delete_account" class="btn btn-danger">Yes, delete my account</button>
 						</div>
 					</div>
 				</div>
