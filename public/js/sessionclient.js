@@ -267,8 +267,9 @@ function sessionclient_activate(activation_code) {
 	})
 }
 
-function sessionclient_update_account(email, links, bio, works) {
+function sessionclient_update_account(edits) {
 	console.log('TODO submit account update')
+	console.log(edits)
 }
 
 //returns a timestamp concatenated with a randomly generated 8-char string

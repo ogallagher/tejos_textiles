@@ -6,9 +6,22 @@ Owen Gallagher
 
 let account
 let editing = false
+let edits = {}
+let edit_links_rows = 0
+
+const ACCOUNT_PHOTO_SIZE = 460 //somewhat arbitrary, based on github profile photo size
 
 window.onload = function() {
 	force_https()
+	
+	//enable bootstrap tooltips
+	$('[data-toggle="tooltip"]').tooltip({
+		placement: 'auto',
+		delay: {
+			show: 500,
+			hide: 100
+		}
+	})
 	
 	//load navbar and footer components
 	html_imports('navbar', '#import_navbar', function() {
@@ -67,24 +80,26 @@ function account_on_login(account_info) {
 		username = visiting_account
 	}
 	
-	//get account details
-	dbclient_fetch_user(username, function(account_details) {
-		if (account_details) {
-			if (account && account_details.username == account.username) {
-				//update account since its mine
-				account = account_details
-			}
+	if (username) {
+		//get account details
+		dbclient_fetch_user(username, function(account_details) {
+			if (account_details) {
+				if (account && account_details.username == account.username) {
+					//update account since its mine
+					account = account_details
+				}
 			
-			account_on_details(account_details)
-		}
-		else {
-			console.log('error: user fetch failed')
-			alert('Server error: unable to fetch details for user ' + username + '.\nRedirecting to home page...')
-			setTimeout(function() {
-				window.location.href = 'index.html'
-			}, 2000)
-		}
-	})
+				account_on_details(account_details)
+			}
+			else {
+				console.log('error: user fetch failed')
+				alert('Server error: unable to fetch details for user ' + username + '.\nRedirecting to home page...')
+				setTimeout(function() {
+					window.location.href = 'index.html'
+				}, 2000)
+			}
+		})
+	}
 }
 
 function account_on_logout() {
@@ -115,16 +130,28 @@ function account_on_details(details) {
 	
 	$('#email').html(details.email).prop('href','mailto:' + details.email)
 	
+	if (details.bio) {
+		$('#bio').html(details.bio.replace('\n','<br>'))
+	}
+	else {
+		$('#bio').html('No bio information provided.')
+	}
+	
 	if (details.links) {
 		html_imports('link_row', function(jstring) {
 			let links = $('#import_links')
 			
-			for (let link of details.links) {
-				let jlink = $(jstring)
-				jlink.find('.link-name').html(link.name)
-				jlink.find('.link-link').html(link.link).prop('href',link.link)
+			if (details.links.length == 0) {
+				links.html('No links provided.')
+			}
+			else {
+				for (let link of details.links) {
+					let jlink = $(jstring)
+					jlink.find('.link-name').html(link.name)
+					jlink.find('.link-link').html(link.link).prop('href',link.link)
 				
-				links.append(jlink)
+					links.append(jlink)
+				}
 			}
 		})
 	}
@@ -145,9 +172,17 @@ function account_on_details(details) {
 		//TODO enable more contributions
 		$('#contributions').hide()
 	})
+	
+	if (account.username == details.username) {
+		$('#edit_email').val(account.email)
+		$('#edit_bio').val(account.bio)
+	}
 }
 
 function account_enable_edits() {
+	editing = false
+	edits = {}
+	
 	let edit_account = $('#edit_account')
 	let save_account = $('#save_account')
 	let editable = $('.editable')
@@ -174,7 +209,70 @@ function account_enable_edits() {
 		editable.attr('data-editing',false)
 		
 		//send updates to server
-		sessionclient_update_account()
+		sessionclient_update_account(edits)
+	})
+	
+	//photo edits
+	$('#edit_photo').change(function(event) {
+		let f = event.target
+		
+		if (f.files && f.files[0]) {
+			img_utils_prep_file(f.files[0], ACCOUNT_PHOTO_SIZE, function(photo) {
+				if (photo) {
+					//register photo change for submission
+					$(f).removeClass('invalid')
+					edits.photo = photo
+					console.log('photo change is ready for commit')
+				}
+				else {
+					console.log('error uploading photo file')
+					$(f).addClass('invalid')
+				}
+			})
+		}
+	})
+	
+	//bio edits
+	$('#edit_bio_submit').click(function() {
+		let bio = $('#edit_bio_input').val()
+		
+		if (bio) {
+			edits.bio = bio
+			console.log('bio change ready for commit')
+		}
+	})
+	
+	//link edits
+	$('#add_link').click(function() {
+		html_imports('edit_link_row', function(jstring) {
+			let row_id = edit_links_rows++
+			let jlink = $(jstring).attr('data-row',row_id)
+			
+			jlink.find('.edit-link-row-delete').click(function() {
+				$('.edit-link-row[data-row="' + row_id + '"]').remove()
+			})
+			
+			$('#edit_links_list').append(jlink)
+		})
+	})
+	$('#edit_links_submit').click(function() {
+		let jlinks = $('.edit-link-row')
+		
+		edits.links = []
+		for (let link of jlinks) {
+			let jlink = $(link)
+			let link_name = jlink.find('.edit-link-row-name').val()
+			let link_url = jlink.find('.edit-link-row-url').val()
+			
+			if (link_name && link_url) {
+				edits.links.push({
+					name: link_name,
+					link: link_url
+				})
+			}
+		}
+		
+		console.log('links change is ready for commit')
 	})
 }
 
@@ -186,8 +284,21 @@ function account_disable_edits() {
 }
 
 function account_edit() {
-	if ($(this).attr('data-editing')) {
-		console.log('TODO enable edits for ' + $(this).prop('id'))
+	if ($(this).attr('data-editing') == 'true') {
+		let src = $(this).prop('id')
+		
+		if (src == 'contact_photo') {
+			$('#edit_contact_card').modal('show')
+		}
+		else if (src == 'bio') {
+			$('#edit_bio').modal('show')
+		}
+		else if (src == 'links') {
+			$('#edit_links').modal('show')
+		}
+		else {
+			console.log('TODO enable edits for ' + src)
+		}
 	}
 	else {
 		console.log('not enabled')

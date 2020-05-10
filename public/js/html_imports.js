@@ -23,8 +23,9 @@ const imports = [
 	'login',
 	'featured_tag',
 	'link_row',
-	'work_tile'
-];
+	'work_tile',
+	'edit_link_row'
+]
 
 /*
 
