@@ -131,7 +131,7 @@ function account_on_details(details) {
 	$('#email').html(details.email).prop('href','mailto:' + details.email)
 	
 	if (details.bio) {
-		$('#bio').html(details.bio.replace('\n','<br>'))
+		$('#bio').html(details.bio.replace(/\n/g,'<br>'))
 	}
 	else {
 		$('#bio').html('No bio information provided.')
@@ -209,7 +209,37 @@ function account_enable_edits() {
 		editable.attr('data-editing',false)
 		
 		//send updates to server
-		sessionclient_update_account(edits)
+		dbclient_update_user(account.username, edits, function(err) {
+			if (err) {
+				alert('Error: failed to update your account info on the server. Check browser logs for details.')
+			}
+			else {
+				alert('Account update successful')
+				
+				//apply edits
+				if (edits.photo) {
+					img_utils_load_photo(edits.photo, function(data_url) {
+						$('#photo').attr('src',data_url)
+					})
+				}
+				if (edits.bio) {
+					$('#bio').html(edits.bio.replace(/\n/g,'<br>'))
+				}
+				if (edits.links) {
+					html_imports('link_row', function(jstring) {
+						let dest = $('#import_links').html('')
+						
+						for (let link of edits.links) {
+							let jlink = $(link)
+							jlink.find('.link-name').html(link.name)
+							jlink.find('.link-link').html(link.link).prop('href',link.link)
+							
+							dest.append(jlink)
+						}
+					})
+				}
+			}
+		})
 	})
 	
 	//photo edits

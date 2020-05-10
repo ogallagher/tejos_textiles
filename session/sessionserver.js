@@ -239,7 +239,6 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				for (let i=2; i<args.length; i++) {
 					db_args.push(args[i])
 				}
-				
 				console.log('checking credential ' + session_id + ' for db --> ' + db_endpoint)
 				
 				get_session(session_id)

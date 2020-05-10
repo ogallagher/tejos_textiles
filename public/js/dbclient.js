@@ -230,7 +230,7 @@ function dbclient_fetch_user(username, callback) {
 			
 				account.links = []
 				if (account_details.links) {
-					let link_entries = account_details.links.split('\n')
+					let link_entries = account_details.links.split(',')
 					for (let link_entry of link_entries) {
 						let key_value = link_entry.split('=')
 						account.links.push({
@@ -282,4 +282,32 @@ function dbclient_fetch_works(username, callback) {
 			callback(null)
 		}
 	})
+}
+
+function dbclient_update_user(username, edits, callback) {
+	console.log('updating user ' + username)
+	
+	let links = undefined
+	if (edits.links) {
+		links = []
+		for (let link of edits.links) {
+			links.push(link.name + '=' + link.link) //apple=apple.com,banana=banana.net,...,zebra=zebra.gov
+		}
+		links = links.join(',')
+	}
+	
+	sessionclient_db_request('update_user', [username, edits.photo, edits.bio, links])
+		.then(function(data) {
+			if (data.error) {
+				console.log('user update failed: ' + data.error)
+				callback(data.error)
+			}
+			else {
+				callback()
+			}
+		})
+		.catch(function(err) {
+			console.log('user update failed: ' + err.responseText)
+			callback('http')
+		})
 }

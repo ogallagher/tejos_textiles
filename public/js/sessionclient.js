@@ -267,11 +267,6 @@ function sessionclient_activate(activation_code) {
 	})
 }
 
-function sessionclient_update_account(edits) {
-	console.log('TODO submit account update')
-	console.log(edits)
-}
-
 //returns a timestamp concatenated with a randomly generated 8-char string
 function sessionclient_generate_session_id() {
 	let session_id = new Date().getTime()

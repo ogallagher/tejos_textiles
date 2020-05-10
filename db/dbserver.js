@@ -136,6 +136,35 @@ exports.get_query = function(endpoint, args, is_external) {
 							
 							query = query.replace('?regexps?', regexps.join(' or '))
 						}
+						else if (endpoint == 'update_user') {
+							//args = [username, photo, bio, links]
+							let changes = []
+							let go = false
+							
+							if (args[1]) {
+								//update photo
+								changes.push('photo=' + db.escape(args[1]))
+								go = true
+							}
+							if (args[2]) {
+								//update bio
+								changes.push('bio=' + db.escape(args[2]))
+								go = true
+							}
+							if (args[3]) {
+								//update links
+								changes.push('links=' + db.escape(args[3]))
+								go = true
+							}
+							changes = changes.join(',')
+							
+							if (go) {
+								query = query.replace('?changes?', changes).replace('?username?', db.escape(args[0]))
+							}
+							else {
+								reject('no changes to save')
+							}
+						}
 					}
 					else {
 						//handle general endpoints by inserting escaped params into the query directly

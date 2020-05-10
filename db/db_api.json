@@ -79,6 +79,12 @@
 		"params": ["?username?"],
 		"query": "select id,title,`text`,`date`,description from works where author=?username? order by `date` desc, title asc",
 		"external": true
+	},
+	"update_user": {
+		"params": ["?username?","?changes?"],
+		"query": "update people set ?changes? where username=?username?",
+		"external": false,
+		"special": true
 	}
 }
 
