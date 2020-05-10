@@ -303,7 +303,7 @@ function dbclient_update_user(username, edits, callback) {
 				callback(data.error)
 			}
 			else {
-				callback()
+				callback({success: data})
 			}
 		})
 		.catch(function(err) {

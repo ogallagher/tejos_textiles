@@ -20,16 +20,19 @@ function img_utils_prep_file(data_url, max_width, callback) {
 		        let w = image.width
 		        let h = image.height
 		        let canvas = document.createElement('canvas')
-		        if (w > max_width) {
-		            w = max_width
+				let k = 1
+		        if (w > h) {
+					k = max_width/w       
 		        }
-		        if (h > max_width) {
-		            h = max_width
+		        else {
+					k = max_width/h
 		        }
+	            w *= k
+				h *= k
 		        canvas.width = w
 		        canvas.height = h
-		
-		        //draw to canvas
+				
+		        //draw centered to canvas
 		        canvas.getContext('2d').drawImage(image, 0, 0, w, h)
 			
 		        //convert back to data url
@@ -44,7 +47,7 @@ function img_utils_prep_file(data_url, max_width, callback) {
 	reader.readAsDataURL(data_url);
 }
 
-//convert db photo to data url
-function img_utils_load_photo(photo, callback) {
+//convert db photo blob to data url
+function img_utils_prep_blob(photo, callback) {
     callback(new TextDecoder('utf-8').decode(new Uint8Array(photo)));
 }

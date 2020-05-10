@@ -24,9 +24,13 @@ content = font-family: 'Darker Grotesque', sans-serif;
 
 /*
 
-html tag overrides
+overrides
 
 */
+
+a.disabled {
+  cursor: default;
+}
 
 /* 
 
@@ -247,6 +251,51 @@ Custom classes
 .editable[data-editing="true"]:hover {
 	border-color: #294939;
 	background-color: #457E62;
+}
+
+/* container for profile photos */
+.avatar {
+	max-width: 460px;
+	max-height: 460px;
+}
+
+/* xs */
+@media (max-width: 575px) {
+	.avatar {
+		width: 100%;
+	}
+}
+
+/* sm */
+@media (min-width: 576px) { 
+	.avatar {
+		width: 200px;
+		height: 200px;
+	}
+}
+
+/* md */
+@media (min-width: 768px) {
+	.avatar {
+		width: 256px;
+		height: 256px;
+	}
+}
+
+/* lg */
+@media (min-width: 992px) {
+	.avatar {
+		width: 300px;
+		height: 300px;
+	}
+}
+
+/* xl */
+@media (min-width: 1200px) {
+	.avatar {
+		width: 350px;
+		height: 350px;
+	}
 }
 
 /*

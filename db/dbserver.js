@@ -162,7 +162,7 @@ exports.get_query = function(endpoint, args, is_external) {
 								query = query.replace('?changes?', changes).replace('?username?', db.escape(args[0]))
 							}
 							else {
-								reject('no changes to save')
+								reject('empty')
 							}
 						}
 					}

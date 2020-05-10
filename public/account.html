@@ -18,6 +18,7 @@
 		<script src="js/force_https.js"></script>
 		<script src="js/url_params.js"></script>
 		<script src="js/img_utils.js"></script>
+		<script src="js/string_utils.js"></script>
         <script src="js/html_imports.js"></script>
         <script src="js/dbclient.js"></script>
 		<script src="js/cookies.js"></script>
@@ -60,7 +61,11 @@
 					<div class="modal-footer bg-slight border-top-0">
 						<div class="row">
 							<div class="col-sm font-navigation-lg">
-								<button type="button" class="btn btn-outline-dark font-navigation-md" onclick="$('#edit_contact_card').modal('hide')">Done</button>
+								<button type="button" id="edit_contact_card_submit" 
+									class="btn btn-outline-dark font-navigation-md" 
+									onclick="$('#edit_contact_card').modal('hide')">
+									Done
+								</button>
 							</div>
 						</div>
 					</div>
@@ -75,7 +80,7 @@
 					</div>
 					<div class="modal-body text-left bg-slight">
 						<div class="form-group">
-							<label for="edit_email" class="font-navigation-md">Bio</label>
+							<label for="edit_bio_input" class="font-navigation-md">Bio</label>
 							<textarea rows="5" class="form-control font-content-lg" id="edit_bio_input" placeholder="A little about me..."></textarea>
 						</div>
 					</div>
@@ -122,7 +127,6 @@
 			<!-- header -->
 			<div class="mb-4 border-bottom border-dark d-flex flex-sm-row flex-column">
 				<div id="username" class='display-3 text-center text-raspberry font-content flex-fill'>
-					username
 				</div>
 				<button id="edit_account" class="btn btn-lg text-dark-hover text-secondary-nohover" style="display:none;" data-toggle="tooltip" title="edit account">
 					<span class="oi oi-pencil"></span>
@@ -130,18 +134,21 @@
 				<button id="save_account" class="btn btn-lg text-dark-hover text-secondary-nohover" style="display:none;" data-toggle="tooltip" title="save changes">
 					<span class="oi oi-check"></span>
 				</button>
+				<div id="edit_toast" class="toast shadow-none bg-transparent border-0 my-auto">
+					<div id="edit_toast_message" class="toast-body font-navigation-md text-center text-raspberry"></div>
+				</div>
 			</div>
 			
 			<!-- contact card -->
             <div class="float-sm-left mr-3 mb-3 float-none">
 				<div id="contact" class="text-md-right text-center font-navigation border-bottom mb-1">
-					<div id="name">First Last</div>
-					<div id="phone">0000000000</div>
+					<div id="name"></div>
+					<div id="phone"></div>
 					<div>
-						<a id="email" href="#">username@domain.com</a>
+						<a id="email" href="#"></a>
 					</div>
 				</div>
-				<div id="contact_photo" class="bg-raspberry mx-auto editable" data-editing="false" style="width:256px;height:256px;">
+				<div id="contact_photo" class="mx-auto editable d-flex flex-column justify-content-center avatar" data-editing="false">
 					<img
 						id="photo"
 						src="https://freeiconshop.com/wp-content/uploads/edd/person-outline.png" 

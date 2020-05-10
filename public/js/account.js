@@ -23,6 +23,15 @@ window.onload = function() {
 		}
 	})
 	
+	//toast options
+	$('#warning_toast').toast({
+		autohide: false
+	})
+	$('#edit_toast').toast({
+		delay: 2000,
+		autohide: true
+	})
+	
 	//load navbar and footer components
 	html_imports('navbar', '#import_navbar', function() {
 		//import login modal
@@ -39,9 +48,6 @@ window.onload = function() {
 	})
 	html_imports('footer','#import_footer')
 	
-	$('#warning_toast').toast({
-		autohide: false
-	})
 	$('#delete_account').click(function() {
 		$('#warning_toast_container').show()
 		$('#warning_toast').show().toast('show')
@@ -130,6 +136,12 @@ function account_on_details(details) {
 	
 	$('#email').html(details.email).prop('href','mailto:' + details.email)
 	
+	if (details.photo) {
+		img_utils_prep_blob(details.photo.data, function (data_url) {
+			$('#photo').prop('src', data_url)
+		})
+	}
+	
 	if (details.bio) {
 		$('#bio').html(details.bio.replace(/\n/g,'<br>'))
 	}
@@ -160,7 +172,7 @@ function account_on_details(details) {
 	dbclient_fetch_works(details.username, function(works) {
 		if (works !== null) {
 			console.log('got contributions for ' + details.username)
-			console.log(works)
+			//TODO handle works
 		}
 		else {
 			console.log('failed to load contributions for ' + details.username)
@@ -175,7 +187,22 @@ function account_on_details(details) {
 	
 	if (account.username == details.username) {
 		$('#edit_email').val(account.email)
-		$('#edit_bio').val(account.bio)
+		
+		$('#edit_bio_input').val(account.bio)
+		
+		html_imports('edit_link_row', function(jstring) {
+			let links = $('#edit_links_list')
+			
+			if (account.links.length != 0) {
+				for (let link of details.links) {
+					let jlink = $(jstring)
+					jlink.find('.edit-link-row-name').val(link.name)
+					jlink.find('.edit-link-row-url').val(link.link)
+				
+					links.append(jlink)
+				}
+			}
+		})
 	}
 }
 
@@ -198,6 +225,12 @@ function account_enable_edits() {
 		
 		//enable account edit forms
 		editable.attr('data-editing',true)
+		
+		//disable links
+		$('.link-link')
+		.addClass('disabled')
+		.prop('data-href', $(this).prop('href'))
+		.prop('href','#')
 	})
 	
 	save_account.click(function() {
@@ -208,37 +241,29 @@ function account_enable_edits() {
 		//disable account edit forms
 		editable.attr('data-editing',false)
 		
+		//enable links
+		$('.link-link')
+		.removeClass('disabled')
+		.prop('href', $(this).attr('data-href'))
+		
 		//send updates to server
-		dbclient_update_user(account.username, edits, function(err) {
-			if (err) {
-				alert('Error: failed to update your account info on the server. Check browser logs for details.')
+		dbclient_update_user(account.username, edits, function(result) {
+			//show result
+			if (result.success == 10) {
+				//10 = sessionserver.SUCCESS
+				$('#edit_toast_message').html('No changes to submit')
+			}
+			else if (result.success) {
+				$('#edit_toast_message').html('Account update successful')
 			}
 			else {
-				alert('Account update successful')
-				
-				//apply edits
-				if (edits.photo) {
-					img_utils_load_photo(edits.photo, function(data_url) {
-						$('#photo').attr('src',data_url)
-					})
-				}
-				if (edits.bio) {
-					$('#bio').html(edits.bio.replace(/\n/g,'<br>'))
-				}
-				if (edits.links) {
-					html_imports('link_row', function(jstring) {
-						let dest = $('#import_links').html('')
-						
-						for (let link of edits.links) {
-							let jlink = $(link)
-							jlink.find('.link-name').html(link.name)
-							jlink.find('.link-link').html(link.link).prop('href',link.link)
-							
-							dest.append(jlink)
-						}
-					})
-				}
+				console.log('user update result: ' + result)
+				$('#edit_toast_message').html('Error: failed to update your account info on the server. Check browser logs for details.')
 			}
+			$('#edit_toast').toast('show')
+			
+			//clear edits object
+			edits = {}
 		})
 	})
 	
@@ -261,14 +286,23 @@ function account_enable_edits() {
 			})
 		}
 	})
+	$('#edit_contact_card_submit').click(function() {
+		//reload photo
+		if (edits.photo) {
+			$('#photo').prop('src', edits.photo)
+		}
+	})
 	
 	//bio edits
 	$('#edit_bio_submit').click(function() {
 		let bio = $('#edit_bio_input').val()
 		
 		if (bio) {
-			edits.bio = bio
+			edits.bio = string_utils_xss_escape(bio)
 			console.log('bio change ready for commit')
+			
+			//reload bio
+			$('#bio').html(edits.bio.replace(/\n/g,'<br>'))
 		}
 	})
 	
@@ -303,6 +337,19 @@ function account_enable_edits() {
 		}
 		
 		console.log('links change is ready for commit')
+		
+		//reload links
+		html_imports('link_row', function(jstring) {
+			let dest = $('#import_links').html('')
+			
+			for (let link of edits.links) {
+				let jlink = $(jstring)
+				jlink.find('.link-name').html(link.name)
+				jlink.find('.link-link').html(link.link).prop('href',link.link)
+		
+				dest.append(jlink)
+			}
+		})
 	})
 }
 
@@ -329,8 +376,5 @@ function account_edit() {
 		else {
 			console.log('TODO enable edits for ' + src)
 		}
-	}
-	else {
-		console.log('not enabled')
 	}
 }

@@ -20,7 +20,7 @@ const SESSION_SAVER_DELAY = enums.time.HOUR		//session saver runs once per __
 const SESSION_CACHE_MAX = 15					//max number of session objects in session_cache
 
 //global vars
-const SUCCESS =				0
+const SUCCESS =				10
 const STATUS_NO_SESSION =	1
 const STATUS_EXPIRE =		2
 const STATUS_CREATE_ERR =	3
@@ -257,8 +257,14 @@ exports.handle_request = function(endpoint, args, dbserver) {
 								})
 							})
 							.catch(function(err) {
-								console.log(err.responseText)
-								reject(STATUS_DB_ERR)
+								console.log('db query not created: ' + err)
+								
+								if (err == 'empty') {
+									resolve(SUCCESS)
+								}
+								else {
+									reject(STATUS_DB_ERR)
+								}
 							})
 					})
 					.catch(function(error_code) {

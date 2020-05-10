@@ -11,7 +11,10 @@ try {
 	//handle POST request data with bodyparser
 	const bodyparser = require('body-parser')
 	app.use(bodyparser.json())
-	app.use(bodyparser.urlencoded({extended: false}))
+	app.use(bodyparser.urlencoded({
+		extended: false,
+		limit: '50mb'
+	}))
 	
 	const enums = require('./enums')
 	const dbserver = require('./db/dbserver')
