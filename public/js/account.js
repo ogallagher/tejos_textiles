@@ -410,40 +410,50 @@ function account_more_works() {
 				jwork.find('.work-tile-license-collapse').prop('id', 'work_' + work.id + '_license')
 				
 				let license
+				let license_url
 				switch (work.license) {
 					case 'cc-0':
 						license = 'Public Domain'
+						license_url = 'https://creativecommons.org/licenses/zero/1.0'
 						break
 					
 					case 'cc-by':
-						license = 'Creative Commons Attribution'
+						license = 'Creative Commons BY'
+						license_url = 'https://creativecommons.org/licenses/by/4.0'
 						break
 					
 					case 'cc-by-sa':
-						license = 'Creative Commons Attribution-Share-Alike'
+						license = 'Creative Commons BY-SA'
+						license_url = 'https://creativecommons.org/licenses/by-sa/4.0'
 						break
 					
 					case 'cc-by-nd':
-						license = 'Creative Commons Attribution-No-Derivatives'
+						license = 'Creative Commons BY-ND'
+						license_url = 'https://creativecommons.org/licenses/by-nd/4.0'
 						break
 					
 					case 'cc-by-nc':
-						license = 'Creative Commons Attribution-NonCommercial'
+						license = 'Creative Commons BY-NC'
+						license_url = 'https://creativecommons.org/licenses/by-nc/4.0'
 						break
 					
 					case 'cc-by-nc-sa':
-						license = 'Creative Commons Attribution-NonCommercial-Share-Alike'
+						license = 'Creative Commons BY-NC-SA'
+						license_url = 'https://creativecommons.org/licenses/by-nc-sa/4.0'
 						break
 					
 					case 'cc-by-nc-nd':
-						license = 'Creative Commons Attribution-NonCommercial-No-Derivatives'
+						license = 'Creative Commons BY-NC-ND'
+						license_url = 'https://creativecommons.org/licenses/by-nc-nd/4.0'
 						break
 					
 					default:
 						license = work.license
 						break
 				}
-				jwork.find('.work-tile-license').html(license)
+				jwork.find('.work-tile-license')
+				.html(license)
+				.prop('href',license_url)
 				
 				if (work.description) {
 					jwork.find('.work-tile-description').html(string_utils_tagify(work.description))
@@ -492,5 +502,10 @@ function account_more_works() {
 		
 		//no more; hide more contributions button
 		$('#more_contributions').hide()
+		
+		if (works_loaded == 0) {
+			//none; hide contributions section
+			$('#contributions').hide()
+		}
 	}
 }
