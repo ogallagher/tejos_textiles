@@ -1,7 +1,8 @@
 {
 	"fetch_puzzles": {
+		"//TODO": "reverse order for newest to oldest",
 		"params": [],
-		"query": "select id,title,date,forecolor,backcolor,textcolor,preview,rating from puzzles",
+		"query": "select id,title,date,forecolor,backcolor,textcolor,preview,rating from puzzles order by `date` asc",
 		"external": true
 	},
 	"fetch_puzzle": {
@@ -98,8 +99,7 @@
 	},
 	"fetch_puzzle_fragments": {
 		"params": ["?puzzle_id?"],
-		"query": "select puzzle_id,work_id,fragment from fragments where puzzle_id=?puzzle_id?",
+		"query": "select f.work_id as work_id, f.fragment as fragment, w.title as title, w.description as description, w.author as author, w.license as license from fragments f inner join works w on f.work_id=w.id where f.puzzle_id=?puzzle_id?",
 		"external": true
 	}
 }
-

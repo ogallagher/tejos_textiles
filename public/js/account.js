@@ -449,6 +449,7 @@ function account_more_works() {
 					
 					default:
 						license = work.license
+						license_url = '#'
 						break
 				}
 				jwork.find('.work-tile-license')
@@ -465,7 +466,7 @@ function account_more_works() {
 				jwork.find('.work-tile-text')
 				.html(string_utils_tagify(work.text))
 				
-				jwork.find('.work-title-card-body')
+				jwork.find('.work-tile-card-body')
 				.attr('data-target', '#work_' + work.id + '_text')
 				
 				jwork.find('.work-tile-text-collapse')

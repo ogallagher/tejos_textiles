@@ -90,6 +90,10 @@ function textile_load_puzzle(callback) {
 				.finally(function() {
 					callback()
 				})
+			
+			window.onresize = function() {
+				puzzle.resize(fcontainer)
+			}
 				
 			//assign completion callback
 			puzzle.onComplete = textile_on_complete

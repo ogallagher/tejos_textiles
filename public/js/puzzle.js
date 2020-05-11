@@ -67,11 +67,11 @@ Puzzle.prototype.updateGraphics = function() {
 	}
 }
 
-Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fauthor,frating,fcontainer) {
+Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,frating,fcontainer) {
 	//update metadata fields
 	ftitle.html(this.title)
 	
-	var date = this.date.substring(0,this.date.indexOf('T'))
+	let date = this.date.substring(0,this.date.indexOf('T'))
 	fdate.html(date)
 	
 	//enable this paperscope

@@ -119,14 +119,13 @@ function puzzles_onload(dbdata) {
 		let ftitle = $('#featured_title')
 		let fdate = $('#featured_date')
 		let fcanvas = $('#featured_puzzle')[0]
-		let fauthor = $('#featured_author')
 		let frating = $('#featured_rating')
 		let fcontainer = $('#featured_container')[0]
 		
 		if (puzzle) {
 			featured_puzzle = puzzle
 			
-			featured_puzzle.feature(ftitle,fdate,fcanvas,fauthor,frating,fcontainer)
+			featured_puzzle.feature(ftitle,fdate,fcanvas,frating,fcontainer)
 				.then(function() {
 					$('#featured_placeholder').remove()
 					$('#featured_url').attr('href','textile.html?puzzle_id=' + featured_puzzle.id)
@@ -139,6 +138,114 @@ function puzzles_onload(dbdata) {
 			window.onresize = function() {
 				featured_puzzle.resize(fcontainer)
 			}
+			
+			dbclient_fetch_puzzle_fragments(featured_puzzle.id, function(fragments) {
+				console.log('got fragments:')
+				console.log(fragments)
+				
+				html_imports('work_tile', function(tile_str) {
+					let fragments_list = $('#fragments_list')
+					let authors_list = $('#featured_authors').html('')
+					let author_button_str = '<a class="btn btn-outline-secondary" href="#"></a>'
+					
+					for (let fragment of fragments) {
+						//load author
+						authors_list.append(
+							$(author_button_str)
+							.prop('href','account.html?username=' + fragment.author)
+							.html(fragment.author)
+						)
+						
+						//load fragment
+						let tile = $(tile_str)
+						
+						//title
+						tile.find('.work-tile-title')
+						.html(fragment.title)
+						.attr('data-target','#fragment_' + fragment.work_id + '_license_collapse')
+						.removeClass('font-title-xlg').addClass('font-title-lg')
+						
+						//license
+						tile.find('.work-tile-license-collapse')
+						.prop('id','fragment_' + fragment.work_id + '_license_collapse')
+						
+						let license
+						let license_url
+						switch (fragment.license) {
+							case 'cc-0':
+								license = 'Public Domain'
+								license_url = 'https://creativecommons.org/licenses/zero/1.0'
+								break
+					
+							case 'cc-by':
+								license = 'Creative Commons BY'
+								license_url = 'https://creativecommons.org/licenses/by/4.0'
+								break
+					
+							case 'cc-by-sa':
+								license = 'Creative Commons BY-SA'
+								license_url = 'https://creativecommons.org/licenses/by-sa/4.0'
+								break
+					
+							case 'cc-by-nd':
+								license = 'Creative Commons BY-ND'
+								license_url = 'https://creativecommons.org/licenses/by-nd/4.0'
+								break
+					
+							case 'cc-by-nc':
+								license = 'Creative Commons BY-NC'
+								license_url = 'https://creativecommons.org/licenses/by-nc/4.0'
+								break
+					
+							case 'cc-by-nc-sa':
+								license = 'Creative Commons BY-NC-SA'
+								license_url = 'https://creativecommons.org/licenses/by-nc-sa/4.0'
+								break
+					
+							case 'cc-by-nc-nd':
+								license = 'Creative Commons BY-NC-ND'
+								license_url = 'https://creativecommons.org/licenses/by-nc-nd/4.0'
+								break
+					
+							default:
+								license = work.license
+								license_url = '#'
+								break
+						}
+						tile.find('.work-tile-license')
+						.html(license)
+						.prop('href', license_url)
+						
+						//text
+						tile.find('.work-tile-card-body')
+						.attr('data-target','#fragment_' + fragment.work_id + '_text_collapse')
+						
+						tile.find('.work-tile-text-collapse')
+						.prop('id', 'fragment_' + fragment.work_id + '_text_collapse')
+						
+						let text = fragment.fragment
+						if (!text) {
+							text = 'TODO: handle complete fragments.<br><a href="account.html?username=' + fragment.author + '#contributions">View original</a>'
+						}
+						tile.find('.work-tile-text')
+						.html(text)
+						
+						//description
+						if (fragment.description) {
+							tile.find('.work-tile-description').html(string_utils_tagify(fragment.description))
+						}
+						else {
+							tile.find('.work-tile-description').html('No description provided')
+						}
+						
+						//author
+						tile.find('.work-tile-fragments')
+						.html('<div class="col"><button class="btn text-raspberry-hover text-bold-hover text-dark-nohover col" role="button" onclick="window.location.href=\'account.html?username=' + fragment.author + '\';">' + fragment.author + '</button></div>')
+					
+						fragments_list.append(tile)
+					}
+				})
+			})
 		}
 	})
 }

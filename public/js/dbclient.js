@@ -349,3 +349,30 @@ function dbclient_fetch_work_fragments(work_id, callback) {
 		}
 	})
 }
+
+function dbclient_fetch_puzzle_fragments(puzzle_id, callback) {
+	console.log('fetching fragments for puzzle ' + puzzle_id)
+	
+	let req = {
+		endpoint: 'fetch_puzzle_fragments',
+		args: [puzzle_id]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('fragments fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				callback(data)
+			}
+		},
+		error: function(err) {
+			console.log('fragments fetch failed: ' + err.responseText)
+			callback(null)
+		}
+	})
+}
