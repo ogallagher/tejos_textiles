@@ -90,6 +90,16 @@
 		"params": ["?author?","?title?","?text?","?description?","?date?","?license?"],
 		"query": "insert into works(title,`text`,`date`,description,author,license) values (?title?,?text?,?date?,?description?,?author?,?license?)",
 		"external": false
+	},
+	"fetch_work_fragments": {
+		"params": ["?work_id?"],
+		"query": "select f.puzzle_id as puzzle_id, p.title as puzzle_title from fragments f inner join puzzles p on f.puzzle_id=p.id where f.work_id=?work_id?",
+		"external": true
+	},
+	"fetch_puzzle_fragments": {
+		"params": ["?puzzle_id?"],
+		"query": "select puzzle_id,work_id,fragment from fragments where puzzle_id=?puzzle_id?",
+		"external": true
 	}
 }
 

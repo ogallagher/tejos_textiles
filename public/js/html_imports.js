@@ -22,8 +22,10 @@ const imports = [
 	'textile_thumbnail',
 	'login',
 	'featured_tag',
+	'textile_tag',
 	'link_row',
 	'work_tile',
+	'work_tag',
 	'edit_link_row'
 ]
 

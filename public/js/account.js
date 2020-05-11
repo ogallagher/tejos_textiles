@@ -146,7 +146,7 @@ function account_on_details(details) {
 	}
 	
 	if (details.bio) {
-		$('#bio').html(details.bio.replace(/\n/g,'<br>'))
+		$('#bio').html(string_utils_tagify(details.bio))
 	}
 	else {
 		$('#bio').html('No bio information provided.')
@@ -308,7 +308,7 @@ function account_enable_edits() {
 			console.log('bio change ready for commit')
 			
 			//reload bio
-			$('#bio').html(edits.bio.replace(/\n/g,'<br>'))
+			$('#bio').html(string_utils_tagify(edits.bio))
 		}
 	})
 	
@@ -388,81 +388,109 @@ function account_edit() {
 function account_more_works() {
 	let works_list = $('#import_works')
 	
-	html_imports('work_tile', function(jstring) {
-		let start
-		if (works_loaded <= WORKS_BATCH_START) {
-			start = 0
-		}
-		else {
-			start = works_loaded-WORKS_BATCH_SIZE
-		}
-		
-		console.log('start = ' + start + '; works loaded = ' + works_loaded)
-		for (let i=start; i<works.length && i<works_loaded; i++) {
-			let jwork = $(jstring)
-			let work = works[i]
-		
-			let title_id = work.title.replace(/[\s\.#]/g,'_')
-			jwork.find('.work-tile-title')
-			.html(work.title)
-			.attr('data-target', '#' + title_id + '-collapse')
-			
-			jwork.find('.work-tile-license-collapse').prop('id', title_id + '-collapse')
-			
-			let license
-			switch (work.license) {
-				case 'cc-0':
-					license = 'Public Domain'
-					break
-					
-				case 'cc-by':
-					license = 'Creative Commons Attribution'
-					break
-					
-				case 'cc-by-sa':
-					license = 'Creative Commons Attribution-Share-Alike'
-					break
-					
-				case 'cc-by-nd':
-					license = 'Creative Commons Attribution-No-Derivatives'
-					break
-					
-				case 'cc-by-nc':
-					license = 'Creative Commons Attribution-NonCommercial'
-					break
-					
-				case 'cc-by-nc-sa':
-					license = 'Creative Commons Attribution-NonCommercial-Share-Alike'
-					break
-					
-				case 'cc-by-nc-nd':
-					license = 'Creative Commons Attribution-NonCommercial-No-Derivatives'
-					break
-					
-				default:
-					license = work.license
-					break
+	html_imports('work_tile', function(jwork_string) {
+		html_imports('work_tag', function(jtag_string) {
+			let start
+			if (works_loaded <= WORKS_BATCH_START) {
+				start = 0
 			}
-			jwork.find('.work-tile-license').html(license)
+			else {
+				start = works_loaded-WORKS_BATCH_SIZE
+			}
 			
-			jwork.find('.work-tile-description').html(work.description)
-		
-			jwork.find('.work-tile-text').html(work.text)
-		
-			console.log('TODO load appearances')
-			
-			works_list.append(jwork)
-		}
+			console.log('start = ' + start + '; works loaded = ' + works_loaded)
+			for (let i=start; i<works.length && i<works_loaded; i++) {
+				let jwork = $(jwork_string)
+				let work = works[i]
+				
+				jwork.find('.work-tile-title')
+				.html(work.title)
+				.attr('data-target', '#work_' + work.id + '_license')
+				
+				jwork.find('.work-tile-license-collapse').prop('id', 'work_' + work.id + '_license')
+				
+				let license
+				switch (work.license) {
+					case 'cc-0':
+						license = 'Public Domain'
+						break
+					
+					case 'cc-by':
+						license = 'Creative Commons Attribution'
+						break
+					
+					case 'cc-by-sa':
+						license = 'Creative Commons Attribution-Share-Alike'
+						break
+					
+					case 'cc-by-nd':
+						license = 'Creative Commons Attribution-No-Derivatives'
+						break
+					
+					case 'cc-by-nc':
+						license = 'Creative Commons Attribution-NonCommercial'
+						break
+					
+					case 'cc-by-nc-sa':
+						license = 'Creative Commons Attribution-NonCommercial-Share-Alike'
+						break
+					
+					case 'cc-by-nc-nd':
+						license = 'Creative Commons Attribution-NonCommercial-No-Derivatives'
+						break
+					
+					default:
+						license = work.license
+						break
+				}
+				jwork.find('.work-tile-license').html(license)
+				
+				if (work.description) {
+					jwork.find('.work-tile-description').html(string_utils_tagify(work.description))
+				}
+				else {
+					jwork.find('.work-tile-description').html('No description provided')
+				}
+				
+				jwork.find('.work-tile-text')
+				.html(string_utils_tagify(work.text))
+				
+				jwork.find('.work-title-card-body')
+				.attr('data-target', '#work_' + work.id + '_text')
+				
+				jwork.find('.work-tile-text-collapse')
+				.prop('id', 'work_' + work.id + '_text')
+				
+				works_list.append(jwork)
+				
+				//load puzzle appearances
+				let fragments_list = jwork.find('.work-tile-fragments')
+				dbclient_fetch_work_fragments(work.id, function(fragments) {
+					if (fragments.length != 0) {
+						//clear fragments container
+						fragments_list.html('')
+						
+						//add fragments/puzzle appearances
+						for (let fragment of fragments) {
+							let jtag = $(jtag_string)
+							jtag.find('.work-tag-value')
+							.html(fragment.puzzle_title)
+							.prop('href','textile.html?puzzle_id=' + fragment.puzzle_id)
+							
+							fragments_list.append(jtag)
+						}
+					}
+					//else, default fragments container displays message for no fragments
+				})
+			}
+		})
 	})
 	
-	if (works_loaded == works.length) {
+	works_loaded += WORKS_BATCH_SIZE
+	if (works_loaded > works.length) {
+		works_loaded = works.length
+		
 		//no more; hide more contributions button
 		$('#more_contributions').hide()
-	}
-	else {
-		works_loaded += WORKS_BATCH_SIZE
-		if (works_loaded > works.length) {
-			works_loaded = works.length
-		}
 	}
 }

@@ -269,7 +269,6 @@ function dbclient_fetch_works(username, callback) {
 				callback(null)
 			}
 			else {
-				console.log(data)
 				callback(data)
 			}
 		},
@@ -322,4 +321,31 @@ function dbclient_contribute(author, title, content, description, license, callb
 			console.log('contribution failed: ' + err)
 			callback(err) //login | http | db
 		})
+}
+
+function dbclient_fetch_work_fragments(work_id, callback) {
+	console.log('fetching fragments for work ' + work_id)
+	
+	let req = {
+		endpoint: 'fetch_work_fragments',
+		args: [work_id]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('fragments fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				callback(data)
+			}
+		},
+		error: function(err) {
+			console.log('fragments fetch failed: ' + err.responseText)
+			callback(null)
+		}
+	})
 }
