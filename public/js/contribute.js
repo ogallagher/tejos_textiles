@@ -11,7 +11,17 @@ window.onload = function() {
 	force_https()
 	
 	html_imports('navbar', '#import_navbar', function() {
-		navbar_onload('contribute')
+		//import login modal
+		html_imports('login','#import_login', function() {
+			navbar_onload('contribute')
+			
+			//assign login callbacks
+			login_on_login = contribute_on_login
+			login_on_logout = contribute_on_logout
+			
+			//log in
+			sessionclient_get_account(contribute_on_login)
+		})
 	})
 	
 	$('.form-check-copyright')
@@ -21,7 +31,35 @@ window.onload = function() {
 		$('#focus_me').select()
 	})
 	
+	$('#login_required').toast({
+		autohide: false
+	})
+	
 	html_imports('footer','#import_footer')
+}
+
+function contribute_on_login(account_info) {
+	//toggle nav account button as account page link or login form
+	navbar_toggle_account(account_info)
+	
+	if (account_info) {
+		//enable contribution form
+		$('.work-input').prop('disabled',false)
+		
+		//hide login required message
+		$('#login_required').toast('hide')
+	}
+	else {
+		contribute_on_logout()
+	}
+}
+
+function contribute_on_logout() {
+	//disable contribution form
+	$('.work-input').prop('disabled',true)
+	
+	//show login required message
+	$('#login_required').show().toast('show')
 }
 
 /*
