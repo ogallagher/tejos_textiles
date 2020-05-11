@@ -77,7 +77,7 @@
 	},
 	"fetch_works": {
 		"params": ["?username?"],
-		"query": "select id,title,`text`,`date`,description from works where author=?username? order by `date` desc, title asc",
+		"query": "select id,title,`text`,`date`,description,license from works where author=?username? order by `date` desc, title asc",
 		"external": true
 	},
 	"update_user": {

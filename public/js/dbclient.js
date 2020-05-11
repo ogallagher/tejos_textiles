@@ -269,12 +269,8 @@ function dbclient_fetch_works(username, callback) {
 				callback(null)
 			}
 			else {
-				if (!data[0]) {
-					callback([])
-				}
-				else {
-					callback(data[0])
-				}
+				console.log(data)
+				callback(data)
 			}
 		},
 		error: function(err) {
@@ -319,16 +315,11 @@ function dbclient_contribute(author, title, content, description, license, callb
 	date = date.substring(0, date.indexOf('T'))	//yyyy-mm-dd
 	
 	sessionclient_db_request('contribute', [author, title, content, description, date, license])
-		.then(function(data) {
-			if (data.error) {
-				console.log('contribution failed: ' + data.error)
-				callback(data.error)
-			}
-			else {
-				callback()
-			}
+		.then(function(res) {
+			callback()
 		})
 		.catch(function(err) {
-			console.log('contribution failed: ' + err.responseText)
+			console.log('contribution failed: ' + err)
+			callback(err) //login | http | db
 		})
 }

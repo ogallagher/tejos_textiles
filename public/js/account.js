@@ -8,8 +8,12 @@ let account
 let editing = false
 let edits = {}
 let edit_links_rows = 0
+let works = []
+let works_loaded = 0
 
 const ACCOUNT_PHOTO_SIZE = 460 //somewhat arbitrary, based on github profile photo size
+const WORKS_BATCH_START = 4 //how many works are loaded initially
+const WORKS_BATCH_SIZE = 8 //how many works to load each time more are requested
 
 window.onload = function() {
 	force_https()
@@ -31,6 +35,13 @@ window.onload = function() {
 		delay: 2000,
 		autohide: true
 	})
+	$('#delete_account').click(function() {
+		$('#warning_toast_container').show()
+		$('#warning_toast').show().toast('show')
+	})
+	$('#warning_toast_close').click(function() {
+		$('#warning_toast_container').hide()
+	})
 	
 	//load navbar and footer components
 	html_imports('navbar', '#import_navbar', function() {
@@ -47,14 +58,6 @@ window.onload = function() {
 		})
 	})
 	html_imports('footer','#import_footer')
-	
-	$('#delete_account').click(function() {
-		$('#warning_toast_container').show()
-		$('#warning_toast').show().toast('show')
-	})
-	$('#warning_toast_close').click(function() {
-		$('#warning_toast_container').hide()
-	})
 }
 
 function account_on_login(account_info) {
@@ -169,21 +172,24 @@ function account_on_details(details) {
 	}
 	
 	//load contributions
-	dbclient_fetch_works(details.username, function(works) {
-		if (works !== null) {
-			console.log('got contributions for ' + details.username)
-			//TODO handle works
+	dbclient_fetch_works(details.username, function(works_info) {
+		works = []
+		works_loaded = WORKS_BATCH_START
+		
+		if (works_info !== null) { //could be [] or [...]
+			console.log('got ' + works_info.length + ' contributions by ' + details.username)
+			works = works_info
+			
+			account_more_works()
 		}
 		else {
+			//TODO handle error
 			console.log('failed to load contributions for ' + details.username)
 		}
 	})
 	
 	//enable more-contributions button
-	$('#more_contributions').click(function() {
-		//TODO enable more contributions
-		$('#contributions').hide()
-	})
+	$('#more_contributions').click(account_more_works)
 	
 	if (account.username == details.username) {
 		$('#edit_email').val(account.email)
@@ -375,6 +381,88 @@ function account_edit() {
 		}
 		else {
 			console.log('TODO enable edits for ' + src)
+		}
+	}
+}
+
+function account_more_works() {
+	let works_list = $('#import_works')
+	
+	html_imports('work_tile', function(jstring) {
+		let start
+		if (works_loaded <= WORKS_BATCH_START) {
+			start = 0
+		}
+		else {
+			start = works_loaded-WORKS_BATCH_SIZE
+		}
+		
+		console.log('start = ' + start + '; works loaded = ' + works_loaded)
+		for (let i=start; i<works.length && i<works_loaded; i++) {
+			let jwork = $(jstring)
+			let work = works[i]
+		
+			let title_id = work.title.replace(/[\s\.#]/g,'_')
+			jwork.find('.work-tile-title')
+			.html(work.title)
+			.attr('data-target', '#' + title_id + '-collapse')
+			
+			jwork.find('.work-tile-license-collapse').prop('id', title_id + '-collapse')
+			
+			let license
+			switch (work.license) {
+				case 'cc-0':
+					license = 'Public Domain'
+					break
+					
+				case 'cc-by':
+					license = 'Creative Commons Attribution'
+					break
+					
+				case 'cc-by-sa':
+					license = 'Creative Commons Attribution-Share-Alike'
+					break
+					
+				case 'cc-by-nd':
+					license = 'Creative Commons Attribution-No-Derivatives'
+					break
+					
+				case 'cc-by-nc':
+					license = 'Creative Commons Attribution-NonCommercial'
+					break
+					
+				case 'cc-by-nc-sa':
+					license = 'Creative Commons Attribution-NonCommercial-Share-Alike'
+					break
+					
+				case 'cc-by-nc-nd':
+					license = 'Creative Commons Attribution-NonCommercial-No-Derivatives'
+					break
+					
+				default:
+					license = work.license
+					break
+			}
+			jwork.find('.work-tile-license').html(license)
+			
+			jwork.find('.work-tile-description').html(work.description)
+		
+			jwork.find('.work-tile-text').html(work.text)
+		
+			console.log('TODO load appearances')
+			
+			works_list.append(jwork)
+		}
+	})
+	
+	if (works_loaded == works.length) {
+		//no more; hide more contributions button
+		$('#more_contributions').hide()
+	}
+	else {
+		works_loaded += WORKS_BATCH_SIZE
+		if (works_loaded > works.length) {
+			works_loaded = works.length
 		}
 	}
 }

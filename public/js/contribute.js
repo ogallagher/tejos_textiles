@@ -73,9 +73,13 @@ window.onload = function() {
 				dbclient_contribute(author, string_utils_xss_escape(title), string_utils_xss_escape(content), string_utils_xss_escape(description), license, function(err) {
 					let contribution_result_message = $('#contribution_result_message')
 					
-					if (err) {
-						//TODO handle contribution failure
-						contribution_result_message.html('Contribution failed :/')
+					if (err == 'login') {
+						contribution_result_message
+						.html('Contribution failed... are you logged in properly?')
+					}
+					else if (err) {
+						contribution_result_message
+						.html('Contribution failed due to a server error. Try again later and please <a href="contact.html">let us know</a> what happened.')
 					}
 					else {
 						contribution_result_message.html('Contribution successful!')
