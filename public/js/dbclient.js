@@ -311,3 +311,24 @@ function dbclient_update_user(username, edits, callback) {
 			callback('http')
 		})
 }
+
+function dbclient_contribute(author, title, content, description, license, callback) {
+	console.log('contributing work ' + title)
+	
+	let date = new Date().toISOString()			//yyyy-mm-ddThh:mm:ss.dddZ
+	date = date.substring(0, date.indexOf('T'))	//yyyy-mm-dd
+	
+	sessionclient_db_request('contribute', [author, title, content, description, date, license])
+		.then(function(data) {
+			if (data.error) {
+				console.log('contribution failed: ' + data.error)
+				callback(data.error)
+			}
+			else {
+				callback()
+			}
+		})
+		.catch(function(err) {
+			console.log('contribution failed: ' + err.responseText)
+		})
+}

@@ -125,7 +125,7 @@
 						<div class="form-group">
 							<label for="title">Your Work</label>
 							<input type="text" class="form-control mb-1 work-input" id="title" placeholder="Title">
-							<textarea rows="18" class="form-control work-input" id="content" placeholder="Once upon two times..."></textarea>
+							<textarea rows="16" class="form-control work-input" id="content" placeholder="Once upon two times..."></textarea>
 						</div>
 						<div class="form-group">
 							<label for="description">Description</label>
@@ -138,7 +138,7 @@
 						<div id="login_required" class="toast" style="display:none;">
 							<div class="toast-header font-navigation text-raspberry">
 								Login required to submit contributions.
-								<button id="warning_toast_close" type="button" class="ml-auto mb-1 close" data-dismiss="toast">
+								<button type="button" class="ml-auto mb-1 close" data-dismiss="toast">
 							      <span aria-hidden="true">&times;</span>
 							    </button>
 							</div>
@@ -250,9 +250,33 @@
 						</div>
 					</div>
 				</div>
-
+				
 				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Submit</button>
+					<button type="button" id="submit" class="btn btn-primary work-input">Submit</button>
+					<div id="title_content_required" class="toast my-2" style="display:none;">
+						<div class="toast-header font-navigation text-raspberry">
+							Your work must have both a title and content.
+							<button type="button" class="ml-auto mb-1 close" data-dismiss="toast">
+						      <span aria-hidden="true">&times;</span>
+						    </button>
+						</div>
+					</div>
+					<div id="limit_exceeded" class="toast my-2" style="display:none;">
+						<div class="toast-header font-navigation text-raspberry">
+							<div id="limit_exceeded_message"></div>
+							<button type="button" class="ml-auto mb-1 close" data-dismiss="toast">
+						      <span aria-hidden="true">&times;</span>
+						    </button>
+						</div>
+					</div>
+					<div id="contribution_result" class="toast my-2" style="display:none;">
+						<div class="toast-header font-navigation text-raspberry">
+							<div id="contribution_result_message"></div>
+							<button type="button" class="ml-auto mb-1 close" data-dismiss="toast">
+						      <span aria-hidden="true">&times;</span>
+						    </button>
+						</div>
+					</div>
 				</div>
 			</form>
 		</article>

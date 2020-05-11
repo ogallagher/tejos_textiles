@@ -85,6 +85,11 @@
 		"query": "update people set ?changes? where username=?username?",
 		"external": false,
 		"special": true
+	},
+	"contribute": {
+		"params": ["?author?","?title?","?text?","?description?","?date?","?license?"],
+		"query": "insert into works(title,`text`,`date`,description,author,license) values (?title?,?text?,?date?,?description?,?author?,?license?)",
+		"external": false
 	}
 }
 
