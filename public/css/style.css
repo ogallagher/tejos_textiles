@@ -175,6 +175,9 @@ Custom classes
 .text-copper {
 	color: #7A780E; /* contribute page */
 }
+.text-copper-hover:hover {
+	color: #7A780E;
+}
 .text-sea {
 	color: #2B4C6F; /* about page */
 }

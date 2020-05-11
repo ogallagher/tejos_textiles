@@ -4,6 +4,9 @@ Owen Gallagher
 11 october 2019
 */
 
+const DESCRIPTION_MAX = 255 //max char count for a work description
+const TITLE_MAX = 127 //max char count for a work title
+
 window.onload = function() {
 	force_https()
 	
