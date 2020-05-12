@@ -44,12 +44,12 @@
         
         <article class="container-fluid">
             <div class="row no-gutters">
-                <div class="col-lg-9">
+                <div class="col-lg-9 border-1 border-bottom">
 					<!-- featured puzzle -->
                     <div class="card m-2" id="featured_card">
                         <div class="card-header py-1 px-3">
                             <div class="row">
-                                <div class="col font-title-lg text-left text-uppercase" id="featured_title">
+                                <div class="col font-title-xlg text-left text-uppercase" id="featured_title">
                                 	tbd
                                 </div>
                                 <div class="col font-title-md text-right">
@@ -60,13 +60,14 @@
                             </div>
                         </div>
                         <div class="card-content">
-                            <div id="featured_container">
+                            <div id="featured_container" class="layers-container">
 								<div id="featured_placeholder" class="overlap-1-center text-center d-flex flex-column justify-content-center font-navigation-lg">
 									<div>
 										Loading featured puzzle...
 									</div>
 								</div>
                                 <canvas id="featured_puzzle" class="puzzle-canvas" height="380"></canvas>
+								<!-- win screen inserted here -->
                             </div>
                         </div>
                         <div class="card-footer font-navigation">
@@ -151,11 +152,18 @@
 							</div>
                         </div>
                     </div>
-					<div class="row no-gutters" id="fragments_list">
+					<h2 id="fragments_header" class="col-12 pl-4 pt-3 font-title text-copper-hover text-dark-nohover clickable" 
+						data-toggle="collapse" data-target="#fragments_list">
+						Included Works
+					</h2>
+					<div class="row no-gutters collapse" id="fragments_list">
 						<!-- featured puzzle fragments -->
 					</div>
                 </div>
                 <div class="col-lg pb-1" id="puzzles_list">
+					<h2 class="pl-4 pt-3 font-title">
+						Recent Textiles
+					</h2>
                 	<!-- all puzzles, in order from newest to oldest -->
                 </div>
             </div>

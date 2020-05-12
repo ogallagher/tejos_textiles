@@ -26,7 +26,8 @@ const imports = [
 	'link_row',
 	'work_tile',
 	'work_tag',
-	'edit_link_row'
+	'edit_link_row',
+	'win_screen'
 ]
 
 /*

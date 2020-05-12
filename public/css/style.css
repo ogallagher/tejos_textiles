@@ -124,6 +124,10 @@ Custom classes
 .bg-slight-hover:hover {
 	background-color: #dddddd;
 }
+.bg-slight-transparent {
+	background-color: #dddddd;
+	opacity: 0.95;
+}
 
 .bg-primary-nohover {
 	background-color: #007bff;
