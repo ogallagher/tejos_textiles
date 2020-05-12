@@ -19,6 +19,7 @@
         <!-- js internal -->
 		<script src="js/force_https.js"></script>
 		<script src="js/url_params.js"></script>
+		<script src="js/string_utils.js"></script>
         <script src="js/html_imports.js"></script>
         <script src="js/dbclient.js"></script>
         <script src="js/shape.js"></script>
@@ -51,13 +52,14 @@
                    </div>
                 </div>
                 <div>
-                    <div id="featured_container">
+                    <div id="featured_container" class="layers-container">
 						<div id="featured_placeholder" class="overlap-1-center text-center d-flex flex-column font-navigation-lg">
 							<div>
 								Loading textile...
 							</div>
 						</div>
                         <canvas id="featured_puzzle" class="puzzle-canvas border border-dark" style="width:100%;height:100vh;"></canvas>
+						<!-- win screen inserted here -->
                     </div>
                 </div>
                 <div class="font-navigation">
@@ -69,18 +71,7 @@
                             </div>
                         </div>
                         <div class="input-group-append ml-auto" id="featured_authors">
-                            <button class="btn btn-outline-secondary rounded-0" type="button">
-                                Adam Ankles
-                            </button>
-                            <button class="btn btn-outline-secondary rounded-0" type="button">
-                                Bailey Bunches
-                            </button>
-                            <button class="btn btn-outline-secondary rounded-0" type="button">
-                                Candice Charleston
-                            </button>
-                            <button class="btn btn-outline-secondary rounded-0" type="button">
-                                Daniel Durham
-                            </button>
+							tbd
                         </div>
                     </div>
                     <!--date-->
@@ -145,6 +136,13 @@
 					<!--user play stats inserted here-->
                 </div>
             </div>
+			<h2 id="fragments_header" class="col-12 pl-4 pt-3 font-title text-copper-hover text-dark-nohover clickable" 
+				data-toggle="collapse" data-target="#fragments_list" style="display:none;">
+				Included Works
+			</h2>
+			<div class="row collapse" id="fragments_list">
+				<!-- featured puzzle fragments -->
+			</div>
 		</article>
 		
         <footer>

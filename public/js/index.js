@@ -44,8 +44,6 @@ window.onload = function() {
 		$('#win_screen_close').click(function() {
 			$('#win_screen').fadeOut(1000)
 		})
-		
-		index_puzzle_on_complete()
 	})
 }
 
@@ -115,29 +113,38 @@ function index_puzzles_onload(dbdata) {
 	//load textile template
 	html_imports('textile_row', function(jstring) {
 		//load puzzle data from db and add puzzles
-		let puzzle,jpuzzle
-		
-		dbdata.forEach(function (p) {
-			puzzle = new Puzzle(p) //see puzzle.js
+		let first = true
+		for (let p of dbdata) {
+			let puzzle = new Puzzle(p) //see puzzle.js
 			puzzle.onComplete = index_puzzle_on_complete //handle puzzle completion
 			
-			jpuzzle = $(jstring)
-			jpuzzle.find('.textile-row-card').attr('id',puzzle.id)
+			let jpuzzle = $(jstring)
+			
+			jpuzzle.find('.textile-row-card')
+			.attr('id',puzzle.id)
+			.click(function() {
+				window.location.href = 'textile.html?puzzle_id=' + puzzle.id
+			})
+			
 			jpuzzle.find('.textile-row-title').html(puzzle.title)
 			
 			domlist.append(jpuzzle) //add to list
-		})
+			
+			if (first) {
+				//feature most recent puzzle
+				featured_puzzle = puzzle
+				first = false
+			}
+		}
 		
-		//feature the most recent puzzle
+		//load featured puzzle
 		let ftitle = $('#featured_title')
 		let fdate = $('#featured_date')
 		let fcanvas = $('#featured_puzzle')[0]
 		let frating = $('#featured_rating')
 		let fcontainer = $('#featured_container')[0]
 		
-		if (puzzle) {
-			featured_puzzle = puzzle
-			
+		if (featured_puzzle) {
 			featured_puzzle.feature(ftitle,fdate,fcanvas,frating,fcontainer)
 				.then(function() {
 					$('#featured_placeholder').remove()
@@ -154,10 +161,7 @@ function index_puzzles_onload(dbdata) {
 		}
 		
 		//load authors and fragments
-		dbclient_fetch_puzzle_fragments(featured_puzzle.id, function(fragments) {
-			console.log('got fragments:')
-			console.log(fragments)
-		
+		dbclient_fetch_puzzle_fragments(featured_puzzle.id, function(fragments) {		
 			html_imports('work_tile', function(tile_str) {
 				let fragments_list = $('#fragments_list')
 				let authors_list = $('#featured_authors').html('')

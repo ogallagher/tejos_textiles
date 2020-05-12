@@ -1,13 +1,12 @@
 {
 	"fetch_puzzles": {
-		"//TODO": "reverse order for newest to oldest",
 		"params": [],
-		"query": "select id,title,date,forecolor,backcolor,textcolor,preview,rating from puzzles order by `date` asc",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating from puzzles order by `date` desc",
 		"external": true
 	},
 	"fetch_puzzle": {
 		"params": ["?puzzle_id?"],
-		"query": "select id,title,date,forecolor,backcolor,textcolor,preview,rating from puzzles where id=?puzzle_id?",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating from puzzles where id=?puzzle_id?",
 		"external": true
 	},
 	"fetch_puzzle_paths": {
