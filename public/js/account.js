@@ -9,7 +9,8 @@ let editing = false
 let edits = {}
 let edit_links_rows = 0
 let works = []
-let works_loaded = 0
+let works_start = 0
+let works_end = 0
 
 const ACCOUNT_PHOTO_SIZE = 460 //somewhat arbitrary, based on github profile photo size
 const WORKS_BATCH_START = 4 //how many works are loaded initially
@@ -174,7 +175,7 @@ function account_on_details(details) {
 	//load contributions
 	dbclient_fetch_works(details.username, function(works_info) {
 		works = []
-		works_loaded = WORKS_BATCH_START
+		works_end = WORKS_BATCH_START
 		
 		if (works_info !== null) { //could be [] or [...]
 			console.log('got ' + works_info.length + ' contributions by ' + details.username)
@@ -332,7 +333,7 @@ function account_enable_edits() {
 		for (let link of jlinks) {
 			let jlink = $(link)
 			let link_name = jlink.find('.edit-link-row-name').val()
-			let link_url = jlink.find('.edit-link-row-url').val()
+			let link_url = string_utils_url(jlink.find('.edit-link-row-url').val())
 			
 			if (link_name && link_url) {
 				edits.links.push({
@@ -386,127 +387,132 @@ function account_edit() {
 }
 
 function account_more_works() {
-	let works_list = $('#import_works')
-	
-	html_imports('work_tile', function(jwork_string) {
-		html_imports('work_tag', function(jtag_string) {
-			let start
-			if (works_loaded <= WORKS_BATCH_START) {
-				start = 0
-			}
-			else {
-				start = works_loaded-WORKS_BATCH_SIZE
-			}
-			
-			console.log('start = ' + start + '; works loaded = ' + works_loaded)
-			for (let i=start; i<works.length && i<works_loaded; i++) {
-				let jwork = $(jwork_string)
-				let work = works[i]
+	if (works.length > 0) {
+		let works_list = $('#import_works')
+		
+		html_imports('work_tile', function(jwork_string) {
+			html_imports('work_tag', function(jtag_string) {
+				console.log('more works: ' + works_start + ' to ' + works_end)
+				for (let i=works_start; i<works.length && i<works_end; i++) {
+					let jwork = $(jwork_string)
+					let work = works[i]
+					
+					//title
+					jwork.find('.work-tile-title')
+					.html(work.title)
+					.attr('data-target', '#work_' + work.id + '_license')
 				
-				jwork.find('.work-tile-title')
-				.html(work.title)
-				.attr('data-target', '#work_' + work.id + '_license')
+					//header collapse
+					jwork.find('.work-tile-license-collapse').prop('id', 'work_' + work.id + '_license')
 				
-				jwork.find('.work-tile-license-collapse').prop('id', 'work_' + work.id + '_license')
+					//date
+					jwork.find('.work-tile-date').html(string_utils_date(work.date))
 				
-				let license
-				let license_url
-				switch (work.license) {
-					case 'cc-0':
-						license = 'Public Domain'
-						license_url = 'https://creativecommons.org/licenses/zero/1.0'
-						break
+					//license
+					let license
+					let license_url
+					switch (work.license) {
+						case 'cc-0':
+							license = 'Public Domain'
+							license_url = 'https://creativecommons.org/licenses/zero/1.0'
+							break
 					
-					case 'cc-by':
-						license = 'Creative Commons BY'
-						license_url = 'https://creativecommons.org/licenses/by/4.0'
-						break
+						case 'cc-by':
+							license = 'Creative Commons BY'
+							license_url = 'https://creativecommons.org/licenses/by/4.0'
+							break
 					
-					case 'cc-by-sa':
-						license = 'Creative Commons BY-SA'
-						license_url = 'https://creativecommons.org/licenses/by-sa/4.0'
-						break
+						case 'cc-by-sa':
+							license = 'Creative Commons BY-SA'
+							license_url = 'https://creativecommons.org/licenses/by-sa/4.0'
+							break
 					
-					case 'cc-by-nd':
-						license = 'Creative Commons BY-ND'
-						license_url = 'https://creativecommons.org/licenses/by-nd/4.0'
-						break
+						case 'cc-by-nd':
+							license = 'Creative Commons BY-ND'
+							license_url = 'https://creativecommons.org/licenses/by-nd/4.0'
+							break
 					
-					case 'cc-by-nc':
-						license = 'Creative Commons BY-NC'
-						license_url = 'https://creativecommons.org/licenses/by-nc/4.0'
-						break
+						case 'cc-by-nc':
+							license = 'Creative Commons BY-NC'
+							license_url = 'https://creativecommons.org/licenses/by-nc/4.0'
+							break
 					
-					case 'cc-by-nc-sa':
-						license = 'Creative Commons BY-NC-SA'
-						license_url = 'https://creativecommons.org/licenses/by-nc-sa/4.0'
-						break
+						case 'cc-by-nc-sa':
+							license = 'Creative Commons BY-NC-SA'
+							license_url = 'https://creativecommons.org/licenses/by-nc-sa/4.0'
+							break
 					
-					case 'cc-by-nc-nd':
-						license = 'Creative Commons BY-NC-ND'
-						license_url = 'https://creativecommons.org/licenses/by-nc-nd/4.0'
-						break
+						case 'cc-by-nc-nd':
+							license = 'Creative Commons BY-NC-ND'
+							license_url = 'https://creativecommons.org/licenses/by-nc-nd/4.0'
+							break
 					
-					default:
-						license = work.license
-						license_url = '#'
-						break
+						default:
+							license = work.license
+							license_url = '#'
+							break
+					}
+					jwork.find('.work-tile-license')
+					.html(license)
+					.prop('href',license_url)
+				
+					//description
+					if (work.description) {
+						jwork.find('.work-tile-description').html(string_utils_tagify(work.description))
+					}
+					else {
+						jwork.find('.work-tile-description').html('No description provided')
+					}
+				
+					//text
+					jwork.find('.work-tile-text')
+					.html(string_utils_tagify(work.text))
+				
+					//text collapse
+					jwork.find('.work-tile-card-body')
+					.attr('data-target', '#work_' + work.id + '_text')
+				
+					jwork.find('.work-tile-text-collapse')
+					.prop('id', 'work_' + work.id + '_text')
+				
+					works_list.append(jwork)
+				
+					//load puzzle appearances
+					let fragments_list = jwork.find('.work-tile-fragments')
+					dbclient_fetch_work_fragments(work.id, function(fragments) {
+						if (fragments.length != 0) {
+							//clear fragments container
+							fragments_list.html('')
+						
+							//add fragments/puzzle appearances
+							for (let fragment of fragments) {
+								let jtag = $(jtag_string)
+								jtag.find('.work-tag-value')
+								.html(fragment.puzzle_title)
+								.prop('href','textile.html?puzzle_id=' + fragment.puzzle_id)
+							
+								fragments_list.append(jtag)
+							}
+						}
+						//else, default fragments container displays message for no fragments
+					})
+					
+					works_start++
 				}
-				jwork.find('.work-tile-license')
-				.html(license)
-				.prop('href',license_url)
 				
-				if (work.description) {
-					jwork.find('.work-tile-description').html(string_utils_tagify(work.description))
+				if (works_end >= works.length) {
+					//no more; hide more contributions button
+					$('#more_contributions').hide()
 				}
 				else {
-					jwork.find('.work-tile-description').html('No description provided')
+					//ready for more
+					works_end += WORKS_BATCH_SIZE
 				}
-				
-				jwork.find('.work-tile-text')
-				.html(string_utils_tagify(work.text))
-				
-				jwork.find('.work-tile-card-body')
-				.attr('data-target', '#work_' + work.id + '_text')
-				
-				jwork.find('.work-tile-text-collapse')
-				.prop('id', 'work_' + work.id + '_text')
-				
-				works_list.append(jwork)
-				
-				//load puzzle appearances
-				let fragments_list = jwork.find('.work-tile-fragments')
-				dbclient_fetch_work_fragments(work.id, function(fragments) {
-					if (fragments.length != 0) {
-						//clear fragments container
-						fragments_list.html('')
-						
-						//add fragments/puzzle appearances
-						for (let fragment of fragments) {
-							let jtag = $(jtag_string)
-							jtag.find('.work-tag-value')
-							.html(fragment.puzzle_title)
-							.prop('href','textile.html?puzzle_id=' + fragment.puzzle_id)
-							
-							fragments_list.append(jtag)
-						}
-					}
-					//else, default fragments container displays message for no fragments
-				})
-			}
+			})
 		})
-	})
-	
-	works_loaded += WORKS_BATCH_SIZE
-	if (works_loaded > works.length) {
-		works_loaded = works.length
-		
-		//no more; hide more contributions button
-		$('#more_contributions').hide()
-		
-		if (works_loaded == 0) {
-			//none; hide contributions section
-			$('#contributions').hide()
-		}
+	}
+	else {
+		//none; hide contributions section
+		$('#contributions').hide()
 	}
 }

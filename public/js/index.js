@@ -177,7 +177,7 @@ function index_puzzles_onload(dbdata) {
 				
 					//load fragment
 					let tile = $(tile_str)
-				
+					
 					//id
 					let tile_id = 'fragment_' + fragment.work_id
 					tile.prop('id', tile_id)
@@ -187,7 +187,10 @@ function index_puzzles_onload(dbdata) {
 					.html(fragment.title)
 					.attr('data-target','#' + tile_id + '_license_collapse') //enable expand/collapse
 					.removeClass('font-title-xlg').addClass('font-title-lg') //shrink from default font
-				
+					
+					//date
+					tile.find('.work-tile-date').html(string_utils_date(fragment.date))
+					
 					//license
 					tile.find('.work-tile-license-collapse')
 					.prop('id', tile_id + '_license_collapse') //enable expand/collapse
@@ -240,13 +243,14 @@ function index_puzzles_onload(dbdata) {
 					.html(license)
 					.prop('href', license_url)
 				
-					//text
+					//text collapse
 					tile.find('.work-tile-card-body')
 					.attr('data-target','#' + tile_id + '_text_collapse')
 				
 					tile.find('.work-tile-text-collapse')
 					.prop('id', tile_id + '_text_collapse')
-				
+					
+					//text
 					if (!fragment.fragment) {
 						//complete fragment; load full text on request
 						tile.find('.work-tile-text')
