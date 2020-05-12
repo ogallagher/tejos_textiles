@@ -376,3 +376,30 @@ function dbclient_fetch_puzzle_fragments(puzzle_id, callback) {
 		}
 	})
 }
+
+function dbclient_fetch_work_text(work_id, callback) {
+	console.log('fetching text for work ' + work_id)
+	
+	let req = {
+		endpoint: 'fetch_work_text',
+		args: [work_id]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('work text fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				callback(data)
+			}
+		},
+		error: function(err) {
+			console.log('work text fetch failed: ' + err.responseText)
+			callback(null)
+		}
+	})
+}

@@ -1,3 +1,14 @@
+/* 
+
+Import font families from Google Fonts. 
+
+titles = font-family: 'Poiret One', cursive;
+navigation = font-family: 'Lato', sans-serif;
+content = font-family: 'Darker Grotesque', sans-serif;
+
+*/
+@import url('https://fonts.googleapis.com/css?family=Darker+Grotesque|Lato:300|Poiret+One&display=swap');
+
 /* override elements */
 
 ul {

@@ -19,6 +19,6 @@ contact@textilesjournal.org
 https://textilesjournal.org/contact.html
 
 
-Don't remember creating any accounts with us? Delete this account: https://textilesjournal.org/account.html#delete_account
+Don't remember creating any accounts with us? Delete this account: https://textilesjournal.org/account.html?username=?username?#delete_account
 
-Want to update your account preferences or bio information (including subscription status)? Visit your account page: https://textilesjournal.org/account.html
+Want to update your account preferences or bio information (including subscription status)? Visit your account page: https://textilesjournal.org/account.html?username=?username?

@@ -159,15 +159,20 @@ function puzzles_onload(dbdata) {
 						//load fragment
 						let tile = $(tile_str)
 						
+						//id
+						let tile_id = 'fragment_' + fragment.work_id
+						tile.prop('id', tile_id)
+						
 						//title
 						tile.find('.work-tile-title')
 						.html(fragment.title)
-						.attr('data-target','#fragment_' + fragment.work_id + '_license_collapse')
-						.removeClass('font-title-xlg').addClass('font-title-lg')
+						.attr('data-target','#' + tile_id + '_license_collapse') //enable expand/collapse
+						.removeClass('font-title-xlg').addClass('font-title-lg') //shrink from default font
 						
 						//license
 						tile.find('.work-tile-license-collapse')
-						.prop('id','fragment_' + fragment.work_id + '_license_collapse')
+						.prop('id', tile_id + '_license_collapse') //enable expand/collapse
+						.append('<br><a class="font-content" href="account.html?username=' + fragment.author + '#contributions">view original</a>') //link to original
 						
 						let license
 						let license_url
@@ -218,17 +223,27 @@ function puzzles_onload(dbdata) {
 						
 						//text
 						tile.find('.work-tile-card-body')
-						.attr('data-target','#fragment_' + fragment.work_id + '_text_collapse')
+						.attr('data-target','#' + tile_id + '_text_collapse')
 						
 						tile.find('.work-tile-text-collapse')
-						.prop('id', 'fragment_' + fragment.work_id + '_text_collapse')
+						.prop('id', tile_id + '_text_collapse')
 						
-						let text = fragment.fragment
-						if (!text) {
-							text = 'TODO: handle complete fragments.<br><a href="account.html?username=' + fragment.author + '#contributions">View original</a>'
+						if (!fragment.fragment) {
+							//complete fragment; load full text on request
+							tile.find('.work-tile-text')
+							.html(
+								'<button class="btn text-bold-hover col font-content-md" \
+								onclick="index_load_work_text(' + fragment.work_id + ',\'#' + tile_id + ' .work-tile-text\');">\
+								Load full text\
+								</button>'
+							)
+							
+							tile.find('.work-tile-text-collapse').removeClass('collapse')
 						}
-						tile.find('.work-tile-text')
-						.html(text)
+						else {
+							tile.find('.work-tile-text')
+							.html(fragment.fragment)
+						}
 						
 						//description
 						if (fragment.description) {
@@ -239,8 +254,14 @@ function puzzles_onload(dbdata) {
 						}
 						
 						//author
-						tile.find('.work-tile-fragments')
-						.html('<div class="col"><button class="btn text-raspberry-hover text-bold-hover text-dark-nohover col" role="button" onclick="window.location.href=\'account.html?username=' + fragment.author + '\';">' + fragment.author + '</button></div>')
+						tile.find('.work-tile-fragments').html(
+							'<div class="col">\
+							<button class="btn text-raspberry-hover text-bold-hover text-dark-nohover col" \
+							role="button" onclick="window.location.href=\'account.html?username=' + fragment.author + '\';">' + 
+							fragment.author + 
+							'</button>\
+							</div>'
+						)
 					
 						fragments_list.append(tile)
 					}
@@ -378,4 +399,24 @@ function index_puzzle_on_complete(puzzle) {
 	//update db.plays submit username,puzzle,duration
 	
 	//load fragment reader; shows literature contained in the puzzle
+}
+
+function index_load_work_text(work_id, dest_selector) {
+	let dest = $(dest_selector)
+	
+	if (!dest.prop('data-text-loaded')) {
+		dbclient_fetch_work_text(work_id, function(work_text) {
+			let text
+			if (work_text) {
+				text = string_utils_tagify(work_text[0].text)
+			}
+			else {
+				text = 'Error: failed to fetch work content from the database!'
+			}
+		
+			dest
+			.html(text)
+			.attr('data-text-loaded',true)
+		})
+	}
 }
