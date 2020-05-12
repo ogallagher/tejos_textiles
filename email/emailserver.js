@@ -7,7 +7,7 @@ Owen Gallagher
 */
 
 //libraries
-const nodemailer = require('nodemailer')
+const sendgrid_mailer = require('@sendgrid/mail')
 const fs = require('fs')
 
 //global constants
@@ -36,12 +36,9 @@ const EMAIL_SUBSCRIBED_PLACEHOLDER = /\?subscribed\?/g
 const EMAIL_ACTIVATION_CODE_PLACEHOLDER = /\?activation_code\?/g
 
 //local vars
-let account
-let options
-let sender
+let defaults
 let templates
 let css = ''
-let defaults
 
 //global methods
 exports.init = function() {
@@ -89,39 +86,26 @@ exports.init = function() {
 			}
 		})
 		
-		nodemailer.createTestAccount()
-			.then(function(credentials) {
-				//TODO get email credentials from environment variables
-				console.log('getting email options and credentials')
-				account = credentials
-				
-				//load connection options
-				options = {
-					pool: true,					//pool connections together
-					host: 'smtp.ethereal.email',
-					port: 587,
-					auth: {
-						user: account.user,		//see https://nodemailer.com/smtp/#authentication for how to set up oath2 with user and token properly
-						pass: account.pass
-					}
-				}
-				
-				//load defaults
-				defaults = {
-					from: {
-						name: 'Textiles Journal',
-						address: 'contact@textilesjournal.org'
-					}
-				}
-				
-				//create connection
-				sender = nodemailer.createTransport(options,defaults)
-				resolve()
-			})
-			.catch(function(err) {
-				console.log('failed to initialize email account: ' + err)
-				reject()
-			})
+		//email api credentials
+		console.log('getting email credentials and configuring')
+		let api_key = process.env.SENDGRID_API_KEY
+		if (!api_key) {
+			api_key = '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'
+		}
+		sendgrid_mailer.setApiKey(api_key)
+		
+		//email defaults
+		//TODO remove testing
+		defaults = { 
+			from: {
+				name: 'Owen Gallagher',
+				email: 'owengall@icloud.com'
+				//name: 'Textiles Journal',
+				//email: 'contact@textilesjournal.org'
+			}
+		}
+		
+		resolve()
 	})
 }
 
@@ -175,19 +159,31 @@ exports.email = function(dest_email, type, args) {
 		
 		if (go) {
 			let message = {
-				to: dest_email,
+				to: {
+					name: args.username,
+					email: dest_email
+				},
 				subject: subject,
 				text: text,
-				html: html
+				html: html,
+				from: defaults.from
 			}
-		
-			sender.sendMail(message, function(err, info) {
-				if (err) {
-					console.log('message send failed: ' + err)
+			
+			sendgrid_mailer
+			.send(message)
+			.then(function(info) {
+				if (info) {
+					console.log('message sent successfully, status: ' + info)
 				}
 				else {
-					console.log('message sent, viewable at:\n' + nodemailer.getTestMessageUrl(info))
-					resolve()
+					console.log('message sent successfully')
+				}
+				resolve()
+			})
+			.catch(function(err) {
+				console.log('error: message send failed: ' + err)
+				if (err.response) {
+					console.log(err.response.body)
 				}
 			})
 		}
