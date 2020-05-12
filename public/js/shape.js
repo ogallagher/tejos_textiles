@@ -33,6 +33,10 @@ function Shape(hole,cap,puzzle) {
 	this.capAnchor
 	this.anchor
 	
+	this.randomize(puzzle)
+}
+
+Shape.prototype.randomize = function(puzzle) {
 	//randomize user drag
 	let bounds = puzzle.paper.view.bounds
 	
@@ -40,6 +44,9 @@ function Shape(hole,cap,puzzle) {
 		(Math.random() * bounds.width) + bounds.x - this.holeP.x, 
 		(Math.random() * bounds.height) + bounds.y - this.holeP.y
 	)
+	
+	//set isComplete
+	this.isComplete = false
 }
 
 Shape.prototype.move = function() {

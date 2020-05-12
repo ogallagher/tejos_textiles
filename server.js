@@ -29,6 +29,7 @@ try {
 	const cors = require('cors')
 	const origins = [
 		'http://localhost:5000', 					//for local testing
+		'http://192.168.0.24:5000',
 		'https://textilesjournal.herokuapp.com',	//english site url
 		'https://revistatejos.herokuapp.com'		//spanish site url
 	]

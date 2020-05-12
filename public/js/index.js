@@ -42,7 +42,11 @@ window.onload = function() {
 		
 		//close button
 		$('#win_screen_close').click(function() {
+			//close win screen
 			$('#win_screen').fadeOut(1000)
+			
+			//enable puzzle for replay
+			featured_puzzle.enable()
 		})
 	})
 }
@@ -417,6 +421,7 @@ function index_puzzle_on_complete(puzzle) {
 	console.log('puzzle completed!')
 	
 	//show win screen
+	$('#solve_time').html(puzzle.solveTime / 1000) //solve time in seconds
 	$('#win_screen').show()
 	
 	//show fragments; shows literature contained in the puzzle

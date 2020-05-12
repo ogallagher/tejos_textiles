@@ -47,6 +47,9 @@ function Puzzle(dbdata) {
 	this.dragBegin = new paper.Point()
 	this.anchor = new paper.Point()
 	
+	this.startTime = null
+	this.solveTime = 0
+	this.enabled = true
 	this.onComplete = function(){} //callback for when the puzzle is completed
 }
 
@@ -95,50 +98,59 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,frating,fcontainer) {
 	let self = this
 	
 	//event handlers
-	paper.view.onMouseDown = function(event) {	
+	paper.view.onMouseDown = function(event) {
 		let mouse = event.point
 		let miss = true;
-		
-		for (let shape of self.shapes) {
-			if (shape.contains(mouse)) {
-				miss = false
-				shape.throwAnchor()
-				selectedShape = shape
-				break
+	
+		if (self.enabled) {
+			for (let shape of self.shapes) {
+				if (shape.contains(mouse)) {
+					miss = false
+					shape.throwAnchor()
+					selectedShape = shape
+					break
+				}
 			}
 		}
 		
 		self.dragBegin = mouse
 		self.anchor = self.pan
-		
+	
 		doubleClick = mouse
 	}
 	paper.view.onMouseUp = function(event) {
-		if (selectedShape != null) {
-			//shapes dragged, check for puzzle completion
-			let complete = true
-			for (let shape of self.shapes) {
-				if (!shape.isComplete) {
-					complete = false
+		if (self.enabled) {
+			if (selectedShape != null) {
+				//shapes dragged, check for puzzle completion
+				let complete = true
+				for (let shape of self.shapes) {
+					if (!shape.isComplete) {
+						complete = false
+					}
+				}
+			
+				if (complete) {
+					self.complete()
 				}
 			}
-			
-			if (complete) {
-				self.complete()
-			}
-		}
 		
-		selectedShape = null
+			selectedShape = null
+		}
 	}
 	paper.view.onMouseDrag = function(event) {
 		var mouse = event.point.subtract(self.dragBegin).divide(self.zoom);
 		
-		if (selectedShape == null) {
+		if (selectedShape == null || !self.enabled) {
 			self.pan = self.anchor.add(mouse)
 			self.updateGraphics()
 		}
 		else {
 			selectedShape.dragTo(mouse)
+		}
+		
+		//begin solve timer
+		if (self.enabled && self.startTime == null) {
+			self.startTime = new Date()
 		}
 	}
 	paper.view.onDoubleClick = function(event) {
@@ -146,17 +158,17 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,frating,fcontainer) {
 		
 		if (m.equals(doubleClick)) {
 			let z1 = self.zoom;
-				
+			
 			if (self.zoom == PUZZLE_Z_MIN) {
 				self.zoom = 1
 			}
 			else {
 				self.zoom = PUZZLE_Z_MIN
 			}
-		
+	
 			let x = m.subtract(m.divide(z1).multiply(self.zoom))
 			self.pan = self.pan.add(x);
-		
+	
 			self.updateGraphics()
 		}
 	}
@@ -190,13 +202,12 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,frating,fcontainer) {
 				self.shapes = []
 				var shapesOut = data.shapes_outline.split(';;')
 				var shapesIn = data.shapes_inline.split(';;')
-
+				
 				if (shapesOut.length == shapesIn.length) {
 					var holeClips = new paper.Group()
 					var capClips = new paper.Group()
-					var shape
 					for (var i=0; i<shapesOut.length; i++) {
-						shape = new Shape(shapesOut[i],shapesIn[i],self)
+						let shape = new Shape(shapesOut[i],shapesIn[i],self)
 		
 						self.shapes.push(shape)
 		
@@ -231,8 +242,22 @@ Puzzle.prototype.resize = function(container) {
 }
 
 Puzzle.prototype.complete = function() {
-	//change appearance to show completion, disable interaction
+	//calculate solve time (ms)
+	this.solveTime = new Date().getTime() - this.startTime.getTime()
+	
+	//disable interaction
+	this.enabled = false
+	this.startTime = null
 	
 	//use callback to do other things in the global context
 	this.onComplete(this)
+}
+
+Puzzle.prototype.enable = function() {
+	this.enabled = true
+	
+	//reset shapes
+	for (let shape of this.shapes) {
+		shape.randomize(this)
+	}
 }
