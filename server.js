@@ -222,6 +222,11 @@ try {
 					}
 				})
 		})
+		
+	//for enabling https by getting ssl cert from certbot
+	app.get('/.well-known/acme-challenge/:content', function(req,res) {
+		res.send('eRNduXySI3Bb1fpaQFU7t1ODNhI0roKeVeOjTuz3-p8.APhvbwl_rvMO2TUKMJgyqQ38kvH7k3s1WZYGORvtTbM')
+	})
 }
 catch (err) {
 	console.log(err)
