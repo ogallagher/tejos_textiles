@@ -31,14 +31,14 @@ try {
 	const emailserver = require('./email/emailserver')
 	
 	const SITE = enums.site.TEXTILES; //select database to connect to
-
+	
 	app.set('port', (process.env.PORT || 5000))
 
 	//enable cross-origin requests for same origin html imports
 	const cors = require('cors')
 	const origins = [
-		'http://localhost:5000', 					//local testing (same device)
-		'http://192.168.0.24:5000',					//local testing (different devices)
+		'https://localhost', 						//local testing (same device)
+		'https://192.168.0.24',						//local testing (different devices)
 		'https://textilesjournal.herokuapp.com',	//english site url
 		'https://revistatejos.herokuapp.com',		//spanish site url
 		'https://www.textilesjournal.org'			//english site domain
@@ -57,20 +57,20 @@ try {
 	
 	//serve the website from public/
 	app.use(express.static('public'))
-
-	app.listen(app.get('port'), function() {
+	
+	function on_start() {
 		let site_name = 'textiles'
 		if (SITE == enums.site.TEJOS) {
 			site_name = 'tejos'
 		}
 		console.log(site_name + ' server is running at <host>:' + app.get('port'))
-	
+
 		console.log('connecting to database...')
 		dbserver.init(SITE)
-	
+
 		console.log('enabling sessions...')
 		sessionserver.init()
-		
+	
 		console.log('enabling email notifications...')
 		emailserver
 			.init()
@@ -80,7 +80,29 @@ try {
 			.catch(function() {
 				console.log('error: email server failed')
 			})
-	})
+	}
+	
+	if (app.get('port') == 443) {
+		//https server
+		const fs = require('fs')
+		const PATH_HTTPS = './secrets/https_config/'
+		
+		try {
+			require('https').createServer({
+			  key: fs.readFileSync(PATH_HTTPS + 'privkey.pem'),
+			  cert: fs.readFileSync(PATH_HTTPS + 'cert.pem'),
+			  ca: fs.readFileSync(PATH_HTTPS + 'fullchain.pem')
+			}, app).listen(app.get('port'), on_start)
+		}
+		catch (err) {
+			console.log(err)
+			console.log('error: https server needs root permissions to run')
+		}
+	}
+	else {
+		//http server
+		app.listen(app.get('port'), on_start)
+	}
 
 	function handle_db(endpoint,args,res) {
 		console.log('db: ' + endpoint + ' [' + args + ']')
@@ -222,7 +244,7 @@ try {
 					}
 				})
 		})
-		
+	
 	//for enabling https by getting ssl cert from certbot
 	app.get('/.well-known/acme-challenge/:content', function(req,res) {
 		res.send('eRNduXySI3Bb1fpaQFU7t1ODNhI0roKeVeOjTuz3-p8.APhvbwl_rvMO2TUKMJgyqQ38kvH7k3s1WZYGORvtTbM')
