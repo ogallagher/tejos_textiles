@@ -88,20 +88,26 @@ exports.init = function() {
 		
 		//email api credentials
 		console.log('getting email credentials and configuring')
-		sendgrid_mailer.setApiKey(process.env.SENDGRID_API_KEY)
+		if (process.env.SENDGRID_API_KEY) {
+			sendgrid_mailer.setApiKey(process.env.SENDGRID_API_KEY)
 		
-		//email defaults
-		//TODO remove testing
-		defaults = { 
-			from: {
-				name: 'Owen Gallagher',
-				email: 'owengall@icloud.com'
-				//name: 'Textiles Journal',
-				//email: 'contact@textilesjournal.org'
+			//email defaults
+			//TODO remove testing
+			defaults = { 
+				from: {
+					name: 'Owen Gallagher',
+					email: 'owengall@icloud.com'
+					//name: 'Textiles Journal',
+					//email: 'contact@textilesjournal.org'
+				}
 			}
-		}
 		
-		resolve()
+			resolve()
+		}
+		else {
+			console.log('error: email credentials not found in env variables')
+			reject()
+		}
 	})
 }
 

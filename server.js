@@ -5,6 +5,14 @@ Owen Gallagher
 */
 
 try {
+	if (require('dotenv').config().error) {
+		console.log('environment variables not loaded from .env; assuming production mode')
+	}
+	else {
+		console.log('environment variables loaded from .env; assuming testing mode')
+	}
+	
+	//web server
 	const express = require('express')
 	const app = express()
 
@@ -16,6 +24,7 @@ try {
 		limit: '50mb'
 	}))
 	
+	//local libraries
 	const enums = require('./enums')
 	const dbserver = require('./db/dbserver')
 	const sessionserver = require('./session/sessionserver')
@@ -31,7 +40,8 @@ try {
 		'http://localhost:5000', 					//local testing (same device)
 		'http://192.168.0.24:5000',					//local testing (different devices)
 		'https://textilesjournal.herokuapp.com',	//english site url
-		'https://revistatejos.herokuapp.com'		//spanish site url
+		'https://revistatejos.herokuapp.com',		//spanish site url
+		'https://www.textilesjournal.org'			//english site domain
 	]
 	
 	app.use(cors({

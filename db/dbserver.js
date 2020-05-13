@@ -26,8 +26,6 @@ exports.init = function(site) {
 	//get database connection credentials
 	let config = null
 	
-	//TODO delete testing
-	let process = {env: {DATABASE_URL: 'mysql://cadwgjdw7ewfoxfn:f3wakbqbpdjanfim@axxb6a0z2kydkco3.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/x7ku0pg29r5qx2ro'}}
 	if (process.env.DATABASE_URL) {
 		config = {
 			url: process.env.DATABASE_URL, //url = mysql://user:password@host:3306/db

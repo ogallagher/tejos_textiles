@@ -19,39 +19,37 @@ let cache
 let saved_key
 
 exports.init = function() {
-	//get config from heroku env vars
-	if (process.env.MEMCACHEDCLOUD_SERVERS) {
-		config.host = process.env.MEMCACHEDCLOUD_SERVERS
-		config.user = process.env.MEMCACHEDCLOUD_USERNAME
-		config.pass = process.env.MEMCACHEDCLOUD_PASSWORD
-	}
-	else {
-		config.host = 'memcached-10973.c11.us-east-1-3.ec2.cloud.redislabs.com:10973'	//TODO remove this
-		config.user = 'mc-B0z3T'
-		config.pass = 'mTQyojfzPN9JnNiQsuBjv0h9APJcB1bx'
-	}
-	
-	cache = memjs.Client.create(config.host, {
-		username: config.user,
-		password: config.pass
-	})
-	
 	return new Promise(function(resolve,reject) {
-		if (cache) {
-			exports.set('test_key', 'test_value', function(err) {
-				if (err) {
-					console.log('error: cache server failed to set test_key')
-					console.log(err)
-					cache = null
-					reject()
-				}
-				else {
-					resolve()
-				}
+		//get config from heroku env vars
+		if (process.env.MEMCACHEDCLOUD_SERVERS) {
+			config.host = process.env.MEMCACHEDCLOUD_SERVERS
+			config.user = process.env.MEMCACHEDCLOUD_USERNAME
+			config.pass = process.env.MEMCACHEDCLOUD_PASSWORD
+			
+			cache = memjs.Client.create(config.host, {
+				username: config.user,
+				password: config.pass
 			})
+		
+			if (cache) {
+				exports.set('test_key', 'test_value', function(err) {
+					if (err) {
+						console.log('error: cache server failed to set test_key')
+						console.log(err)
+						cache = null
+						reject()
+					}
+					else {
+						resolve()
+					}
+				})
+			}
+			else {
+				console.log('error: cache server connection failed')
+				reject()
+			}
 		}
 		else {
-			console.log('error: cache server connection failed')
 			reject()
 		}
 	})
