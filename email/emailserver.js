@@ -88,11 +88,7 @@ exports.init = function() {
 		
 		//email api credentials
 		console.log('getting email credentials and configuring')
-		let api_key = process.env.SENDGRID_API_KEY
-		if (!api_key) {
-			api_key = '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'
-		}
-		sendgrid_mailer.setApiKey(api_key)
+		sendgrid_mailer.setApiKey(process.env.SENDGRID_API_KEY)
 		
 		//email defaults
 		//TODO remove testing
