@@ -105,25 +105,31 @@ function index_on_login(account_info) {
 						//add new user stats
 						let featured_tags = $('#featured_tags')
 						html_imports('featured_tag', function(jtemplate) {
-							//plays tag
-							let jstring = jtemplate
-											.replace('?key?', account.username + ' plays')
-											.replace('?value?', data.times)
-							let jtag = $(jstring)
-							.attr('data-tag-type','user-stats')
-							.prop('id','user_plays')
-							featured_tags.append(jtag)
-							
-							//fastest solve
-							if (data.fastest) {
-								jstring = jtemplate
-											.replace('?key?', account.username + ' fastest solve')
-											.replace('?value?', (data.fastest / 1000) + 's')
-								jtag = $(jstring)
+							try {
+								//plays tag
+								let jstring = jtemplate
+												.replace('?key?', account.username + ' plays')
+												.replace('?value?', data.times)
+								let jtag = $(jstring)
 								.attr('data-tag-type','user-stats')
-								.prop('id','user_fastest')
-								
+								.prop('id','user_plays')
 								featured_tags.append(jtag)
+						
+								//fastest solve
+								if (data.fastest) {
+									jstring = jtemplate
+												.replace('?key?', account.username + ' fastest solve')
+												.replace('?value?', (data.fastest / 1000) + 's')
+									jtag = $(jstring)
+									.attr('data-tag-type','user-stats')
+									.prop('id','user_fastest')
+							
+									featured_tags.append(jtag)
+								}
+							}
+							catch (err) {
+								console.log(err)
+								console.log('account play stats fetch failed; perhaps user logged out?')
 							}
 						})
 					}

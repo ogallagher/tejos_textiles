@@ -56,7 +56,8 @@ function Puzzle(dbdata) {
 Puzzle.prototype.updateGraphics = function() {
 	let v = this.paper.view
 	
-	if (featuredPuzzle == this) {
+	//both featured and fully loaded from db
+	if (featuredPuzzle == this && this.text) {
 		this.background.bounds.size = v.size
 		this.foreground.bounds.size = v.size
 		this.foregroundCaps.bounds.size = v.size

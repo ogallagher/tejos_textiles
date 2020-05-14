@@ -254,6 +254,11 @@ try {
 	app.get('/.well-known/acme-challenge/:content', function(req,res) {
 		res.send('eRNduXySI3Bb1fpaQFU7t1ODNhI0roKeVeOjTuz3-p8.APhvbwl_rvMO2TUKMJgyqQ38kvH7k3s1WZYGORvtTbM')
 	})
+	
+	//for enabling app auth with ms exchange and azure
+	app.get('/.well-known/microsoft-identity-association.json', function(req, res) {
+		res.send(process.env.MS_APP_DOMAIN_AUTH)
+	})
 }
 catch (err) {
 	console.log(err)

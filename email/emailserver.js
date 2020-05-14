@@ -90,17 +90,18 @@ exports.init = function() {
 		console.log('getting email credentials and configuring')
 		if (process.env.SENDGRID_API_KEY) {
 			sendgrid_mailer.setApiKey(process.env.SENDGRID_API_KEY)
-		
+			
 			//email defaults
 			//TODO remove testing
 			defaults = { 
 				from: {
-					name: 'Owen Gallagher',
-					email: 'owengall@icloud.com'
-					//name: 'Textiles Journal',
-					//email: 'contact@textilesjournal.org'
+					//name: 'Owen Gallagher',
+					//email: 'owengall@icloud.com'
+					name: 'Textiles Journal',
+					email: 'contact@textilesjournal.org'
 				}
 			}
+			console.log('sending email as ' + defaults.from.email)
 		
 			resolve()
 		}
