@@ -39,9 +39,12 @@ try {
 	const origins = [
 		'https://localhost', 						//local testing (same device)
 		'https://192.168.0.24',						//local testing (different devices)
-		'https://textilesjournal.herokuapp.com',	//english site url
-		'https://revistatejos.herokuapp.com',		//spanish site url
-		'https://www.textilesjournal.org'			//english site domain
+		'https://textilesjournal.herokuapp.com',	//english site heroku
+		'https://revistatejos.herokuapp.com',		//spanish site heroku
+		'https://textilesjournal.org',				//english site domain
+		'http://textilesjournal.org',				//english site domain (http)
+		'https://www.textilesjournal.org',			//english site subdomain (www)
+		'http://www.textilesjournal.org'			//english site subdomain (www; http)
 	]
 	
 	app.use(cors({
