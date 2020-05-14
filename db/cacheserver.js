@@ -28,9 +28,10 @@ exports.init = function() {
 			
 			cache = memjs.Client.create(config.host, {
 				username: config.user,
-				password: config.pass
+				password: config.pass,
+				keepAlive: true
 			})
-		
+			
 			if (cache) {
 				exports.set('test_key', 'test_value', function(err) {
 					if (err) {

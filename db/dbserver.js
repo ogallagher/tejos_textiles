@@ -55,22 +55,26 @@ exports.init = function(site) {
 	
 	//connect to database
 	if (config != null) {
-		console.log('connecting to ' + config.name + '...')
+		console.log('connecting to ' + config.name)
 		
-		db = mysql.createConnection({
+		//create connections pool
+		db = mysql.createPool({
 			host: config.host,
 			user: config.user,
 			password: config.pass,
-			database: config.db
+			database: config.db,
+			waitForConnections: true
 		})
 		
-		db.connect(function(err) {
+		//test a connection
+		db.getConnection(function(err, connection) {
 			if (err) {
 				console.log('error: failed to connect to ' + config.host)
 				console.log(err)
 			}
 			else {
 				console.log('database connected')
+				connection.release()
 			}
 		})
 	}

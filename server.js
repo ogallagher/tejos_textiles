@@ -70,13 +70,13 @@ try {
 		}
 		console.log(site_name + ' server is running at <host>:' + app.get('port'))
 
-		console.log('connecting to database...')
+		console.log('connecting to database')
 		dbserver.init(SITE)
 
-		console.log('enabling sessions...')
+		console.log('enabling sessions')
 		sessionserver.init()
 	
-		console.log('enabling email notifications...')
+		console.log('enabling email notifications')
 		emailserver
 			.init()
 			.then(function() {
@@ -249,10 +249,15 @@ try {
 					}
 				})
 		})
+		
+	//handle oauth
+	app.get('/oauth/callback', function(req,res) {
+		
+	})
 	
 	//for enabling https by getting ssl cert from certbot
 	app.get('/.well-known/acme-challenge/:content', function(req,res) {
-		res.send('eRNduXySI3Bb1fpaQFU7t1ODNhI0roKeVeOjTuz3-p8.APhvbwl_rvMO2TUKMJgyqQ38kvH7k3s1WZYGORvtTbM')
+		res.send(process.env.CERTBOT_DOMAIN_AUTH)
 	})
 	
 	//for enabling app auth with ms exchange and azure

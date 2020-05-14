@@ -7,8 +7,8 @@ Owen Gallagher
 */
 
 //libraries
-const sendgrid_mailer = require('@sendgrid/mail')
 const fs = require('fs')
+const nodemailer = require('nodemailer')
 
 //global constants
 const emailserver_EMAIL_REGISTER		= 0
@@ -39,6 +39,7 @@ const EMAIL_ACTIVATION_CODE_PLACEHOLDER = /\?activation_code\?/g
 let defaults
 let templates
 let css = ''
+let mailer
 
 //global methods
 exports.init = function() {
@@ -86,24 +87,49 @@ exports.init = function() {
 			}
 		})
 		
-		//email api credentials
+		//email config
 		console.log('getting email credentials and configuring')
-		if (process.env.SENDGRID_API_KEY) {
-			sendgrid_mailer.setApiKey(process.env.SENDGRID_API_KEY)
-			
-			//email defaults
-			//TODO remove testing
-			defaults = { 
-				from: {
-					//name: 'Owen Gallagher',
-					//email: 'owengall@icloud.com'
-					name: 'Textiles Journal',
-					email: 'contact@textilesjournal.org'
+		if (process.env.EMAIL_PASSWORD) {
+			try {
+				//email credentials
+				mailer = nodemailer.createTransport({
+					host: 'smtp.office365.com',
+					secure: true,
+					port: 465,
+					auth: {
+						user: 'contact@textilesjournal.org',
+						pass: process.env.EMAIL_PASSWORD
+					}
+				})
+				
+				mailer.verify(function(err, success) {
+					if (err) {
+						console.log(err)
+						reject()
+					}
+					else {
+						console.log('verified: ' + success)
+						
+						//TODO remove testing
+						resolve()
+					}
+				})
+				
+				//email defaults
+				defaults = { 
+					from: {
+						//name: 'Owen Gallagher',
+						//email: 'owengall@icloud.com'
+						name: 'Textiles Journal',
+						email: 'contact@textilesjournal.org'
+					}
 				}
+				console.log('sending email as ' + defaults.from.email)
 			}
-			console.log('sending email as ' + defaults.from.email)
-		
-			resolve()
+			catch (err) {
+				console.log(err)
+				reject()
+			}
 		}
 		else {
 			console.log('error: email credentials not found in env variables')
@@ -172,8 +198,8 @@ exports.email = function(dest_email, type, args) {
 				from: defaults.from
 			}
 			
-			sendgrid_mailer
-			.send(message)
+			mailer
+			.sendMail(message)
 			.then(function(info) {
 				if (info) {
 					console.log('message sent successfully, status: ' + info)
