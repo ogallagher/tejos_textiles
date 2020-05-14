@@ -180,7 +180,7 @@ function dbclient_fetch_user_rating(username,puzzle_id,callback) {
 			}
 		})
 		.catch(function(err) {
-			console.log('rating fetch failed: ' + err.responseText)
+			console.log('rating fetch failed: ' + err)
 			callback(null)
 		})
 }
@@ -199,7 +199,7 @@ function dbclient_fetch_user_plays(username,puzzle_id,callback) {
 			}
 		})
 		.catch(function(err) {
-			console.log('user plays fetch failed: ' + err.responseText)
+			console.log('user plays fetch failed: ' + err)
 			callback(null)
 		})
 }
@@ -302,7 +302,7 @@ function dbclient_update_user(username, edits, callback) {
 			}
 		})
 		.catch(function(err) {
-			console.log('user update failed: ' + err.responseText)
+			console.log('user update failed: ' + err)
 			callback('http')
 		})
 }
@@ -402,4 +402,24 @@ function dbclient_fetch_work_text(work_id, callback) {
 			callback(null)
 		}
 	})
+}
+
+function dbclient_play(username, puzzle_id, duration, callback) {
+	console.log('submitting ' + username + ' played ' + puzzle_id)
+	
+	sessionclient_db_request('play', [username, puzzle_id, duration])
+		.then(function(res) {
+			if (res.error) {
+				console.log('play submission to db failed: ' + res.error)
+				callback(res.error)
+			}
+			else {
+				console.log('play success')
+				callback()
+			}
+		})
+		.catch(function(err) {
+			console.log('play submission to db failed: ' + err)
+			callback(err)
+		})
 }

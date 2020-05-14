@@ -105,5 +105,10 @@
 		"params": ["?work_id?"],
 		"query": "select `text` from works where id=?work_id?",
 		"external": true
+	},
+	"play": {
+		"params": ["?username?","?puzzle_id?","?duration?"],
+		"query": "insert into plays(username,puzzle_id,duration) values (?username?,?puzzle_id?,?duration?)",
+		"external": false
 	}
 }

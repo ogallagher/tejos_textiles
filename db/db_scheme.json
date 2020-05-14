@@ -46,7 +46,6 @@
 	"plays": {
 		"username": "username",
 		"puzzle_id": "puzzle_id",
-		"count": "count",
 		"duration": "duration"
 	},
 	"fragments": {

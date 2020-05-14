@@ -18,6 +18,7 @@ const SESSION_ID_CHAR_RANGE = SESSION_ID_CHAR_MAX - SESSION_ID_CHAR_MIN //includ
 
 const SESSION_COOKIE_KEY = 'session_id'
 const USERNAME_COOKIE_KEY = 'username'
+const PLAYS_COOKIE_KEY = 'plays'
 
 const URL_SESSIONS = '/sessions'
 const ENDPOINT_CREATE = 'create'

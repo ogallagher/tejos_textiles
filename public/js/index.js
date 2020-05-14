@@ -14,6 +14,20 @@ window.onload = function() {
 	//fetch puzzles from db and insert into page
 	dbclient_fetch_puzzles(index_puzzles_onload)
 	
+	//enable bootstrap tooltips
+	$('[data-toggle="tooltip"]').tooltip({
+		placement: 'auto',
+		delay: {
+			show: 250,
+			hide: 100
+		}
+	})
+	
+	//enable toasts
+	$('.toast').toast({
+		delay: 4000
+	})
+	
 	//enable featured card widgets
 	index_featured_authors()
 	index_featured_date()
@@ -45,15 +59,11 @@ window.onload = function() {
 			//close win screen
 			$('#win_screen').fadeOut(1000)
 		})
-	})
-	
-	//enable bootstrap tooltips
-	$('[data-toggle="tooltip"]').tooltip({
-		placement: 'auto',
-		delay: {
-			show: 250,
-			hide: 100
-		}
+		
+		//login-to-record-play toast
+		$('#login_play_toast').toast({
+			autohide: false
+		})
 	})
 	
 	//enable play-again button
@@ -99,23 +109,48 @@ function index_on_login(account_info) {
 							let jstring = jtemplate
 											.replace('?key?', account.username + ' plays')
 											.replace('?value?', data.times)
-							let jtag = $(jstring).attr('data-tag-type','user-stats')
+							let jtag = $(jstring)
+							.attr('data-tag-type','user-stats')
+							.prop('id','user_plays')
 							featured_tags.append(jtag)
-						
 							
 							//fastest solve
 							if (data.fastest) {
 								jstring = jtemplate
 											.replace('?key?', account.username + ' fastest solve')
-											.replace('?value?', data.fastest)
-								jtag = $(jstring).attr('data-tag-type','user-stats')
-						
+											.replace('?value?', (data.fastest / 1000) + 's')
+								jtag = $(jstring)
+								.attr('data-tag-type','user-stats')
+								.prop('id','user_fastest')
+								
 								featured_tags.append(jtag)
 							}
 						})
 					}
 				})
 			})
+		}
+		
+		//recover anonymous user stats from cookies
+		let cookie_plays = cookies_get(PLAYS_COOKIE_KEY)
+		if (cookie_plays) {
+			let plays = cookie_plays.split(';')
+			
+			for (let play of plays) {
+				let entry = play.split(',')
+				
+				dbclient_play(account.username, entry[0], entry[1], function(err) {
+					if (err) {
+						//TODO handle error
+					}
+					else {
+						//TODO update user stats
+						
+						//delete plays cookie
+						cookies_delete(PLAYS_COOKIE_KEY)
+					}
+				})
+			}
 		}
 	}
 }
@@ -190,15 +225,21 @@ function index_puzzles_onload(dbdata) {
 				let fragments_list = $('#fragments_list')
 				let authors_list = $('#featured_authors').html('')
 				let author_button_str = '<a class="btn btn-outline-secondary" href="#"></a>'
+				let author_names = []
 			
 				for (let fragment of fragments) {
 					//load author
-					authors_list.append(
-						$(author_button_str)
-						.prop('href','account.html?username=' + fragment.author)
-						.html(fragment.author)
-					)
-				
+					let author = fragment.author
+					if (!author_names.includes(author)) {
+						authors_list.append(
+							$(author_button_str)
+							.prop('href','account.html?username=' + author)
+							.html(fragment.author)
+						)
+						
+						author_names.push(author)
+					}
+					
 					//load fragment
 					let tile = $(tile_str)
 					
@@ -304,8 +345,8 @@ function index_puzzles_onload(dbdata) {
 					tile.find('.work-tile-fragments').html(
 						'<div class="col">\
 						<button class="btn text-raspberry-hover text-bold-hover text-dark-nohover col" \
-						role="button" onclick="window.location.href=\'account.html?username=' + fragment.author + '\';">' + 
-						fragment.author + 
+						role="button" onclick="window.location.href=\'account.html?username=' + author + '\';">' + 
+						author + 
 						'</button>\
 						</div>'
 					)
@@ -381,13 +422,8 @@ function index_featured_stars() {
 		}
 	})
 	
-	//TODO update db tables with new rating
-	let login_toast = $('#rate_login_toast').toast({
-		delay: 4000
-	})
-	let enable_toast = $('#rate_enable_toast').toast({
-		delay: 4000
-	})
+	let login_toast = $('#rate_login_toast')
+	let enable_toast = $('#rate_enable_toast')
 	
 	rating.click(function(event) {
 		let star_count = Math.floor(r+1)
@@ -404,7 +440,6 @@ function index_featured_stars() {
 				})
 			}
 			else {
-				//TODO toast to verify account to rate
 				enable_toast.toast('show')
 			}
 		}
@@ -451,9 +486,44 @@ function index_puzzle_on_complete(puzzle) {
 	$('#fragments_header').show()
 	$('#fragments_list').collapse()
 	
-	//if not logged in, store play cookie and toast to login to save progress
-	
-	//update db.plays submit username,puzzle,duration
+	if (account) {
+		//update db.plays submit username,puzzle,duration
+		dbclient_play(account.username, puzzle.id, puzzle.solveTime, function(err) {
+			if (err) {
+				//TODO handle error; create a retry button so play is not lost
+				alert('Error: unable to save play data to server!\nTODO: retry play push to db')
+			}
+			else {
+				//update user stats
+				//num plays
+				let user_plays = $('#user_plays .featured-tag-value')
+				user_plays.html(parseInt(user_plays.html()) + 1)
+				
+				//fastest solve
+				let user_fastest = $('#user_fastest .featured-tag-value')
+				let previous = parseFloat(user_fastest.html())
+				
+				if (puzzle.solveTime < previous * 1000) {
+					user_fastest.html(puzzle.solveTime / 1000)
+				}
+			}
+		})
+	}
+	else {
+		//if not logged in, store play cookie and toast to login to save progress
+		$('#login_play_toast_container').show()
+		$('#login_play_toast').toast('show')
+		
+		let cookie_plays = cookies_get(PLAYS_COOKIE_KEY) //puzzle,duration;puzzle,duration;...
+		if (cookie_plays) {
+			cookie_plays += ';'
+		}
+		else {
+			cookie_plays = ''
+		}
+		
+		cookies_set(PLAYS_COOKIE_KEY, cookie_plays + puzzle.id + ',' + puzzle.solveTime)
+	}
 }
 
 function index_load_work_text(work_id, dest_selector) {
