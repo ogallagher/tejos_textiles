@@ -249,11 +249,6 @@ try {
 					}
 				})
 		})
-		
-	//handle oauth
-	app.get('/oauth/callback', function(req,res) {
-		
-	})
 	
 	//for enabling https by getting ssl cert from certbot
 	app.get('/.well-known/acme-challenge/:content', function(req,res) {
@@ -261,6 +256,7 @@ try {
 	})
 	
 	//for enabling app auth with ms exchange and azure
+	//TODO remove unused graph api emailing stuff
 	app.get('/.well-known/microsoft-identity-association.json', function(req, res) {
 		res.send(process.env.MS_APP_DOMAIN_AUTH)
 	})

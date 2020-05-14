@@ -9,6 +9,7 @@ Owen Gallagher
 //libraries
 const fs = require('fs')
 const nodemailer = require('nodemailer')
+const sendgrid = require('@sendgrid/mail')
 
 //global constants
 const emailserver_EMAIL_REGISTER		= 0
@@ -92,12 +93,13 @@ exports.init = function() {
 		if (process.env.EMAIL_PASSWORD) {
 			try {
 				//email credentials
+				/*
 				mailer = nodemailer.createTransport({
 					host: 'smtp.office365.com',
-					secure: true,
-					port: 465,
+					secure: false,
+					port: 587,
 					auth: {
-						user: 'contact@textilesjournal.org',
+						user: 'contact@textilesjournal.org', //contact@textilesjournal.onmicrosoft.com, contact@textilesjournal.org
 						pass: process.env.EMAIL_PASSWORD
 					}
 				})
@@ -114,6 +116,8 @@ exports.init = function() {
 						resolve()
 					}
 				})
+				*/
+				sendgrid.setApiKey(process.env.SENDGRID_API_KEY)
 				
 				//email defaults
 				defaults = { 
@@ -198,6 +202,7 @@ exports.email = function(dest_email, type, args) {
 				from: defaults.from
 			}
 			
+			/*
 			mailer
 			.sendMail(message)
 			.then(function(info) {
@@ -214,6 +219,17 @@ exports.email = function(dest_email, type, args) {
 				if (err.response) {
 					console.log(err.response.body)
 				}
+			})
+			*/
+			sendgrid.send(message)
+			.then(function(info) {
+				console.log('message sent successfully, status: ' + info)
+			})
+			.catch(function(err) {
+				console.log('error: message send failed: ' + err)
+ 				if (err.response) {
+ 					console.log(err.response.body)
+ 				}
 			})
 		}
 	})
