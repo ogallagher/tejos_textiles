@@ -260,4 +260,6 @@ Puzzle.prototype.enable = function() {
 	for (let shape of this.shapes) {
 		shape.randomize(this)
 	}
+	
+	this.updateGraphics()
 }

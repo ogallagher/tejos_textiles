@@ -38,7 +38,9 @@ try {
 	const cors = require('cors')
 	const origins = [
 		'https://localhost', 						//local testing (same device)
+		'http://localhost',							//local testing (same devicel; http)
 		'https://192.168.0.24',						//local testing (different devices)
+		'http://192.168.0.24',						//local testing (different devices; http)
 		'https://textilesjournal.herokuapp.com',	//english site heroku
 		'https://revistatejos.herokuapp.com',		//spanish site heroku
 		'https://textilesjournal.org',				//english site domain

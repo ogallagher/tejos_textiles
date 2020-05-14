@@ -44,10 +44,30 @@ window.onload = function() {
 		$('#win_screen_close').click(function() {
 			//close win screen
 			$('#win_screen').fadeOut(1000)
-			
-			//enable puzzle for replay
-			featured_puzzle.enable()
 		})
+	})
+	
+	//enable bootstrap tooltips
+	$('[data-toggle="tooltip"]').tooltip({
+		placement: 'auto',
+		delay: {
+			show: 250,
+			hide: 100
+		}
+	})
+	
+	//enable play-again button
+	$('#featured_again').click(function() {
+		//hide win screen
+		$('#win_screen').hide()
+		
+		//enable puzzle for replay
+		if (featured_puzzle) {
+			featured_puzzle.enable()
+		}
+		
+		//hide play-again button
+		$(this).hide()
 	})
 }
 
@@ -423,6 +443,9 @@ function index_puzzle_on_complete(puzzle) {
 	//show win screen
 	$('#solve_time').html(puzzle.solveTime / 1000) //solve time in seconds
 	$('#win_screen').show()
+	
+	//show again button
+	$('#featured_again').show()
 	
 	//show fragments; shows literature contained in the puzzle
 	$('#fragments_header').show()
