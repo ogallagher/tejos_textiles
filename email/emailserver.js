@@ -9,7 +9,6 @@ Owen Gallagher
 //libraries
 const fs = require('fs')
 const nodemailer = require('nodemailer')
-const sendgrid = require('@sendgrid/mail')
 
 //global constants
 const emailserver_EMAIL_REGISTER		= 0
@@ -90,17 +89,18 @@ exports.init = function() {
 		
 		//email config
 		console.log('getting email credentials and configuring')
-		if (process.env.EMAIL_PASSWORD) {
+		if (process.env.EMAIL) {
 			try {
 				//email credentials
-				/*
 				mailer = nodemailer.createTransport({
-					host: 'smtp.office365.com',
-					secure: false,
-					port: 587,
+					host: 'smtp.gmail.com',
+					secure: true,
+					port: 465,
 					auth: {
-						user: 'contact@textilesjournal.org', //contact@textilesjournal.onmicrosoft.com, contact@textilesjournal.org
-						pass: process.env.EMAIL_PASSWORD
+						type: 'OAuth2',
+						user: process.env.EMAIL,
+						serviceClient: process.env.GSUITE_APP_ID,
+						privateKey: process.env.GSUITE_PRIVATE_KEY
 					}
 				})
 				
@@ -110,25 +110,17 @@ exports.init = function() {
 						reject()
 					}
 					else {
-						console.log('verified: ' + success)
+						console.log('email connection verified: ' + success)
 						
-						//TODO remove testing
+						//email defaults
+						defaults = { 
+							from: '"Textiles Journal" ' + process.env.EMAIL
+						}
+						console.log('sending email as ' + defaults.from)
+						
 						resolve()
 					}
 				})
-				*/
-				sendgrid.setApiKey(process.env.SENDGRID_API_KEY)
-				
-				//email defaults
-				defaults = { 
-					from: {
-						//name: 'Owen Gallagher',
-						//email: 'owengall@icloud.com'
-						name: 'Textiles Journal',
-						email: 'contact@textilesjournal.org'
-					}
-				}
-				console.log('sending email as ' + defaults.from.email)
 			}
 			catch (err) {
 				console.log(err)
@@ -192,22 +184,19 @@ exports.email = function(dest_email, type, args) {
 		
 		if (go) {
 			let message = {
-				to: {
-					name: args.username,
-					email: dest_email
-				},
+				to: '"' + args.username + '" ' + dest_email,
 				subject: subject,
 				text: text,
 				html: html,
 				from: defaults.from
 			}
 			
-			/*
 			mailer
 			.sendMail(message)
 			.then(function(info) {
 				if (info) {
-					console.log('message sent successfully, status: ' + info)
+					console.log('message sent successfully, status: ')
+					console.log(info)
 				}
 				else {
 					console.log('message sent successfully')
@@ -219,17 +208,6 @@ exports.email = function(dest_email, type, args) {
 				if (err.response) {
 					console.log(err.response.body)
 				}
-			})
-			*/
-			sendgrid.send(message)
-			.then(function(info) {
-				console.log('message sent successfully, status: ' + info)
-			})
-			.catch(function(err) {
-				console.log('error: message send failed: ' + err)
- 				if (err.response) {
- 					console.log(err.response.body)
- 				}
 			})
 		}
 	})

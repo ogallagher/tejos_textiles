@@ -6,10 +6,10 @@ Owen Gallagher
 
 try {
 	if (require('dotenv').config().error) {
-		console.log('environment variables not loaded from .env; assuming production mode')
+		throw 'environment variables not loaded from .env'
 	}
 	else {
-		console.log('environment variables loaded from .env; assuming testing mode')
+		console.log('environment variables loaded from .env')
 	}
 	
 	//web server
@@ -32,7 +32,7 @@ try {
 	
 	const SITE = enums.site.TEXTILES; //select database to connect to
 	
-	app.set('port', (process.env.PORT || 5000))
+	app.set('port', process.env.PORT)
 
 	//enable cross-origin requests for same origin html imports
 	const cors = require('cors')
@@ -97,7 +97,8 @@ try {
 			  key: fs.readFileSync(PATH_HTTPS + 'privkey.pem'),
 			  cert: fs.readFileSync(PATH_HTTPS + 'cert.pem'),
 			  ca: fs.readFileSync(PATH_HTTPS + 'fullchain.pem')
-			}, app).listen(app.get('port'), on_start)
+			}, app)
+			.listen(app.get('port'), on_start)
 		}
 		catch (err) {
 			console.log(err)
@@ -254,15 +255,9 @@ try {
 	app.get('/.well-known/acme-challenge/:content', function(req,res) {
 		res.send(process.env.CERTBOT_DOMAIN_AUTH)
 	})
-	
-	//for enabling app auth with ms exchange and azure
-	//TODO remove unused graph api emailing stuff
-	app.get('/.well-known/microsoft-identity-association.json', function(req, res) {
-		res.send(process.env.MS_APP_DOMAIN_AUTH)
-	})
 }
 catch (err) {
 	console.log(err)
-	console.log('Error: please run the `npm install` command to get needed node modules first')
+	console.log('Error: make sure you run the `npm install` command to get needed node modules first')
 	process.exit(1)
 }
