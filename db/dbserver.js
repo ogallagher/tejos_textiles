@@ -113,6 +113,7 @@ exports.get_query = function(endpoint, args, is_external) {
 			
 			if (entry) {
 				if (!is_external || entry.external) {
+					//allow query if it's internal, or if external queries are allowed for this endpoint
 					let params = entry.params //array of parameters to be replaced in query
 					let query = entry.query //sql query to be assembled
 					
@@ -156,6 +157,15 @@ exports.get_query = function(endpoint, args, is_external) {
 							if (args[3]) {
 								//update links
 								changes.push('links=' + db.escape(args[3]))
+								go = true
+							}
+							if (args[4] != null) { //can be true, false, or null/undefined
+								//update subscribed
+								let subscribed = 0
+								if (args[4]) {
+									subscribed = 1
+								}
+								changes.push('subscription=' + subscribed)
 								go = true
 							}
 							changes = changes.join(',')

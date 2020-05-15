@@ -293,7 +293,7 @@ function dbclient_update_user(username, edits, callback) {
 		links = links.join(',')
 	}
 	
-	sessionclient_db_request('update_user', [username, edits.photo, edits.bio, links])
+	sessionclient_db_request('update_user', [username, edits.photo, edits.bio, links, edits.subscribed])
 		.then(function(data) {
 			if (data.error) {
 				console.log('user update failed: ' + data.error)

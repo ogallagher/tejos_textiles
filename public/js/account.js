@@ -59,6 +59,173 @@ window.onload = function() {
 		})
 	})
 	html_imports('footer','#import_footer')
+	
+	//edit controls
+	let edit_account = $('#edit_account')
+	let save_account = $('#save_account')
+	let editable = $('.editable')
+	
+	edit_account.click(function() {
+		editing = true
+		edit_account.hide()
+		save_account.show()
+		
+		//enable account edit forms
+		editable.attr('data-editing',true)
+		
+		//disable links
+		$('.link-link')
+		.addClass('disabled')
+		.prop('data-href', $(this).prop('href'))
+		.prop('href','#')
+	})
+	
+	//push edits
+	save_account.click(function() {
+		editing = false
+		save_account.hide()
+		edit_account.show()
+		
+		//disable account edit forms
+		editable.attr('data-editing',false)
+		
+		//enable links
+		$('.link-link')
+		.removeClass('disabled')
+		.prop('href', $(this).attr('data-href'))
+		
+		//send updates to server
+		if (account) {
+			dbclient_update_user(account.username, edits, function(result) {
+				//show result
+				if (result.success == 10) {
+					//10 = sessionserver.SUCCESS
+					$('#edit_toast_message').html('No changes to submit')
+				}
+				else if (result.success) {
+					$('#edit_toast_message').html('Account update successful')
+				}
+				else {
+					console.log('user update result: ' + result)
+					$('#edit_toast_message').html('Error: failed to update your account info on the server. Check browser logs for details.')
+				}
+				$('#edit_toast').toast('show')
+			
+				//clear edits object
+				edits = {}
+			})
+		}
+		else {
+			//suspicious; maybe didn't log in and forced edits to be enabled
+			alert('An error occurred updating this account. Did you log in?')
+		}
+	})
+	
+	editable.click(account_edit)
+	
+	//photo edits
+	$('#edit_photo').change(function(event) {
+		let f = event.target
+		
+		if (f.files && f.files[0]) {
+			img_utils_prep_file(f.files[0], ACCOUNT_PHOTO_SIZE, function(photo) {
+				if (photo) {
+					//register photo change for submission
+					$(f).removeClass('invalid')
+					edits.photo = photo
+					console.log('photo change is ready for commit')
+				}
+				else {
+					console.log('error uploading photo file')
+					$(f).addClass('invalid')
+				}
+			})
+		}
+	})
+	
+	//commit contact card edits
+	$('#edit_contact_card_submit').click(function() {
+		//reload photo
+		if (edits.photo) {
+			$('#photo').prop('src', edits.photo)
+		}
+		
+		//subscribed edits
+		edits.subscribed = $('#edit_subscribed').prop('checked')
+		
+		//reload subscribed
+		let text = 'no'
+		if (edits.subscribed) {
+			text = 'yes'
+		}
+		$('#subscribed').html(text)
+	})
+	
+	//bio edits
+	$('#edit_bio_submit').click(function() {
+		let bio = $('#edit_bio_input').val()
+		
+		if (bio) {
+			edits.bio = string_utils_xss_escape(bio)
+			console.log('bio change ready for commit')
+			
+			//reload bio
+			$('#bio').html(string_utils_tagify(edits.bio))
+		}
+	})
+	
+	//link edits
+	$('#add_link').click(function() {
+		html_imports('edit_link_row', function(jstring) {
+			let row_id = edit_links_rows++
+			let jlink = $(jstring).attr('data-row',row_id)
+			
+			jlink.find('.edit-link-row-delete').click(function() {
+				$('.edit-link-row[data-row="' + row_id + '"]').remove()
+			})
+			
+			$('#edit_links_list').append(jlink)
+		})
+	})
+	$('#edit_links_submit').click(function() {
+		let jlinks = $('.edit-link-row')
+		
+		edits.links = []
+		for (let link of jlinks) {
+			let jlink = $(link)
+			let link_name = jlink.find('.edit-link-row-name').val()
+			let link_url = string_utils_url(jlink.find('.edit-link-row-url').val())
+			
+			if (link_name && link_url) {
+				edits.links.push({
+					name: link_name,
+					link: link_url
+				})
+			}
+		}
+		
+		console.log('links change is ready for commit')
+		
+		//reload links
+		html_imports('link_row', function(jstring) {
+			let dest = $('#import_links').html('')
+			
+			for (let link of edits.links) {
+				let jlink = $(jstring)
+				
+				jlink.find('.link-name')
+				.html(link.name)
+				
+				jlink.find('.link-link')
+				.html(link.link)
+				.addClass('disabled')
+				.prop('data-href', link.link)
+				.prop('href','#')
+				
+				dest.append(jlink)
+			}
+		})
+	})
 }
 
 function account_on_login(account_info) {
@@ -81,7 +248,7 @@ function account_on_login(account_info) {
 			//load foreign account edits
 			username = visiting_account
 			
-			//disable edits called once more details are supplied
+			//account_disable_edits called once more details are supplied
 		}
 	}
 	else if (!visiting_account) {
@@ -199,8 +366,8 @@ function account_on_details(details) {
 	
 		if (details.links) {
 			html_imports('link_row', function(jstring) {
-				let links = $('#import_links')
-			
+				let links = $('#import_links').html('')
+				
 				if (details.links.length == 0) {
 					links.html('No links provided.')
 				}
@@ -256,6 +423,15 @@ function account_on_details(details) {
 				}
 			})
 			
+			if (account.subscribed) {
+				$('#subscribed').html('yes')
+				$('#edit_subscribed').prop('checked',true)
+			}
+			else {
+				$('#subscribed').html('no')
+				$('#edit_subscribed').prop('checked',false)
+			}
+			
 			//enable account deletion
 			$('#confirm_delete_account').click(account_delete)
 		}
@@ -270,153 +446,11 @@ function account_enable_edits() {
 	editing = false
 	edits = {}
 	
-	let edit_account = $('#edit_account')
-	let save_account = $('#save_account')
-	let editable = $('.editable')
+	//show edit-account button
+	$('#edit_account').show()
 	
-	editable.click(account_edit)
-	
-	edit_account
-	.show()
-	.click(function() {
-		editing = true
-		edit_account.hide()
-		save_account.show()
-		
-		//enable account edit forms
-		editable.attr('data-editing',true)
-		
-		//disable links
-		$('.link-link')
-		.addClass('disabled')
-		.prop('data-href', $(this).prop('href'))
-		.prop('href','#')
-	})
-	
-	save_account.click(function() {
-		editing = false
-		save_account.hide()
-		edit_account.show()
-		
-		//disable account edit forms
-		editable.attr('data-editing',false)
-		
-		//enable links
-		$('.link-link')
-		.removeClass('disabled')
-		.prop('href', $(this).attr('data-href'))
-		
-		//send updates to server
-		if (account) {
-			dbclient_update_user(account.username, edits, function(result) {
-				//show result
-				if (result.success == 10) {
-					//10 = sessionserver.SUCCESS
-					$('#edit_toast_message').html('No changes to submit')
-				}
-				else if (result.success) {
-					$('#edit_toast_message').html('Account update successful')
-				}
-				else {
-					console.log('user update result: ' + result)
-					$('#edit_toast_message').html('Error: failed to update your account info on the server. Check browser logs for details.')
-				}
-				$('#edit_toast').toast('show')
-			
-				//clear edits object
-				edits = {}
-			})
-		}
-		else {
-			//suspicious; maybe didn't log in and forced edits to be enabled
-			alert('An error occurred updating this account. Did you log in?')
-		}
-	})
-	
-	//photo edits
-	$('#edit_photo').change(function(event) {
-		let f = event.target
-		
-		if (f.files && f.files[0]) {
-			img_utils_prep_file(f.files[0], ACCOUNT_PHOTO_SIZE, function(photo) {
-				if (photo) {
-					//register photo change for submission
-					$(f).removeClass('invalid')
-					edits.photo = photo
-					console.log('photo change is ready for commit')
-				}
-				else {
-					console.log('error uploading photo file')
-					$(f).addClass('invalid')
-				}
-			})
-		}
-	})
-	$('#edit_contact_card_submit').click(function() {
-		//reload photo
-		if (edits.photo) {
-			$('#photo').prop('src', edits.photo)
-		}
-	})
-	
-	//bio edits
-	$('#edit_bio_submit').click(function() {
-		let bio = $('#edit_bio_input').val()
-		
-		if (bio) {
-			edits.bio = string_utils_xss_escape(bio)
-			console.log('bio change ready for commit')
-			
-			//reload bio
-			$('#bio').html(string_utils_tagify(edits.bio))
-		}
-	})
-	
-	//link edits
-	$('#add_link').click(function() {
-		html_imports('edit_link_row', function(jstring) {
-			let row_id = edit_links_rows++
-			let jlink = $(jstring).attr('data-row',row_id)
-			
-			jlink.find('.edit-link-row-delete').click(function() {
-				$('.edit-link-row[data-row="' + row_id + '"]').remove()
-			})
-			
-			$('#edit_links_list').append(jlink)
-		})
-	})
-	$('#edit_links_submit').click(function() {
-		let jlinks = $('.edit-link-row')
-		
-		edits.links = []
-		for (let link of jlinks) {
-			let jlink = $(link)
-			let link_name = jlink.find('.edit-link-row-name').val()
-			let link_url = string_utils_url(jlink.find('.edit-link-row-url').val())
-			
-			if (link_name && link_url) {
-				edits.links.push({
-					name: link_name,
-					link: link_url
-				})
-			}
-		}
-		
-		console.log('links change is ready for commit')
-		
-		//reload links
-		html_imports('link_row', function(jstring) {
-			let dest = $('#import_links').html('')
-			
-			for (let link of edits.links) {
-				let jlink = $(jstring)
-				jlink.find('.link-name').html(link.name)
-				jlink.find('.link-link').html(link.link).prop('href',link.link)
-		
-				dest.append(jlink)
-			}
-		})
-	})
+	//show subscription
+	$('#subscription').show()
 }
 
 function account_disable_edits() {
@@ -426,6 +460,7 @@ function account_disable_edits() {
 	$('#save_account').hide()
 	$('#delete_account').hide()
 	$('#recover_account').hide()
+	$('#subscription').hide()
 }
 
 function account_edit() {
