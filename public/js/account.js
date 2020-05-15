@@ -119,97 +119,142 @@ function account_on_logout() {
 }
 
 function account_on_details(details) {
-	//fill account page with account information
-	$('#username').html(details.username)
-	
-	if (details.name) {
-		//TODO include name?
-		$('#name').hide()
-	}
-	else {
-		$('#name').hide()
-	}
-	
-	if (details.phone) {
-		//TODO include phone?
-		$('#phone').hide()
-	}
-	else {
-		$('#phone').hide()
-	}
-	
-	$('#email').html(details.email).prop('href','mailto:' + details.email)
-	
-	if (details.photo) {
-		img_utils_prep_blob(details.photo.data, function (data_url) {
-			$('#photo').prop('src', data_url)
-		})
-	}
-	
-	if (details.bio) {
-		$('#bio').html(string_utils_tagify(details.bio))
-	}
-	else {
-		$('#bio').html('No bio information provided.')
-	}
-	
-	if (details.links) {
-		html_imports('link_row', function(jstring) {
-			let links = $('#import_links')
-			
-			if (details.links.length == 0) {
-				links.html('No links provided.')
-			}
-			else {
-				for (let link of details.links) {
-					let jlink = $(jstring)
-					jlink.find('.link-name').html(link.name)
-					jlink.find('.link-link').html(link.link).prop('href',link.link)
-				
-					links.append(jlink)
-				}
-			}
-		})
-	}
-	
-	//load contributions
-	dbclient_fetch_works(details.username, function(works_info) {
-		works = []
-		works_end = WORKS_BATCH_START
+	if (details.deleted) {
+		//hide delete section
+		$('#delete_account').hide()
+		$('#warning_toast_container').hide()
 		
-		if (works_info !== null) { //could be [] or [...]
-			console.log('got ' + works_info.length + ' contributions by ' + details.username)
-			works = works_info
-			
-			account_more_works()
+		//hide most sections
+		$('#contact_container').hide()
+		$('#username').html(details.username)
+		$('#bio').html('This account was deleted.')
+		$('#activity').hide()
+		$('#import_links').hide()
+		$('#contributions').hide()
+		
+		//disable edits
+		account_disable_edits()
+		
+		if (account && account.username == details.username) {
+			//enable account recovery
+			$('#recover_account')
+			.show()
+			.click(function() {
+				//account session cookies may have been deleted post account deletion
+				sessionclient_get_account(function(account_info) {
+					if (account_info) {
+						sessionclient_recover(account.username)
+						.then(function() {
+							//reload page
+							window.location.reload()
+						})
+						.catch(function(err) {
+							//TODO handle err
+						})
+					}
+					else {
+						$('#login_modal').modal('show')
+					}
+				})
+			})
+		}
+	}
+	else {
+		//fill account page with account information
+		$('#username').html(details.username)
+	
+		if (details.name) {
+			//TODO include name?
+			$('#name').hide()
 		}
 		else {
-			//TODO handle error
-			console.log('failed to load contributions for ' + details.username)
+			$('#name').hide()
 		}
-	})
 	
-	//enable more-contributions button
-	$('#more_contributions').click(account_more_works)
+		if (details.phone) {
+			//TODO include phone?
+			$('#phone').hide()
+		}
+		else {
+			$('#phone').hide()
+		}
 	
-	if (account.username == details.username) {
-		$('#edit_email').val(account.email)
-		
-		$('#edit_bio_input').val(account.bio)
-		
-		html_imports('edit_link_row', function(jstring) {
-			let links = $('#edit_links_list')
+		$('#email').html(details.email).prop('href','mailto:' + details.email)
+	
+		if (details.photo) {
+			img_utils_prep_blob(details.photo.data, function (data_url) {
+				$('#photo').prop('src', data_url)
+			})
+		}
+	
+		if (details.bio) {
+			$('#bio').html(string_utils_tagify(details.bio))
+		}
+		else {
+			$('#bio').html('No bio information provided.')
+		}
+	
+		if (details.links) {
+			html_imports('link_row', function(jstring) {
+				let links = $('#import_links')
 			
-			if (account.links.length != 0) {
-				for (let link of details.links) {
-					let jlink = $(jstring)
-					jlink.find('.edit-link-row-name').val(link.name)
-					jlink.find('.edit-link-row-url').val(link.link)
-				
-					links.append(jlink)
+				if (details.links.length == 0) {
+					links.html('No links provided.')
 				}
+				else {
+					for (let link of details.links) {
+						let jlink = $(jstring)
+						jlink.find('.link-name').html(link.name)
+						jlink.find('.link-link').html(link.link).prop('href',link.link)
+				
+						links.append(jlink)
+					}
+				}
+			})
+		}
+	
+		//load contributions
+		dbclient_fetch_works(details.username, function(works_info) {
+			works = []
+			works_end = WORKS_BATCH_START
+		
+			if (works_info !== null) { //could be [] or [...]
+				console.log('got ' + works_info.length + ' contributions by ' + details.username)
+				works = works_info
+			
+				account_more_works()
+			}
+			else {
+				//TODO handle error
+				console.log('failed to load contributions for ' + details.username)
 			}
 		})
+	
+		//enable more-contributions button
+		$('#more_contributions').click(account_more_works)
+		
+		if (account && account.username == details.username) {
+			$('#edit_email').val(account.email)
+			
+			$('#edit_bio_input').val(account.bio)
+		
+			html_imports('edit_link_row', function(jstring) {
+				let links = $('#edit_links_list')
+			
+				if (account.links.length != 0) {
+					for (let link of details.links) {
+						let jlink = $(jstring)
+						jlink.find('.edit-link-row-name').val(link.name)
+						jlink.find('.edit-link-row-url').val(link.link)
+				
+						links.append(jlink)
+					}
+				}
+			})
+		}
+	
+		//enable account deletion
+		$('#confirm_delete_account').click(account_delete)
 	}
 }
 
@@ -365,6 +410,8 @@ function account_disable_edits() {
 	editing = false
 	$('#edit_account').hide()
 	$('#save_account').hide()
+	$('#delete_account').hide()
+	$('#recover_account').hide()
 }
 
 function account_edit() {
@@ -514,5 +561,25 @@ function account_more_works() {
 	else {
 		//none; hide contributions section
 		$('#contributions').hide()
+	}
+}
+
+function account_delete() {
+	if (account) {
+		sessionclient_delete(account.username)
+		.then(function() {
+			//TODO handle success
+			console.log('account deletion successful')
+			
+			//update local values
+			account.deleted = true
+			account_on_details(account)
+		})
+		.catch(function(err) {
+			//TODO handle error
+		})
+	}
+	else {
+		console.log('error: not logged into any account that should be deleted?')
 	}
 }

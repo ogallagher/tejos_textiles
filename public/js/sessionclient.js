@@ -268,6 +268,37 @@ function sessionclient_activate(activation_code) {
 	})
 }
 
+function sessionclient_delete(username) {
+	return new Promise(function(resolve,reject) {
+		//mark person in db as deleted
+		sessionclient_db_request('delete_user', [username])
+		.then(function(res) {
+			//delete cookies
+			cookies_delete(SESSION_COOKIE_KEY)
+			cookies_delete(USERNAME_COOKIE_KEY)
+			resolve()
+		})
+		.catch(function(err) {
+			console.log('account deletion failed: ' + err)
+			reject(err)
+		})
+	})
+}
+
+function sessionclient_recover(username) {
+	return new Promise(function(resolve,reject) {
+		//mark person in db as not deleted
+		sessionclient_db_request('recover_user', [username])
+		.then(function(res) {
+			resolve()
+		})
+		.catch(function(err) {
+			console.log('account recovery failed: ' + err)
+			reject(err)
+		})
+	})
+}
+
 //returns a timestamp concatenated with a randomly generated 8-char string
 function sessionclient_generate_session_id() {
 	let session_id = new Date().getTime()

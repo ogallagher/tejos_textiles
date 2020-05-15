@@ -67,7 +67,7 @@
 	},
 	"fetch_user_details": {
 		"params": ["?username?"],
-		"query": "select admin,enabled,bio,email,links,photo,subscription from people where username=?username?",
+		"query": "select admin,enabled,bio,email,links,photo,subscription,deleted from people where username=?username?",
 		"external": true
 	},
 	"fetch_user_plays": {
@@ -109,6 +109,16 @@
 	"play": {
 		"params": ["?username?","?puzzle_id?","?duration?"],
 		"query": "insert into plays(username,puzzle_id,duration) values (?username?,?puzzle_id?,?duration?)",
+		"external": false
+	},
+	"delete_user": {
+		"params": ["?username?"],
+		"query": "update people set deleted=1 where username=?username?",
+		"external": false
+	},
+	"recover_user": {
+		"params": ["?username?"],
+		"query": "update people set deleted=0 where username=?username?",
 		"external": false
 	}
 }
