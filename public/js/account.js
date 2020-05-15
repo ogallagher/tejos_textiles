@@ -62,6 +62,7 @@ window.onload = function() {
 }
 
 function account_on_login(account_info) {
+	//can be null
 	account = account_info
 	
 	//toggle nav account button as account page link or login form
@@ -79,6 +80,8 @@ function account_on_login(account_info) {
 		else {
 			//load foreign account edits
 			username = visiting_account
+			
+			//disable edits called once more details are supplied
 		}
 	}
 	else if (!visiting_account) {
@@ -234,6 +237,7 @@ function account_on_details(details) {
 		$('#more_contributions').click(account_more_works)
 		
 		if (account && account.username == details.username) {
+			//prep edit fields for own account
 			$('#edit_email').val(account.email)
 			
 			$('#edit_bio_input').val(account.bio)
@@ -251,10 +255,14 @@ function account_on_details(details) {
 					}
 				}
 			})
+			
+			//enable account deletion
+			$('#confirm_delete_account').click(account_delete)
 		}
-	
-		//enable account deletion
-		$('#confirm_delete_account').click(account_delete)
+		else {
+			//disable edits
+			account_disable_edits()
+		}
 	}
 }
 
@@ -299,24 +307,30 @@ function account_enable_edits() {
 		.prop('href', $(this).attr('data-href'))
 		
 		//send updates to server
-		dbclient_update_user(account.username, edits, function(result) {
-			//show result
-			if (result.success == 10) {
-				//10 = sessionserver.SUCCESS
-				$('#edit_toast_message').html('No changes to submit')
-			}
-			else if (result.success) {
-				$('#edit_toast_message').html('Account update successful')
-			}
-			else {
-				console.log('user update result: ' + result)
-				$('#edit_toast_message').html('Error: failed to update your account info on the server. Check browser logs for details.')
-			}
-			$('#edit_toast').toast('show')
+		if (account) {
+			dbclient_update_user(account.username, edits, function(result) {
+				//show result
+				if (result.success == 10) {
+					//10 = sessionserver.SUCCESS
+					$('#edit_toast_message').html('No changes to submit')
+				}
+				else if (result.success) {
+					$('#edit_toast_message').html('Account update successful')
+				}
+				else {
+					console.log('user update result: ' + result)
+					$('#edit_toast_message').html('Error: failed to update your account info on the server. Check browser logs for details.')
+				}
+				$('#edit_toast').toast('show')
 			
-			//clear edits object
-			edits = {}
-		})
+				//clear edits object
+				edits = {}
+			})
+		}
+		else {
+			//suspicious; maybe didn't log in and forced edits to be enabled
+			alert('An error occurred updating this account. Did you log in?')
+		}
 	})
 	
 	//photo edits

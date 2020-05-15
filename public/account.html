@@ -57,6 +57,14 @@
 								Something went wrong when uploading that file. Try again, perhaps with a different file type.
 							</div>
 						</div>
+						<div class="form-group mt-4">
+							<div class="form-check">
+								<input id="edit_subscribed" class="form-check-input clickable" type="checkbox"/>
+								<label class="form-check-label font-navigation" for="edit_subscribed">
+									Subscribe me to notification emails (whenever a new puzzle is released).
+								</label>
+							</div>
+						</div>
 					</div>
 					<div class="modal-footer bg-slight border-top-0">
 						<div class="row">
@@ -155,6 +163,10 @@
 						class="img-fluid" 
 						alt="avatar" 
 					/>
+				</div>
+				<div id="subscription" class="text-md-right text-center font-navigation my-2">
+					<span class="ml-2">Subscribed to email updates:</span>
+					<span id="subscribed" class="font-weight-bold ml-2">no</span>
 				</div>
 			</div>
 			

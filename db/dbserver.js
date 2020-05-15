@@ -191,12 +191,23 @@ exports.get_query = function(endpoint, args, is_external) {
 }
 
 exports.send_query = function(sql,callback) {
-	db.query(sql, function(err,res) {
-		//try to cache result
-		cacheserver.set_saved(res)
+	db.getConnection(function(err, conn) {
+		if (err) {
+			//connection failed
+			callback(err,null)
+		}
+		else {
+			conn.query(sql, function(err,res) {
+				//release connection when no longer needed
+				conn.release()
+				
+				//try to cache result
+				cacheserver.set_saved(res)
 		
-		//return error if defined, and response results
-		callback(err,res)
+				//return error if defined, and response results
+				callback(err,res)
+			})
+		}
 	})
 }
 

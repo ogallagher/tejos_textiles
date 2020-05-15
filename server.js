@@ -90,7 +90,7 @@ try {
 	if (app.get('port') == 443) {
 		//https server
 		const fs = require('fs')
-		const PATH_HTTPS = './secrets/https_config/'
+		const PATH_HTTPS = process.env.PATH_HTTPS
 		
 		try {
 			require('https').createServer({
