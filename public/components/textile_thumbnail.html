@@ -1,11 +1,19 @@
-<div 
-	class="bg-secondary-hover bg-dark-nohover text-light mx-1 clickable" 
-	style="width: 200px; height: 150px" 
-	onclick="puzzle_thumb_click($(this))">
-	
-	<div class="font-title-lg text-center h-100 d-flex flex-column justify-content-center">
-		<div class="textile-thumbnail-title">
+<div class="bg-dark text-light mx-1 clickable lift-hover" style="width: 200px; height: 150px" data-puzzle-id=""
+	onmouseenter="puzzle_thumb_mouseenter($(this));" onmouseleave="puzzle_thumb_mouseleave($(this));" onclick="puzzle_thumb_click($(this));">
+	<div class="text-center h-100 d-flex flex-column justify-content-center">
+		<div class="font-title-lg textile-thumbnail-title border-1 border-bottom text-uppercase">
 			?title?
+		</div>
+		<div class="text-lychee pt-1 font-navigation-md">
+			<div class="textile-thumbnail-details" style="display:none;">
+				<div class="textile-thumbnail-date">
+					16 May 2020
+				</div>
+			</div>
+			<div class="textile-thumbnail-subtitle">
+				<div class="textile-thumbnail-rating">
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

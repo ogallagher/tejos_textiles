@@ -83,6 +83,8 @@ window.onload = function() {
 }
 
 function load_collections(thumbnail) {
+	let star = '<span class="oi oi-star text-warning"></span>'
+	
 	dbclient_fetch_collection(COLLECTION_TOP_RATED, TOP_RATED_COUNT, function(tops) {
 		let coll_top_rated = $('#collection_top_rated')
 		top_rated_container = $('#top_rated')
@@ -91,11 +93,20 @@ function load_collections(thumbnail) {
 		let tops_n = tops.length
 		jtops = []
 		
-		tops.forEach(function(top) {
-			let ptop = new Puzzle(top)
+		tops.forEach(function(rtop) {
+			console.log(rtop)
 			let jtop = $(thumbnail)
+			.attr('data-puzzle-id',rtop.id)
 			
-			jtop.find('.textile-thumbnail-title').html(ptop.title)
+			jtop.find('.textile-thumbnail-title').html(rtop.title)
+			
+			jtop.find('.textile-thumbnail-date').html(string_utils_date(rtop.date))
+			
+			let stars = ''
+			for (let i=0; i<rtop.rating; i++) {
+				stars += star
+			}
+			jtop.find('.textile-thumbnail-rating').html(stars)
 			
 			jtops.push(jtop)
 		})
@@ -122,10 +133,18 @@ function load_collections(thumbnail) {
 		jchoices = []
 		
 		choices.forEach(function(choice) {
-			let pchoice = new Puzzle(choice)
 			let jchoice = $(thumbnail)
+			.attr('data-puzzle-id',choice.id)
 			
-			jchoice.find('.textile-thumbnail-title').html(pchoice.title)
+			jchoice.find('.textile-thumbnail-title').html(choice.title)
+			
+			jchoice.find('.textile-thumbnail-date').html(string_utils_date(choice.date))
+			
+			let stars = ''
+			for (let i=0; i<choice.rating; i++) {
+				stars += star
+			}
+			jchoice.find('.textile-thumbnail-rating').html(stars)
 			
 			jchoices.push(jchoice)
 		})
@@ -140,7 +159,6 @@ function load_collections(thumbnail) {
 			update_collection(choice_container, jchoices, choice_scroll)
 		})
 		
-		console.log('adding choices')
 		update_collection(choice_container, jchoices, choice_scroll)
 	})
 	
@@ -153,10 +171,18 @@ function load_collections(thumbnail) {
 		jpops = []
 		
 		pops.forEach(function(pop) {
-			let ppop = new Puzzle(pop)
 			let jpop = $(thumbnail)
+			.attr('data-puzzle-id',pop.id)
 			
-			jpop.find('.textile-thumbnail-title').html(ppop.title)
+			jpop.find('.textile-thumbnail-title').html(pop.title)
+			
+			jpop.find('.textile-thumbnail-date').html(string_utils_date(pop.date))
+			
+			let stars = ''
+			for (let i=0; i<pop.rating; i++) {
+				stars += star
+			}
+			jpop.find('.textile-thumbnail-rating').html(stars)
 			
 			jpops.push(jpop)
 		})
@@ -225,11 +251,6 @@ function circular_offset(base, offset, max) {
 	return base
 }
 
-//TODO select the puzzle on click
-function puzzle_thumb_click(clicked) {
-	console.log('TODO select puzzle on click')
-}
-
 function search_gallery() {
     var search_val = search_input.val().toString().toLowerCase();
     console.log('searching gallery for ' + search_val);
@@ -264,4 +285,17 @@ function load_search_results(results) {
 			puzzle_list.append(jpuzzle.clone())
 		})
 	})
+}
+
+function puzzle_thumb_mouseenter(self) {
+	self.find('.textile-thumbnail-details').show()
+}
+
+function puzzle_thumb_mouseleave(self) {
+	self.find('.textile-thumbnail-details').hide()
+}
+
+function puzzle_thumb_click(self) {
+	let puzzle_id = self.attr('data-puzzle-id')
+	window.location.href = 'textile.html?puzzle_id=' + puzzle_id
 }

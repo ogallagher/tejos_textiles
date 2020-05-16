@@ -191,6 +191,9 @@ Custom classes
 .text-sea {
 	color: #2B4C6F; /* about page */
 }
+.text-lychee {
+	color: #E3F4CF;
+}
 
 .text-bold-hover:hover {
 	font-weight: bold;
