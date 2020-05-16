@@ -31,9 +31,20 @@ let puzzles		//Puzzle array
 let jpuzzle_str //html template for textile_row component
 
 window.onload = function() {
+	force_https()
+	
 	//load navbar
 	html_imports('navbar', '#import_navbar', function() {
-		navbar_onload('gallery')
+		//import login modal
+		html_imports('login','#import_login', function() {
+			navbar_onload('gallery')
+			
+			//assign login callbacks
+			login_on_login = gallery_on_login
+		
+			//load account
+			sessionclient_get_account(gallery_on_login)
+		})
 	})
 	
 	//load footer
@@ -92,6 +103,11 @@ window.onload = function() {
 	else {
 		scroll_view_size = 5
 	}
+}
+
+function gallery_on_login(account_info) {
+	//toggle nav account button as account page link or login form
+	navbar_toggle_account(account_info)
 }
 
 function load_collections(thumbnail) {

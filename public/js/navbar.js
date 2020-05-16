@@ -29,15 +29,19 @@ function navbar_onload(page) {
 				.then(function() {
 					//session deleted from server and client cookies; ready to re-enable login
 					navbar_toggle_account(null)
-				
+					
 					//pass execution to page to clean up evidence of user info
-					login_on_logout()
+					if (login_on_logout) {
+						login_on_logout()
+					}
 				})
 		}
 		else {
 			//same as above, but session in the case that the session has already deleted (manually deleting cookies, deleting account, etc)
 			navbar_toggle_account(null)
-			login_on_logout()
+			if (login_on_logout) {
+				login_on_logout()
+			}
 		}
 	})
 }

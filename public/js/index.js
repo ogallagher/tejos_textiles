@@ -186,10 +186,25 @@ function index_puzzles_onload(dbdata) {
 			let jpuzzle = $(jstring)
 			
 			jpuzzle.find('.textile-row-card')
-			.attr('id',puzzle.id)
-			.click(function() {
-				window.location.href = 'textile.html?puzzle_id=' + puzzle.id
-			})
+			.attr('data-puzzle-id',puzzle.id)
+			.attr('data-target', '#puzzle_details_' + puzzle.id)
+		
+			jpuzzle.find('.textile-row-title').html(puzzle.title)
+		
+			jpuzzle.find('.textile-row-details')
+			.prop('id', 'puzzle_details_' + puzzle.id)
+		
+			jpuzzle.find('.textile-row-date')
+			.html(string_utils_date(puzzle.date))
+		
+			jpuzzle.find('.textile-row-rating')
+			.html(puzzle.rating)
+		
+			jpuzzle.find('.textile-row-plays')
+			.html(puzzle.plays)
+		
+			jpuzzle.find('.textile-row-play')
+			.prop('href', 'textile.html?puzzle_id=' + puzzle.id)
 			
 			jpuzzle.find('.textile-row-title').html(puzzle.title)
 			
