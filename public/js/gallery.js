@@ -6,7 +6,7 @@ Owen Gallagher
 
 const THUMBNAIL_WIDTH = 200
 const TOP_RATED_COUNT = 15
-const EDITORS_PICKS_COUNT = 15
+const EDITORS_CHOICE_COUNT = 15
 const TOP_PLAYED_COUNT = 15
 
 let scroll_view_size = 5
@@ -113,9 +113,7 @@ function load_collections(thumbnail) {
 		update_collection(top_rated_container, jtops, top_rated_scroll)
 	})
 	
-	//TODO test editor's choice when puzzle.featured exists
-	/*
-	dbclient_fetch_collection(COLLECTION_EDITORS_CHOICE, EDITORS_PICKS_COUNT, function(choices) {
+	dbclient_fetch_collection(COLLECTION_EDITORS_CHOICE, EDITORS_CHOICE_COUNT, function(choices) {
 		let coll_choice = $('#collection_editors_choice')
 		choice_container = $('#editors_choice')
 		choice_scroll = 0
@@ -142,9 +140,9 @@ function load_collections(thumbnail) {
 			update_collection(choice_container, jchoices, choice_scroll)
 		})
 		
+		console.log('adding choices')
 		update_collection(choice_container, jchoices, choice_scroll)
 	})
-	*/
 	
 	dbclient_fetch_collection(COLLECTION_TOP_PLAYED, TOP_PLAYED_COUNT, function(pops) {
 		let coll_pops = $('#collection_top_played')
@@ -191,7 +189,7 @@ function on_window_resize() {
 		scroll_view_size = new_size
 		
 		update_collection(top_rated_container,jtops,top_rated_scroll)
-		//update_collection(choice_container,jchoices,choice_scroll) TODO test choice once puzzle.featured is added to db
+		update_collection(choice_container,jchoices,choice_scroll)
 		update_collection(top_played_container,jpops,top_played_scroll)
 	}
 }

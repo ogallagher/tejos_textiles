@@ -7,8 +7,20 @@ Owen Gallagher
 Works in tandem with the SQL server, supporting a subset of db data from a cache for quicker fetching of frequently retrieved data.
 */
 
+//external libs
 const memjs = require('memjs')
+const enums = require('../enums')
 
+//internal consts
+const expirations = {
+	puzzles: enums.time.DAY / 1000,
+	paths_x: enums.time.YEAR / 1000,
+	collection_top_rated: enums.time.DAY / 1000,
+	collection_editors_choice: enums.time.WEEK / 1000,
+	collection_top_played: enums.time.DAY / 1000
+}
+
+//internal vars
 let config = {
 	host: null,
 	user: null,
@@ -56,11 +68,12 @@ exports.init = function() {
 	})
 }
 
-exports.set = function(key,value,callback) {
+exports.set = function(key,value,expiry,callback) {
 	if (key && cache) {
-		cache.set(key,value, {
-			expires: 600
-		}, function(err) {
+		cache.set(key, value, {
+			expires: expiry //seconds after which the cache entry expires
+		}, 
+		function(err) {
 			if (callback) {
 				callback(err)
 			}
@@ -69,7 +82,7 @@ exports.set = function(key,value,callback) {
 				console.log(err)
 			}
 			else {
-				console.log('cache server added entry for ' + key)
+				console.log('cache server set ' + key)
 			}
 		})
 	}
@@ -84,9 +97,10 @@ exports.get = function(key) {
 			if (key) {
 				cache.get(key, function(err, value) {
 					if (err || !value) {
-						reject('cache server did not find an entry for ' + key)
+						reject('cache server found no entry for ' + key)
 					}
 					else {
+						//console.log('cache server got ' + key)
 						resolve(value)
 					}
 				})
@@ -115,7 +129,25 @@ Also unsets saved_key, so entry cannot be updated twice without resaving the key
 */
 exports.set_saved = function(value) {
 	if (saved_key) {
-		exports.set(saved_key, value)
+		let expiry =  10 * enums.time.MINUTE / 1000
+		
+		if (saved_key == 'puzzles') {
+			expiry = expirations.puzzles
+		}
+		else if (saved_key.match(/paths_.+/)) {
+			expiry = expirations.paths_x
+		}
+		else if (saved_key == 'collection_top_rated') {
+			expiry = expirations.collection_top_rated
+		}
+		else if (saved_key == 'collection_editors_choice') {
+			expiry = expirations.collection_editors_choice
+		}
+		else if (saved_key == 'collection_top_played') {
+			expiry = expirations.collection_top_played
+		}
+		
+		exports.set(saved_key, value, expiry)
 		saved_key = null
 	}
 }

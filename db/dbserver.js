@@ -105,7 +105,6 @@ exports.get_query = function(endpoint, args, is_external) {
 		let cached = try_cache(endpoint, args)
 		
 		if (cached) {
-			console.log('got cache entry for ' + endpoint)
 			resolve({cached: cached})
 		}
 		else {
@@ -239,6 +238,18 @@ function try_cache(endpoint, args) {
 				
 		case 'fetch_puzzle_paths':
 			key = 'paths_' + args[0] //paths_<puzzle_id>
+			break
+			
+		case 'fetch_collection_top_rated':
+			key = 'collection_top_rated'
+			break
+			
+		case 'fetch_collection_editors_choice':
+			key = 'collection_editors_choice'
+			break
+			
+		case 'fetch_collection_top_played':
+			key = 'collection_top_played'
 			break
 			
 		default:

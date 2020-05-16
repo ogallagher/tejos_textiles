@@ -18,3 +18,15 @@ exports.time = {
 	MONTH:  1000 * 60 * 60 * 24 * 30,
 	YEAR:   1000 * 60 * 60 * 24 * 365
 }
+
+exports.log_type = {
+	DEBUG: 0,
+	INFO: 1,
+	WARNING: 2,
+	ERROR: 3
+}
+
+exports.var_max = {
+	FOUR_BYTE_U:	4294967295,
+	FOUR_BYTE:		2147483647
+}
