@@ -1,7 +1,7 @@
 {
 	"fetch_puzzles": {
 		"params": [],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating from puzzles order by `date` desc",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating,plays from puzzles order by `date` desc",
 		"external": true
 	},
 	"fetch_puzzle": {
@@ -31,7 +31,7 @@
 	},
 	"search_puzzles": {
 		"params": [],
-		"query": "select id,title,date,forecolor,backcolor,textcolor,preview from puzzles where ?regexps?",
+		"query": "select id,title,date,forecolor,backcolor,textcolor,preview,rating,plays from puzzles where ?regexps?",
 		"external": true,
 		"special": true
 	},

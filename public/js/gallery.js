@@ -26,7 +26,9 @@ let top_played_scroll
 
 let search_input, search_button
 
-let puzzle_list
+let puzzle_list //dom container with puzzles
+let puzzles		//Puzzle array
+let jpuzzle_str //html template for textile_row component
 
 window.onload = function() {
 	//load navbar
@@ -55,17 +57,27 @@ window.onload = function() {
 	//enable the search button
 	search_button.click(search_gallery)
 	
-	let orderby = $('#orderby')
-	let orderby_options = $('#orderby_menu').children()
-	//update the orderby label to match the selected option
-	orderby_options.click(function() {
-		orderby.html($(this).html().toLowerCase())
+	//enable orderby button
+	$('#orderby_menu').children().click(function() {
+		let col = $(this).html().toLowerCase()
+		
+		//update label to show orderby choice
+		$('#orderby').html(col)
+		
+		//do sort
+		order_gallery(col)
 	})
 	
 	puzzle_list = $('#puzzle_list')
+	puzzles = []
 	
-	//get all puzzles
-	dbclient_fetch_puzzles(load_search_results)
+	//load textile_row component
+	html_imports('textile_row', function(jstring) {
+		jpuzzle_str = jstring
+		
+		//get all puzzles
+		dbclient_fetch_puzzles(load_search_results)
+	})
 	
 	//manually handle collection flexbox behavior at different screen breakpoints
 	jwindow = $(window).resize(on_window_resize)
@@ -94,7 +106,6 @@ function load_collections(thumbnail) {
 		jtops = []
 		
 		tops.forEach(function(rtop) {
-			console.log(rtop)
 			let jtop = $(thumbnail)
 			.attr('data-puzzle-id',rtop.id)
 			
@@ -255,9 +266,6 @@ function search_gallery() {
     var search_val = search_input.val().toString().toLowerCase();
     console.log('searching gallery for ' + search_val);
 	
-    //clear old results
-	$('#puzzle_list').empty()
-	
     if (search_val != '') {
         var search_vals = search_val.split(/[\s,]+/);
 		
@@ -271,20 +279,60 @@ function search_gallery() {
 }
 
 function load_search_results(results) {
-	//import textile_row template
-	html_imports('textile_row', function(jstring) {
-	    //show search results
-		let puzzle, jpuzzle
-		results.forEach(function(pstring) {
-			puzzle = new Puzzle(pstring)
-			
-			jpuzzle = $(jstring)
-			jpuzzle.find('.textile-row-card').attr('id',puzzle.title)
-			jpuzzle.find('.textile-row-title').html(puzzle.title)
-			
-			puzzle_list.append(jpuzzle.clone())
-		})
+	//clear puzzles array
+	puzzles = []
+	
+    //clear old results
+	puzzle_list.empty()
+	
+    //show search results
+	results.forEach(function(pstring) {
+		let puzzle = new Puzzle(pstring)
+		puzzles.push(puzzle)
+		
+		let jpuzzle = $(jpuzzle_str)
+		jpuzzle.find('.textile-row-card').attr('data-puzzle-id',puzzle.id)
+		jpuzzle.find('.textile-row-title').html(puzzle.title)
+		
+		puzzle_list.append(jpuzzle)
 	})
+}
+
+function order_gallery(sort_col) {
+	//sort puzzles
+	switch (sort_col) {
+		case 'date':
+			puzzles = puzzles.sort(Puzzle.compare_date)
+			break
+			
+		case 'title':
+			puzzles = puzzles.sort(Puzzle.compare_title)
+			break
+			
+		case 'rating':
+			puzzles = puzzles.sort(Puzzle.compare_rating)
+			break
+			
+		case 'popularity':
+			puzzles = puzzles.sort(Puzzle.compare_popularity)
+			break
+			
+		default:
+			console.log('error: cannot sort on column ' + sort_col)
+			break
+	}
+	
+    //clear old results
+	puzzle_list.empty()
+	
+	//update puzzles list
+	for (let puzzle of puzzles) {
+		let jpuzzle = $(jpuzzle_str)
+		jpuzzle.find('.textile-row-card').attr('data-puzzle-id',puzzle.id)
+		jpuzzle.find('.textile-row-title').html(puzzle.title)
+		
+		puzzle_list.append(jpuzzle)
+	}
 }
 
 function puzzle_thumb_mouseenter(self) {

@@ -25,7 +25,8 @@ function Puzzle(dbdata) {
 	this.id = dbdata.id
 	this.title = dbdata.title
 	this.date = dbdata.date
-	this.rating = dbdata.rating //TODO debug this
+	this.rating = dbdata.rating
+	this.plays = dbdata.plays
 	
 	this.paper = new paper.PaperScope()
 	
@@ -53,6 +54,7 @@ function Puzzle(dbdata) {
 	this.onComplete = function(){} //callback for when the puzzle is completed
 }
 
+//instance methods
 Puzzle.prototype.updateGraphics = function() {
 	let v = this.paper.view
 	
@@ -262,4 +264,61 @@ Puzzle.prototype.enable = function() {
 	}
 	
 	this.updateGraphics()
+}
+
+//static methods
+//reverse order (higher dates first)
+Puzzle.compare_date = function(a,b) {
+	let a_val = new Date(a.date)
+	let b_val = new Date(b.date)
+	
+	let diff = a_val - b_val
+	if (diff < 0) {
+		return 1
+	}
+	else if (diff > 0) {
+		return -1
+	}
+	else {
+		return 0
+	}
+}
+
+Puzzle.compare_title = function(a,b) {
+	let a_val = a.title.toLowerCase()
+	let b_val = b.title.toLowerCase()
+
+	return  a_val.localeCompare(b_val)
+}
+
+//reverse order (higher rating first)
+Puzzle.compare_rating = function(a,b) {
+	let a_val = parseFloat(a.rating)
+	let b_val = parseFloat(b.rating)
+	
+	if (a_val < b_val) {
+		return 1
+	}
+	else if (a_val > b_val) {
+		return -1
+	}
+	else {
+		return 0
+	}
+}
+
+//reverse order (higher popularity first)
+Puzzle.compare_popularity = function(a,b) {
+	let a_val = parseInt(a.plays)
+	let b_val = parseInt(b.plays)
+	
+	if (a_val < b_val) {
+		return -1
+	}
+	else if (a_val > b_val) {
+		return 1
+	}
+	else {
+		return 0
+	}
 }
