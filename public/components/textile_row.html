@@ -1,7 +1,28 @@
 <div class="d-flex">
-	<div class="card mx-1 mt-1 w-100 text-center textile-row-card clickable bg-slight-hover">
+	<div class="card mx-1 mt-1 w-100 text-center textile-row-card clickable bg-slight-hover" data-toggle="collapse">
 		<div class="card-body">
-			<p class="card-text font-navigation-md text-uppercase textile-row-title">?title?</p>
+			<p class="font-navigation-md text-uppercase textile-row-title mb-0">?title?</p>
+			<div class="font-content-md textile-row-details collapse row justify-content-center mt-2">
+				<div class="col col-auto text-right">
+					<div>
+						<span class="text-secondary">Published: </span>
+						<span class="textile-row-date"></span>
+					</div>
+					<div>
+						<span class="text-secondary">Rating: </span>
+						<span class="textile-row-rating"></span>
+					</div>
+					<div>
+						<span class="text-secondary">Plays: </span>
+						<span class="textile-row-plays"></span>
+					</div>
+				</div>
+				<div class="col col-auto d-flex flex-column justify-content-center">
+					<h2 class="text-secondary-nohover text-dark-hover">
+						<a class="oi oi-play-circle text-decoration-none text-reset textile-row-play" href="#"></a>
+					</h2>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
