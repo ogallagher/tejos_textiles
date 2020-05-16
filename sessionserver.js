@@ -10,10 +10,10 @@ Owen Gallagher
 const fs = require('fs')
 
 //local libraries
-const enums = require('../enums.js')
+const enums = require('./enums.js')
 
 //config
-const SESSIONS_PATH = 'session/sessions/'		//sessions are stored in this directory, accessed from root directory
+const SESSIONS_PATH = 'efs/sessions/'			//sessions are stored in this directory, accessed from root directory
 const SESSION_TTL = enums.time.WEEK				//session expiration
 const SESSION_CLEANER_DELAY = enums.time.WEEK	//session cleaner runs once per __
 const SESSION_SAVER_DELAY = enums.time.HOUR		//session saver runs once per __

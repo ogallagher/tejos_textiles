@@ -27,7 +27,7 @@ try {
 	//local libraries
 	const enums = require('./enums')
 	const dbserver = require('./db/dbserver')
-	const sessionserver = require('./session/sessionserver')
+	const sessionserver = require('./sessionserver')
 	const emailserver = require('./email/emailserver')
 	
 	const SITE = enums.site.TEXTILES; //select database to connect to
