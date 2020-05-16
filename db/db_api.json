@@ -15,13 +15,18 @@
 		"external": true
 	},
 	"fetch_collection_top_rated": {
-		"params": [],
-		"query": "",
+		"params": ["?count?"],
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating from puzzles order by `rating` desc limit ?count?",
 		"external": true
 	},
 	"fetch_collection_editors_choice": {
 		"params": [],
-		"query": "",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating from puzzles where featured=1",
+		"external": true
+	},
+	"fetch_collection_top_played": {
+		"params": ["?count?"],
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating,plays from puzzles order by plays desc limit ?count?",
 		"external": true
 	},
 	"search_puzzles": {

@@ -181,7 +181,14 @@ exports.get_query = function(endpoint, args, is_external) {
 					else {
 						//handle general endpoints by inserting escaped params into the query directly
 						for (let i=0; i<params.length; i++) {
-							query = query.replace(params[i],db.escape(args[i]))
+							let arg = args[i]
+							if (isNaN(args[i])) {
+								//is string, escaped
+								arg = db.escape(arg)
+							}
+							//else, is number, directly inserted
+							
+							query = query.replace(params[i], arg)
 						}
 					}
 					

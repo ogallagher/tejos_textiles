@@ -4,8 +4,13 @@ Owen Gallagher
 6 December 2019
 */
 
-const thumbnail_width = 200
+const THUMBNAIL_WIDTH = 200
+const TOP_RATED_COUNT = 15
+const EDITORS_PICKS_COUNT = 15
+const TOP_PLAYED_COUNT = 15
+
 let scroll_view_size = 5
+let jwindow
 
 let top_rated_container
 let jtops
@@ -14,6 +19,10 @@ let top_rated_scroll
 let choice_container
 let jchoices
 let choice_scroll
+
+let top_played_container
+let jpops
+let top_played_scroll
 
 let search_input, search_button
 
@@ -59,28 +68,22 @@ window.onload = function() {
 	dbclient_fetch_puzzles(load_search_results)
 	
 	//manually handle collection flexbox behavior at different screen breakpoints
-	let jwindow = $(window)
-	jwindow.resize(function() {
-		let new_size = 5
-		
-		if (jwindow.width() < 555) {
-			new_size = 3
-		}
-		else if (jwindow.width() < 700) {
-			new_size = 4
-		}
-		
-		if (new_size != scroll_view_size) {
-			scroll_view_size = new_size
-			
-			update_collection(top_rated_container,jtops,top_rated_scroll)
-			update_collection(choice_container,jchoices,choice_scroll)
-		}
-	})
+	jwindow = $(window).resize(on_window_resize)
+	
+	//update scroll_view_size
+	if (jwindow.width() < 555) {
+		scroll_view_size = 3
+	}
+	else if (jwindow.width() < 700) {
+		scroll_view_size = 4
+	}
+	else {
+		scroll_view_size = 5
+	}
 }
 
 function load_collections(thumbnail) {
-	dbclient_fetch_collection('top_rated', function(tops) {
+	dbclient_fetch_collection(COLLECTION_TOP_RATED, TOP_RATED_COUNT, function(tops) {
 		let coll_top_rated = $('#collection_top_rated')
 		top_rated_container = $('#top_rated')
 		top_rated_scroll = 0
@@ -110,7 +113,9 @@ function load_collections(thumbnail) {
 		update_collection(top_rated_container, jtops, top_rated_scroll)
 	})
 	
-	dbclient_fetch_collection('editors_choice', function(choices) {
+	//TODO test editor's choice when puzzle.featured exists
+	/*
+	dbclient_fetch_collection(COLLECTION_EDITORS_CHOICE, EDITORS_PICKS_COUNT, function(choices) {
 		let coll_choice = $('#collection_editors_choice')
 		choice_container = $('#editors_choice')
 		choice_scroll = 0
@@ -139,6 +144,56 @@ function load_collections(thumbnail) {
 		
 		update_collection(choice_container, jchoices, choice_scroll)
 	})
+	*/
+	
+	dbclient_fetch_collection(COLLECTION_TOP_PLAYED, TOP_PLAYED_COUNT, function(pops) {
+		let coll_pops = $('#collection_top_played')
+		top_played_container = $('#top_played')
+		top_played_scroll = 0
+		
+		let pops_n = pops.length
+		jpops = []
+		
+		pops.forEach(function(pop) {
+			let ppop = new Puzzle(pop)
+			let jpop = $(thumbnail)
+			
+			jpop.find('.textile-thumbnail-title').html(ppop.title)
+			
+			jpops.push(jpop)
+		})
+		
+		coll_pops.find('.scroll-left').click(function() {
+			top_played_scroll = circular_offset(top_played_scroll, -scroll_view_size, pops_n)
+			update_collection(top_played_container, jpops, top_played_scroll)
+		})
+		
+		coll_pops.find('.scroll-right').click(function() {
+			top_played_scroll = circular_offset(top_played_scroll, scroll_view_size, pops_n)
+			update_collection(top_played_container, jpops, top_played_scroll)
+		})
+		
+		update_collection(top_played_container, jpops, top_played_scroll)
+	})
+}
+
+function on_window_resize() {
+	let new_size = 5
+	
+	if (jwindow.width() < 555) {
+		new_size = 3
+	}
+	else if (jwindow.width() < 700) {
+		new_size = 4
+	}
+	
+	if (new_size != scroll_view_size) {
+		scroll_view_size = new_size
+		
+		update_collection(top_rated_container,jtops,top_rated_scroll)
+		//update_collection(choice_container,jchoices,choice_scroll) TODO test choice once puzzle.featured is added to db
+		update_collection(top_played_container,jpops,top_played_scroll)
+	}
 }
 
 //scroll the collection horizontally
@@ -155,15 +210,18 @@ function update_collection(container, collection, base) {
 
 //my implementation of circular indexes in the collection lists
 function circular_offset(base, offset, max) {
+	let wrap = scroll_view_size
 	if (max > scroll_view_size) {
-		base += offset
+		wrap = max
+	}
 	
-		if (base >= max) {
-			base = base - max
-		}
-		if (base < 0) {
-			base = base + max
-		}
+	base += offset
+	
+	if (base >= wrap) {
+		base = base - wrap
+	}
+	if (base < 0) {
+		base = base + wrap
 	}
 	
 	return base
@@ -171,7 +229,7 @@ function circular_offset(base, offset, max) {
 
 //TODO select the puzzle on click
 function puzzle_thumb_click(clicked) {
-	console.log(clicked.html())
+	console.log('TODO select puzzle on click')
 }
 
 function search_gallery() {

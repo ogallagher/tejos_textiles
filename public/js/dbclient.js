@@ -7,6 +7,10 @@ Handles connection and queries to the database by communicating with server.js
 via HTTP requests.
 */
 
+const COLLECTION_TOP_RATED = 1
+const COLLECTION_TOP_PLAYED = 2
+const COLLECTION_EDITORS_CHOICE = 3
+
 function dbclient_fetch_puzzles(callback) {	
 	console.log('fetching puzzles...');
 	
@@ -15,10 +19,14 @@ function dbclient_fetch_puzzles(callback) {
 		args: []
 	};
 	
-	$.get('/db', req, function(data) {
-		console.log('fetched ' + data.length + ' puzzles from db');
-		
-		callback(data);
+	$.get({
+		url: '/db', 
+		data: req, 
+		success: function(data) {
+			console.log('fetched ' + data.length + ' puzzles from db');
+			
+			callback(data);
+		}
 	});
 }
 
@@ -65,6 +73,7 @@ function dbclient_fetch_puzzle(id, callback) {
 		success: function(data) {
 			if (data.error) {
 				console.log('error: failed to fetch puzzle: ' + err.responseText)
+				callback()
 			}
 			else {
 				callback(data[0])
@@ -72,31 +81,56 @@ function dbclient_fetch_puzzle(id, callback) {
 		},
 		error: function(err) {
 			console.log('error: failed to fetch puzzle: ' + err.responseText)
+			callback()
 		}
 	})
 }
 
 //TODO this is just a placeholder until collections are actually implemented
-function dbclient_fetch_collection(collection,callback) {
+function dbclient_fetch_collection(collection, count, callback) {
 	console.log('fetching collection ' + collection + '...')
 	
 	let req = {
-		endpoint: 'fetch_collection_' + collection,
-		args: []
+		endpoint: '',
+		args: [count]
 	}
 	
-	callback([
-		{title: 'one',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'two',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'three',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'four',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'five',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'six',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'seven',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'eight',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'nine',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}},
-		{title: 'ten',forecolor:{data:null},backcolor:{data:null},textcolor:{data:null}}
-	])
+	switch (collection) {
+		case COLLECTION_TOP_RATED:
+			req.endpoint = 'fetch_collection_top_rated'
+			break
+			
+		case COLLECTION_TOP_PLAYED:
+			req.endpoint = 'fetch_collection_top_played'
+			break
+			
+		case COLLECTION_EDITORS_CHOICE:
+			req.endpoint = 'fetch_collection_editors_choice'
+			break
+			
+		default:
+			console.log('error: unknown collection type ' + collection)
+			callback()
+			return
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('error: collection fetch failed: ' + data.error)
+				callback()
+			}
+			else {
+				callback(data)
+			}
+		},
+		error: function(err) {
+			console.log('error: server connection failed for ' + req.endpoint + ': ' + err)
+			callback()
+		}
+	})
 }
 
 function dbclient_fetch_search(terms,callback) {
@@ -107,14 +141,18 @@ function dbclient_fetch_search(terms,callback) {
 		args: terms
 	}
 	
-	$.get('/db', req, function(data) {
-		if (data.error) {
-			console.log('error: puzzle search failed: ' + data.error)
-			callback(false)
-		}
-		else {
-			console.log('fetched ' + data.length + ' puzzles from db')
-			callback(data)
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('error: puzzle search failed: ' + data.error)
+				callback(false)
+			}
+			else {
+				console.log('fetched ' + data.length + ' puzzles from db')
+				callback(data)
+			}
 		}
 	})
 }

@@ -75,8 +75,7 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,frating,fcontainer) {
 	//update metadata fields
 	ftitle.html(this.title)
 	
-	let date = this.date.substring(0,this.date.indexOf('T'))
-	fdate.html(date)
+	fdate.html(string_utils_date(this.date))
 	
 	//enable this paperscope
 	paper = this.paper
