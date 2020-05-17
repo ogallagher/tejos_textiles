@@ -41,10 +41,11 @@ exports.init = function() {
 			})
 			
 			if (cache) {
-				exports.set('test_key', 'test_value', function(err) {
+				exports.set('test_key', 'test_value', 600, function(err) {
 					if (err) {
 						console.log('error: cache server failed to set test_key')
 						console.log(err)
+						cache.quit()
 						cache = null
 						reject()
 					}
@@ -116,7 +117,9 @@ If we know that we will want to set a new entry soon, but will not know the key 
 Remember the key, then update with the value.
 */
 exports.save_key = function(key) {
-	saved_key = key
+	if (cache) {
+		saved_key = key
+	}
 }
 
 /*
@@ -124,7 +127,7 @@ Used in tandem with save_key(). Calls set with the saved key.
 Also unsets saved_key, so entry cannot be updated twice without resaving the key.
 */
 exports.set_saved = function(value) {
-	if (saved_key) {
+	if (saved_key && cache) {
 		let expiry =  10 * enums.time.MINUTE / 1000
 		
 		if (saved_key == 'puzzles') {
