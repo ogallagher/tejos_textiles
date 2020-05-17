@@ -33,14 +33,10 @@ let saved_key
 exports.init = function() {
 	return new Promise(function(resolve,reject) {
 		//get config from heroku env vars
-		if (process.env.MEMCACHEDCLOUD_SERVERS) {
-			config.host = process.env.MEMCACHEDCLOUD_SERVERS
-			config.user = process.env.MEMCACHEDCLOUD_USERNAME
-			config.pass = process.env.MEMCACHEDCLOUD_PASSWORD
+		if (process.env.MEMCACHED_SERVER) {
+			config.host = process.env.MEMCACHED_SERVER
 			
 			cache = memjs.Client.create(config.host, {
-				username: config.user,
-				password: config.pass,
 				keepAlive: true
 			})
 			

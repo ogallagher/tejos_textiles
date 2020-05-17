@@ -67,12 +67,12 @@
 	},
  	"fetch_user": {
     	"params": ["?username?"],
-		"query": "select username,enabled,admin,subscription,email from people where username=?username?",
+		"query": "select username,enabled,`admin`,subscription,email from people where username=?username?",
 		"external": false
 	},
 	"fetch_user_details": {
 		"params": ["?username?"],
-		"query": "select admin,enabled,bio,email,links,photo,subscription,deleted from people where username=?username?",
+		"query": "select `admin`,enabled,bio,email,links,photo,subscription,deleted from people where username=?username?",
 		"external": true
 	},
 	"fetch_user_plays": {
