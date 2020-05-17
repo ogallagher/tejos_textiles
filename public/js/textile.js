@@ -11,22 +11,27 @@ Main entrypoint for textile.html
 let account
 let puzzle
 let user_rating
+let loaded_user_stats
 let scroll_lock
 
 window.onload = function() {
 	force_https()
 	
 	textile_load_puzzle(function() {
-		//import navbar
-		html_imports('navbar','#import_navbar', function() {
-			//import login modal
-			html_imports('login','#import_login', function() {
-				//assign login callback
-				login_on_login = textile_on_login
-				
-				//load account
-				sessionclient_get_account(textile_on_login)
-			})
+		if (!loaded_user_stats && account) {
+			textile_on_login(account)
+		}
+	})
+	
+	//import navbar
+	html_imports('navbar','#import_navbar', function() {
+		//import login modal
+		html_imports('login','#import_login', function() {
+			//assign login callback
+			login_on_login = textile_on_login
+			
+			//load account
+			sessionclient_get_account(textile_on_login)
 		})
 	})
 	
@@ -114,11 +119,12 @@ function textile_on_login(account_info) {
 	//toggle nav account button as account page link or login form
 	navbar_toggle_account(account)
 	
-	if (account) {
+	if (account && !loaded_user_stats) {
 		console.log('index: account set to ' + account.username)
 		
 		//update featured puzzle rating to reflect this account's opinion
 		if (puzzle) {
+			loaded_user_stats = true
 			dbclient_fetch_user_rating(account.username, puzzle.id, function(data) {
 				if (data) {
 					user_rating = data.rating

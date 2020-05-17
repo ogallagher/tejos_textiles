@@ -7,12 +7,10 @@ Owen Gallagher
 let featured_puzzle
 let account //see sessionclient:Account class
 let user_rating
+let loaded_user_stats
 
 window.onload = function() {
 	force_https()
-	
-	//fetch puzzles from db and insert into page
-	dbclient_fetch_puzzles(index_puzzles_onload)
 	
 	//enable bootstrap tooltips
 	$('[data-toggle="tooltip"]').tooltip({
@@ -32,6 +30,9 @@ window.onload = function() {
 	index_featured_authors()
 	index_featured_date()
 	index_featured_stars()
+	
+	//fetch puzzles from db and insert into page
+	dbclient_fetch_puzzles(index_puzzles_onload)
 	
 	//import navbar and footer
 	html_imports('navbar','#import_navbar', function() {
@@ -87,10 +88,12 @@ function index_on_login(account_info) {
 	//toggle nav account button as account page link or login form
 	navbar_toggle_account(account)
 	
-	if (account) {
+	if (account && !loaded_user_stats) {
 		console.log('index: account set to ' + account.username)
 		
-		if (featured_puzzle) {			
+		if (featured_puzzle) {
+			loaded_user_stats = true
+			
 			//chain fetches to prevent issues with the sessionserver reading+writing a session at the same time
 			//update featured puzzle rating to reflect this account's opinion
 			dbclient_fetch_user_rating(account.username, featured_puzzle.id, function(data) {
@@ -238,6 +241,10 @@ function index_puzzles_onload(dbdata) {
 			
 			window.onresize = function() {
 				featured_puzzle.resize(fcontainer)
+			}
+			
+			if (!loaded_user_stats && account) {
+				index_on_login(account)
 			}
 		}
 		
