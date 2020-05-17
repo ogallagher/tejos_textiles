@@ -120,7 +120,7 @@ exports.get_query = function(endpoint, args, is_external) {
 						//handle endpoints with special implementations
 						if (endpoint == 'search_puzzles') {
 							//build where clause from compound regexp with relevant columns
-							let columns = ['title']
+							let columns = ['title','date']
 							let regexps = []
 							
 							for (let column of columns) {

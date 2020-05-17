@@ -26,9 +26,7 @@ window.onload = function() {
 		delay: 4000
 	})
 	
-	//enable featured card widgets
-	index_featured_authors()
-	index_featured_date()
+	//enable interaction with rating stars
 	index_featured_stars()
 	
 	//fetch puzzles from db and insert into page
@@ -478,29 +476,6 @@ function index_featured_stars() {
 	})
 }
 
-//TODO handle interaction with featured author buttons
-function index_featured_authors() {
-	var authors = $('#featured_authors').children()
-	
-	authors.click(function(event) {
-		var author = $(this).html().trim()
-		
-		console.log(author + ' clicked')
-	})
-}
-
-//TODO handle interaction with date
-function index_featured_date() {
-	var date_button = $('#featured_date')
-	
-	date_button.click(function(event) {
-		var date = date_button.html()
-		
-		console.log(date + ' clicked')
-	})
-}
-
-//TODO handle puzzle completion
 function index_puzzle_on_complete(puzzle) {
 	console.log('puzzle completed!')
 	

@@ -44,9 +44,7 @@ window.onload = function() {
 		}
 	})
 	
-	//enable featured card widgets
-	textile_authors()
-	textile_date()
+	//enable interaction with rating stars
 	textile_stars()
 	
 	//import footer
@@ -347,14 +345,6 @@ function textile_load_puzzle(callback) {
 		console.log('error: textile not defined')
 		//TODO handle undefined textile
 	}
-}
-
-function textile_authors() {
-	
-}
-
-function textile_date() {
-	
 }
 
 function textile_stars() {

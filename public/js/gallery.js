@@ -86,8 +86,17 @@ window.onload = function() {
 	html_imports('textile_row', function(jstring) {
 		jpuzzle_str = jstring
 		
-		//get all puzzles
-		dbclient_fetch_puzzles(load_search_results)
+		let date_search = url_params_get('date')
+		if (date_search) {
+			//load date search passed in url param
+			console.log('searching for date ' + date_search)
+			search_input.val(date_search)
+			search_gallery()
+		}
+		else {
+			//get all puzzles
+			dbclient_fetch_puzzles(load_search_results)
+		}
 	})
 	
 	//manually handle collection flexbox behavior at different screen breakpoints
