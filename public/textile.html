@@ -45,23 +45,22 @@
 		
 		<article class="container-fluid mb-3">
 			<!-- featured puzzle -->
-            <div class="mx-2">
-                <div class="row py-1">
-					<div class="col display-4 font-title text-center text-uppercase bg-dark text-light" id="featured_title">
-						Untitled
-					</div>
-					<button id="featured_again"
-						class="col-auto btn px-3 my-auto ml-3 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-						title="play again" data-toggle="tooltip" style="display:none;">
-						<span class="oi oi-reload"></span>
-					</button>
-					<!--TODO enable this button, make it sticky/absolute?-->
-					<button id="anchor_scroll"
-						class="col-auto btn px-3 my-auto mr-3 ml-2 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-						title="anchor scroll on textile" data-toggle="tooltip">
-						<span class="oi oi-link-intact"></span>
-					</button>
-                </div>
+            <div id="title_bar" class="row py-1 sticky-top bg-light">
+				<div class="col display-4 font-title text-center text-uppercase bg-dark text-light ml-3" id="featured_title">
+					Untitled
+				</div>
+				<button id="featured_again"
+					class="col-auto btn px-3 my-auto ml-3 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+					title="play again" data-toggle="tooltip" style="display:none;">
+					<span class="oi oi-reload"></span>
+				</button>
+				<button id="anchor_scroll"
+					class="btn px-3 my-auto mr-3 ml-2 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+					title="anchor scroll on textile" data-toggle="tooltip">
+					<span id="anchor_scroll_icon" class="oi oi-link-broken"></span>
+				</button>
+            </div>
+            <div class="mx-2" style="overflow:visible;">
                 <div>
                     <div id="featured_container" class="layers-container">
 						<div id="featured_placeholder" class="overlap-1-center text-center d-flex flex-column font-navigation-lg">

@@ -225,10 +225,11 @@ function index_puzzles_onload(dbdata) {
 		let fcontainer = $('#featured_container')[0]
 		
 		if (featured_puzzle) {
+			$('#featured_url').attr('href','textile.html?puzzle_id=' + featured_puzzle.id)
+			
 			featured_puzzle.feature(ftitle,fdate,fcanvas,frating,fcontainer)
 				.then(function() {
 					$('#featured_placeholder').remove()
-					$('#featured_url').attr('href','textile.html?puzzle_id=' + featured_puzzle.id)
 					console.log('feature success')
 				})
 				.catch(function() {

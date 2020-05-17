@@ -11,6 +11,7 @@ Main entrypoint for textile.html
 let account
 let puzzle
 let user_rating
+let scroll_lock
 
 window.onload = function() {
 	force_https()
@@ -74,6 +75,36 @@ window.onload = function() {
 		
 		//hide play-again button
 		$(this).hide()
+	})
+	
+	//enable scroll-lock button
+	scroll_lock = false
+	$('#anchor_scroll').click(function() {
+		scroll_lock = !scroll_lock
+		
+		if (scroll_lock) {
+			//scroll to puzzle
+			window.location.href = '#featured_container'
+			
+			//prevent scrolling
+			$('body').on('scroll touchmove mousewheel', function(e) {
+				e.preventDefault()
+			})
+			
+			//button icon
+			$('#anchor_scroll_icon')
+			.removeClass('oi-link-broken')
+			.addClass('oi-link-intact')
+		}
+		else {
+			//enable scrolling
+			$('body').off('scroll touchmove mousewheel')
+			
+			//button icon
+			$('#anchor_scroll_icon')
+			.removeClass('oi-link-intact')
+			.addClass('oi-link-broken')
+		}
 	})
 }
 
