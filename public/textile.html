@@ -46,10 +46,21 @@
 		<article class="container-fluid mb-3">
 			<!-- featured puzzle -->
             <div class="mx-2">
-                <div class="py-1">
-                   <div class="display-4 font-title text-center text-uppercase bg-dark text-light" id="featured_title">
-					   Untitled
-                   </div>
+                <div class="row py-1">
+					<div class="col display-4 font-title text-center text-uppercase bg-dark text-light" id="featured_title">
+						Untitled
+					</div>
+					<button id="featured_again"
+						class="col-auto btn px-3 my-auto ml-3 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+						title="play again" data-toggle="tooltip" style="display:none;">
+						<span class="oi oi-reload"></span>
+					</button>
+					<!--TODO enable this button, make it sticky/absolute?-->
+					<button id="anchor_scroll"
+						class="col-auto btn px-3 my-auto mr-3 ml-2 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+						title="anchor scroll on textile" data-toggle="tooltip">
+						<span class="oi oi-link-intact"></span>
+					</button>
                 </div>
                 <div>
                     <div id="featured_container" class="layers-container">
@@ -62,7 +73,7 @@
 						<!-- win screen inserted here -->
                     </div>
                 </div>
-                <div class="font-navigation">
+                <div class="font-navigation" id="textile_tags">
                     <!--authors-->
                     <div class="input-group my-2">
                         <div class="input-group-prepend">
@@ -136,7 +147,7 @@
 					<!--user play stats inserted here-->
                 </div>
             </div>
-			<h2 id="fragments_header" class="col-12 pl-4 pt-3 font-title text-copper-hover text-dark-nohover clickable" 
+			<h2 id="fragments_header" class="col-12 pl-4 pt-3 font-title text-copper-hover text-dark-nohover clickable border-top" 
 				data-toggle="collapse" data-target="#fragments_list" style="display:none;">
 				Included Works
 			</h2>

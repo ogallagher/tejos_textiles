@@ -29,6 +29,15 @@ window.onload = function() {
 		})
 	})
 	
+	//enable bootstrap tooltips
+	$('[data-toggle="tooltip"]').tooltip({
+		placement: 'auto',
+		delay: {
+			show: 250,
+			hide: 100
+		}
+	})
+	
 	//enable featured card widgets
 	textile_authors()
 	textile_date()
@@ -47,7 +56,24 @@ window.onload = function() {
 			$('#win_screen').fadeOut(1000)
 		})
 		
-		textile_puzzle_on_complete()
+		//login-to-record-play toast
+		$('#login_play_toast').toast({
+			autohide: false
+		})
+	})
+	
+	//enable play-again button
+	$('#featured_again').click(function() {
+		//hide win screen
+		$('#win_screen').hide()
+		
+		//enable puzzle for replay
+		if (puzzle) {
+			puzzle.enable()
+		}
+		
+		//hide play-again button
+		$(this).hide()
 	})
 }
 
@@ -67,6 +93,42 @@ function textile_on_login(account_info) {
 					user_rating = data.rating
 					$('#featured_rating').mouseleave()
 				}
+				
+				//add tags for account play stats: number of plays, fastest solve
+				dbclient_fetch_user_plays(account.username, puzzle.id, function(data) {
+					if (data) {
+						//add new user stats
+						let textile_tags = $('#textile_tags')
+						html_imports('textile_tag', function(jtemplate) {
+							try {
+								//plays tag
+								let jstring = jtemplate
+												.replace('?key?', account.username + ' plays')
+												.replace('?value?', data.times)
+								let jtag = $(jstring)
+								.attr('data-tag-type','user-stats')
+								.prop('id','user_plays')
+								textile_tags.append(jtag)
+								
+								//fastest solve
+								if (data.fastest) {
+									jstring = jtemplate
+												.replace('?key?', account.username + ' fastest solve')
+												.replace('?value?', (data.fastest / 1000) + 's')
+									jtag = $(jstring)
+									.attr('data-tag-type','user-stats')
+									.prop('id','user_fastest')
+							
+									textile_tags.append(jtag)
+								}
+							}
+							catch (err) {
+								console.log(err)
+								console.log('account play stats fetch failed; perhaps user logged out?')
+							}
+						})
+					}
+				})
 			})
 		}
 	}
@@ -106,27 +168,30 @@ function textile_load_puzzle(callback) {
 			window.onresize = function() {
 				puzzle.resize(puzzle_container)
 			}
-				
+			
 			//assign completion callback
 			puzzle.onComplete = textile_puzzle_on_complete
 			
 			//load authors and fragments
 			dbclient_fetch_puzzle_fragments(puzzle.id, function(fragments) {
-				console.log('got fragments:')
-				console.log(fragments)
-				
 				html_imports('work_tile', function(tile_str) {
 					let fragments_list = $('#fragments_list')
 					let authors_list = $('#featured_authors').html('')
 					let author_button_str = '<a class="btn btn-outline-secondary rounded-0" href="#"></a>'
+					let author_names = []
 					
 					for (let fragment of fragments) {
 						//load author
-						authors_list.append(
-							$(author_button_str)
-							.prop('href','account.html?username=' + fragment.author)
-							.html(fragment.author)
-						)
+						let author = fragment.author
+						if (!author_names.includes(author)) {
+							authors_list.append(
+								$(author_button_str)
+								.prop('href','account.html?username=' + author)
+								.html(author)
+							)
+							
+							author_names.push(author)
+						}
 						
 						//load fragment
 						let tile = $(tile_str)
@@ -144,7 +209,7 @@ function textile_load_puzzle(callback) {
 						//license
 						tile.find('.work-tile-license-collapse')
 						.prop('id', tile_id + '_license_collapse') //enable expand/collapse
-						.append('<br><a class="font-content" href="account.html?username=' + fragment.author + '#contributions">view original</a>') //link to original
+						.append('<br><a class="font-content" href="account.html?username=' + author + '#contributions">view original</a>') //link to original
 						
 						let license
 						let license_url
@@ -196,7 +261,7 @@ function textile_load_puzzle(callback) {
 						//text
 						tile.find('.work-tile-card-body')
 						.attr('data-target','#' + tile_id + '_text_collapse')
-				
+						
 						tile.find('.work-tile-text-collapse')
 						.prop('id', tile_id + '_text_collapse')
 						
@@ -224,13 +289,13 @@ function textile_load_puzzle(callback) {
 						else {
 							tile.find('.work-tile-description').html('No description provided')
 						}
-				
+						
 						//author
 						tile.find('.work-tile-fragments').html(
 							'<div class="col">\
 							<button class="btn text-raspberry-hover text-bold-hover text-dark-nohover col" \
-							role="button" onclick="window.location.href=\'account.html?username=' + fragment.author + '\';">' + 
-							fragment.author + 
+							role="button" onclick="window.location.href=\'account.html?username=' + author + '\';">' + 
+							author + 
 							'</button>\
 							</div>'
 						)
@@ -325,7 +390,7 @@ function textile_stars() {
 		
 		if (account) {
 			if (account.enabled) {
-				dbclient_rate(account.username, featured_puzzle.id, star_count, function(rated) {
+				dbclient_rate(account.username, puzzle.id, star_count, function(rated) {
 					if (rated) {
 						user_rating = star_count
 					}
@@ -346,19 +411,58 @@ function textile_stars() {
 }
 
 //TODO handle puzzle completion
-function textile_puzzle_on_complete() {
+function textile_puzzle_on_complete(puzzle) {
 	console.log('puzzle completed!')
 	
 	//show win screen
+	$('#solve_time').html(puzzle.solveTime / 1000) //solve time in seconds
 	$('#win_screen').show()
+	
+	//show again button
+	$('#featured_again').show()
 	
 	//show fragments; shows literature contained in the puzzle
 	$('#fragments_header').show()
 	$('#fragments_list').collapse()
 	
-	//if not logged in, store play cookie and toast to login to save progress
-	
-	//update db.plays submit username,puzzle,duration
+	if (account) {
+		//update db.plays submit username,puzzle,duration
+		dbclient_play(account.username, puzzle.id, puzzle.solveTime, function(err) {
+			if (err) {
+				//TODO handle error; create a retry button so play is not lost
+				alert('Error: unable to save play data to server!\nTODO: retry play push to db')
+			}
+			else {
+				//update user stats
+				//num plays
+				let user_plays = $('#user_plays .textile-tag-value')
+				user_plays.html(parseInt(user_plays.html()) + 1)
+				
+				//fastest solve
+				let user_fastest = $('#user_fastest .textile-tag-value')
+				let previous = parseFloat(user_fastest.html())
+				
+				if (puzzle.solveTime < previous * 1000) {
+					user_fastest.html(puzzle.solveTime / 1000)
+				}
+			}
+		})
+	}
+	else {
+		//if not logged in, store play cookie and toast to login to save progress
+		$('#login_play_toast_container').show()
+		$('#login_play_toast').toast('show')
+		
+		let cookie_plays = cookies_get(PLAYS_COOKIE_KEY) //puzzle,duration;puzzle,duration;...
+		if (cookie_plays) {
+			cookie_plays += ';'
+		}
+		else {
+			cookie_plays = ''
+		}
+		
+		cookies_set(PLAYS_COOKIE_KEY, cookie_plays + puzzle.id + ',' + puzzle.solveTime)
+	}
 }
 
 function textile_load_work_text(work_id, dest_selector) {
