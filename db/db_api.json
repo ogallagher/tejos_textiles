@@ -99,12 +99,12 @@
 	},
 	"fetch_work_fragments": {
 		"params": ["?work_id?"],
-		"query": "select f.id as id, f.puzzle_id as puzzle_id, p.title as puzzle_title from fragments f inner join puzzles p on f.puzzle_id=p.id where f.work_id=?work_id?",
+		"query": "select f.id as id, f.puzzle_id as puzzle_id, p.title as puzzle_title from fragments f inner join puzzles p on f.puzzle_id=p.id where f.work_id=?work_id? group by puzzle_id",
 		"external": true
 	},
 	"fetch_puzzle_fragments": {
 		"params": ["?puzzle_id?"],
-		"query": "select f.id as id, f.work_id as work_id, f.fragment as fragment, w.title as title, w.description as description, w.author as author, w.license as license from fragments f inner join works w on f.work_id=w.id where f.puzzle_id=?puzzle_id?",
+		"query": "select f.id as id, f.work_id as work_id, f.fragment as fragment, w.title as title, w.description as description, w.author as author, w.license as license, w.`date` as `date` from fragments f inner join works w on f.work_id=w.id where f.puzzle_id=?puzzle_id?",
 		"external": true
 	},
 	"fetch_work_text": {

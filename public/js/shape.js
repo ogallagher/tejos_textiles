@@ -91,4 +91,7 @@ Shape.prototype.complete = function() {
 		this.move()
 		this.isComplete = true
 	}
+	else {
+		this.isComplete = false
+	}
 }

@@ -109,7 +109,7 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,frating,fcontainer) {
 	
 		if (self.enabled) {
 			for (let shape of self.shapes) {
-				if (shape.contains(mouse)) {
+				if (shape.contains(mouse) && !shape.isComplete) {
 					miss = false
 					shape.throwAnchor()
 					selectedShape = shape
@@ -125,7 +125,7 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,frating,fcontainer) {
 	}
 	paper.view.onMouseUp = function(event) {
 		if (self.enabled) {
-			if (selectedShape != null) {
+			if (selectedShape != null) {				
 				//shapes dragged, check for puzzle completion
 				let complete = true
 				for (let shape of self.shapes) {
