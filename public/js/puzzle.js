@@ -42,7 +42,7 @@ function Puzzle(dbdata) {
 	this.textS = new paper.Point()
 	this.shapes = [];
 	
-	this.scale = 2; //TODO include scale in dbdata
+	this.scale = 0.8; //TODO include scale in dbdata
 	this.pan = new paper.Point()
 	this.zoom = 1
 	this.dragBegin = new paper.Point()

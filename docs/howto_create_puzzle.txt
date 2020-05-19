@@ -15,7 +15,7 @@ How to create, prep, and upload a new tejo/textile puzzle
 
 4. Scan the text drawing to a raster image.
 
-5. Convert the text scan to bmp with ffmpeg, and use potrace to vectorize the bmp. I created vectorize_img.sh to do these steps. The output is ./input_file_name.svg.
+5. Convert the text scan to bmp with ffmpeg, and use potrace to vectorize the bmp. I created vectorize_img.sh to do these steps. The output is ./input_file_name.svg. The signature is vectorize_img <src_file> <filetype_ext>.
 
 6. Scan the shapes drawing and vectorize it the same way as the text.
 

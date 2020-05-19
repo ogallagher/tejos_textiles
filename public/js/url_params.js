@@ -19,7 +19,7 @@ if (url_query.indexOf('&') != -1) {
 else {
 	let entry = url_query.split('=')
 	
-	url_params[entry[0]] = entry[1]
+	url_params[entry[0]] = decodeURIComponent(entry[1])
 }
 
 function url_params_get(key) {

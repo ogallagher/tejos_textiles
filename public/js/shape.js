@@ -13,6 +13,9 @@ function Shape(hole,cap,puzzle) {
 	this.puzzle = puzzle
 	
 	this.hole = new paper.Path(hole)
+	if (!this.hole.clockwise) {
+		this.hole.reorient(false, true)
+	}
 	this.hole.scale(puzzle.scale)
 	this.holeP = this.hole.position.multiply(puzzle.scale)	//current position
 	this.holeS = this.hole.bounds.size						//current size
