@@ -118,7 +118,30 @@ exports.get_query = function(endpoint, args, is_external) {
 					
 					if (entry.special) {
 						//handle endpoints with special implementations
-						if (endpoint == 'search_puzzles') {
+						if (endpoint == 'fetch_puzzles') {
+							for (let i=0; i<params.length; i++) {
+								let arg = args[i]
+								if (isNaN(args[i])) {
+									//is string, escaped
+									arg = db.escape(arg)
+								}
+								//else, is number, directly inserted
+							
+								query = query.replace(params[i], arg)
+							}
+							
+							let admin = args[0]
+							console.log(admin)
+							if (admin == false || admin == 'false') {
+								//is not admin, hide puzzles where puzzle.testing=1
+								query = query.replace('?where?','where testing=0')
+							}
+							else {
+								query = query.replace('?where?','')
+							}
+							console.log(query)
+						}
+						else if (endpoint == 'search_puzzles') {
 							//build where clause from compound regexp with relevant columns
 							let columns = ['title','date']
 							let regexps = []

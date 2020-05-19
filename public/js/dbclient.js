@@ -11,23 +11,27 @@ const COLLECTION_TOP_RATED = 1
 const COLLECTION_TOP_PLAYED = 2
 const COLLECTION_EDITORS_CHOICE = 3
 
-function dbclient_fetch_puzzles(callback) {	
+function dbclient_fetch_puzzles(admin, callback) {	
 	console.log('fetching puzzles...');
+	
+	if (admin == null) {
+		admin = false
+	}
 	
 	let req = {
 		endpoint: 'fetch_puzzles',
-		args: []
-	};
+		args: [admin]
+	}
 	
 	$.get({
 		url: '/db', 
 		data: req, 
 		success: function(data) {
-			console.log('fetched ' + data.length + ' puzzles from db');
+			console.log('fetched ' + data.length + ' puzzles from db')
 			
-			callback(data);
+			callback(data)
 		}
-	});
+	})
 }
 
 function dbclient_fetch_puzzle_paths(id,callback) {

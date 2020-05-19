@@ -94,6 +94,7 @@ function login_register(username, password, email, subscribed) {
 			}
 			else {
 				//server error
+				console.log(reason)
 				alert('Login failed due to a server error!')
 			}
 		})

@@ -230,9 +230,10 @@ function textile_load_puzzle(callback) {
 						
 						//load fragment
 						let tile = $(tile_str)
-				
+						
 						//id
-						let tile_id = 'fragment_' + fragment.work_id
+						console.log(fragment)
+						let tile_id = 'fragment_' + fragment.id
 						tile.prop('id', tile_id)
 						
 						//title

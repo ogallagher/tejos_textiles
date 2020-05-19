@@ -29,9 +29,6 @@ window.onload = function() {
 	//enable interaction with rating stars
 	index_featured_stars()
 	
-	//fetch puzzles from db and insert into page
-	dbclient_fetch_puzzles(index_puzzles_onload)
-	
 	//import navbar and footer
 	html_imports('navbar','#import_navbar', function() {
 		//import login modal
@@ -41,8 +38,8 @@ window.onload = function() {
 			//assign login callbacks
 			login_on_login = index_on_login
 			login_on_logout = index_on_logout
-		
-			//load account
+			
+			//load account; puzzles are fetched once account.admin is determined
 			sessionclient_get_account(index_on_login)
 		})
 	})
@@ -81,6 +78,13 @@ window.onload = function() {
 }
 
 function index_on_login(account_info) {
+	let old_admin = (account != null && account.admin)
+	let new_admin = (account_info != null && account_info.admin)
+	if (old_admin != new_admin) {
+		//fetch puzzles from db and insert into page if account admin status changed
+		dbclient_fetch_puzzles(new_admin, index_puzzles_onload)
+	}
+	
 	account = account_info
 	
 	//toggle nav account button as account page link or login form
@@ -174,7 +178,7 @@ function index_on_logout() {
 //when a puzzle is loaded from dbclient, add it to the document and make it interactive
 function index_puzzles_onload(dbdata) {
 	//bind puzzles to list
-	let domlist = $('#puzzles_list')
+	let domlist = $('#puzzles_list').empty()
 	
 	//load textile template
 	html_imports('textile_row', function(jstring) {
@@ -271,7 +275,7 @@ function index_puzzles_onload(dbdata) {
 					let tile = $(tile_str)
 					
 					//id
-					let tile_id = 'fragment_' + fragment.work_id
+					let tile_id = 'fragment_' + fragment.id
 					tile.prop('id', tile_id)
 				
 					//title

@@ -112,6 +112,7 @@ function sessionclient_create(username,password,email,subscribed) {
 						//login info from dbserver
 						account.enabled = account_info.enabled.data[0]
 						account.admin = account_info.admin.data[0]
+						//subscription and email are also returned on login, but are ignored
 					}
 					
 					resolve(account)

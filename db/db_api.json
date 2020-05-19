@@ -1,12 +1,13 @@
 {
 	"fetch_puzzles": {
 		"params": [],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating,plays from puzzles order by `date` desc",
-		"external": true
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating,plays from puzzles ?where? order by `date` desc",
+		"external": true,
+		"special": true
 	},
 	"fetch_puzzle": {
 		"params": ["?puzzle_id?"],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating,plays from puzzles where id=?puzzle_id?",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating,plays from puzzles where id=?puzzle_id?",
 		"external": true
 	},
 	"fetch_puzzle_paths": {
@@ -16,22 +17,22 @@
 	},
 	"fetch_collection_top_rated": {
 		"params": ["?count?"],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating from puzzles order by `rating` desc limit ?count?",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating from puzzles order by `rating` desc limit ?count?",
 		"external": true
 	},
 	"fetch_collection_editors_choice": {
 		"params": [],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating from puzzles where featured=1",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating from puzzles where featured=1",
 		"external": true
 	},
 	"fetch_collection_top_played": {
 		"params": ["?count?"],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,preview,rating,plays from puzzles order by plays desc limit ?count?",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating,plays from puzzles order by plays desc limit ?count?",
 		"external": true
 	},
 	"search_puzzles": {
 		"params": [],
-		"query": "select id,title,date,forecolor,backcolor,textcolor,preview,rating,plays from puzzles where ?regexps?",
+		"query": "select id,title,date,forecolor,backcolor,textcolor,scale,z_min,preview,rating,plays from puzzles where ?regexps?",
 		"external": true,
 		"special": true
 	},
@@ -72,7 +73,7 @@
 	},
 	"fetch_user_details": {
 		"params": ["?username?"],
-		"query": "select `admin`,enabled,bio,email,links,photo,subscription,deleted from people where username=?username?",
+		"query": "select `admin`,enabled,bio,email,links,photo,subscription,deleted,anonymous from people where username=?username?",
 		"external": true
 	},
 	"fetch_user_plays": {
@@ -98,12 +99,12 @@
 	},
 	"fetch_work_fragments": {
 		"params": ["?work_id?"],
-		"query": "select f.puzzle_id as puzzle_id, p.title as puzzle_title from fragments f inner join puzzles p on f.puzzle_id=p.id where f.work_id=?work_id?",
+		"query": "select f.id as id, f.puzzle_id as puzzle_id, p.title as puzzle_title from fragments f inner join puzzles p on f.puzzle_id=p.id where f.work_id=?work_id?",
 		"external": true
 	},
 	"fetch_puzzle_fragments": {
 		"params": ["?puzzle_id?"],
-		"query": "select f.work_id as work_id, f.fragment as fragment, w.title as title, w.description as description, w.author as author, w.license as license from fragments f inner join works w on f.work_id=w.id where f.puzzle_id=?puzzle_id?",
+		"query": "select f.id as id, f.work_id as work_id, f.fragment as fragment, w.title as title, w.description as description, w.author as author, w.license as license from fragments f inner join works w on f.work_id=w.id where f.puzzle_id=?puzzle_id?",
 		"external": true
 	},
 	"fetch_work_text": {

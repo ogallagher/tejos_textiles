@@ -42,7 +42,8 @@ function Puzzle(dbdata) {
 	this.textS = new paper.Point()
 	this.shapes = [];
 	
-	this.scale = 0.8; //TODO include scale in dbdata
+	this.scale = dbdata.scale //initial scale applied to puzzle on load
+	this.z_min = dbdata.z_min //how far out the user can zoom
 	this.pan = new paper.Point()
 	this.zoom = 1
 	this.dragBegin = new paper.Point()
