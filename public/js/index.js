@@ -80,7 +80,7 @@ window.onload = function() {
 function index_on_login(account_info) {
 	let old_admin = (account != null && account.admin)
 	let new_admin = (account_info != null && account_info.admin)
-	if (old_admin != new_admin) {
+	if (old_admin != new_admin ||  account == null) {
 		//fetch puzzles from db and insert into page if account admin status changed
 		dbclient_fetch_puzzles(new_admin, index_puzzles_onload)
 	}

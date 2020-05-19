@@ -131,7 +131,6 @@ exports.get_query = function(endpoint, args, is_external) {
 							}
 							
 							let admin = args[0]
-							console.log(admin)
 							if (admin == false || admin == 'false') {
 								//is not admin, hide puzzles where puzzle.testing=1
 								query = query.replace('?where?','where testing=0')
@@ -139,7 +138,6 @@ exports.get_query = function(endpoint, args, is_external) {
 							else {
 								query = query.replace('?where?','')
 							}
-							console.log(query)
 						}
 						else if (endpoint == 'search_puzzles') {
 							//build where clause from compound regexp with relevant columns
