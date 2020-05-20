@@ -21,6 +21,9 @@ exports.EMAIL_NEW_PUZZLE = emailserver_EMAIL_NEW_PUZZLE
 exports.EMAIL_CONTRIBUTION = emailserver_EMAIL_CONTRIBUTION
 exports.EMAIL_CUSTOM = emailserver_EMAIL_CUSTOM
 
+const TJ_EMAIL = 'contact@textilesjournal.org'
+exports.TJ_EMAIL = process.env.EMAIL
+
 //local constants
 const PATH_EMAIL_TEMPLATES = 'email/email_templates/'
 
@@ -98,7 +101,7 @@ exports.init = function() {
 					port: 465,
 					auth: {
 						type: 'OAuth2',
-						user: process.env.EMAIL,
+						user: TJ_EMAIL,
 						serviceClient: process.env.GSUITE_APP_ID,
 						privateKey: process.env.GSUITE_PRIVATE_KEY
 					}
@@ -114,7 +117,7 @@ exports.init = function() {
 						
 						//email defaults
 						defaults = { 
-							from: '"Textiles Journal" ' + process.env.EMAIL
+							from: '"Textiles Journal" ' + TJ_EMAIL
 						}
 						console.log('sending email as ' + defaults.from)
 						
@@ -137,6 +140,7 @@ exports.init = function() {
 exports.email = function(dest_email, type, args) {
 	return new Promise(function(resolve) {
 		let out = 'sending '
+		let from = defaults.from
 		let subject = ''
 		let text = ''
 		let html = ''
@@ -170,8 +174,12 @@ exports.email = function(dest_email, type, args) {
 			
 			case emailserver_EMAIL_CUSTOM:
 				out += 'custom'
+				from = args.from
 				subject = args.subject
-			
+				text = args.message + '\n\n' + from
+				html = undefined
+				console.log(args)
+				
 				break
 			
 			default:
@@ -179,8 +187,7 @@ exports.email = function(dest_email, type, args) {
 				go = false
 				break
 		}
-		out += ' email to ' + dest_email;
-		console.log(out)
+		out += ' email to ' + dest_email + ' from ' + from;
 		
 		if (go) {
 			let message = {
@@ -188,15 +195,14 @@ exports.email = function(dest_email, type, args) {
 				subject: subject,
 				text: text,
 				html: html,
-				from: defaults.from
+				from: from
 			}
 			
 			mailer
 			.sendMail(message)
 			.then(function(info) {
 				if (info) {
-					console.log('message sent successfully, status: ')
-					console.log(info)
+					console.log('message sent successfully, status: ' + info.response)
 				}
 				else {
 					console.log('message sent successfully')

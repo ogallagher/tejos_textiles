@@ -39,47 +39,47 @@ Custom classes
 */
 
 .font-title-xlg {
-	font-family: 'Poiret One', cursive;
+	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 	font-size: xx-large;
 }
 .font-title-lg {
-	font-family: 'Poiret One', cursive;
+	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 	font-size: x-large;
 }
 .font-title-md {
-	font-family: 'Poiret One', cursive;
+	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 	font-size: large;
 }
 .font-title {
-	font-family: 'Poiret One', cursive;
+	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 }
 
 .font-navigation-lg {
-	font-family: 'Lato', sans-serif;
+	font-family: 'Lato', 'Verdana', sans-serif;
 	font-size: x-large;
 }
 .font-navigation-md {
-	font-family: 'Lato', sans-serif;
+	font-family: 'Lato', 'Verdana', sans-serif;
 	font-size: large;
 }
 .font-navigation {
-	font-family: 'Lato', sans-serif;
+	font-family: 'Lato', 'Verdana', sans-serif;
 }
 
 .font-content-lg {
-	font-family: 'Darker Grotesque', sans-serif;
+	font-family: 'Darker Grotesque', 'Helvetica', sans-serif;
 	font-size: x-large;
 }
 .font-content-md {
-	font-family: 'Darker Grotesque', sans-serif;
+	font-family: 'Darker Grotesque', 'Helvetica', sans-serif;
 	font-size: large;
 }
 .font-content-sm {
-	font-family: 'Darker Grotesque', sans-serif;
+	font-family: 'Darker Grotesque', 'Helvetica', sans-serif;
 	font-size: medium;
 }
 .font-content {
-	font-family: 'Darker Grotesque', sans-serif;
+	font-family: 'Darker Grotesque', 'Helvetica', sans-serif;
 }
 
 .puzzle-canvas {
@@ -90,8 +90,14 @@ Custom classes
 .bg-olive {
 	background-color: #457E62;
 }
+.bg-olive-hover:hover {
+	background-color: #457E62;
+}
 .bg-olive-dark {
 	background-color: #294939; /* contact page */
+}
+.bg-olive-dark-hover:hover {
+	background-color: #294939;
 }
 .bg-sand {
 	background-color: #F0EEB6;
@@ -182,6 +188,9 @@ Custom classes
 .text-olive-dark {
 	color: #294939; /* contact page */
 }
+.text-olive-dark-nohover {
+	color: #294939;
+}
 .text-copper {
 	color: #7A780E; /* contribute page */
 }
@@ -206,6 +215,14 @@ Custom classes
 .border-raspberry {
 	border-width: 1px;
 	border-color: #8A2E60;
+}
+.border-olive {
+	border-width: 1px;
+	border-color: #457E62;
+}
+.border-olive-dark {
+	border-width: 1px;
+	border-color: #294939;
 }
 
 .layers-container {

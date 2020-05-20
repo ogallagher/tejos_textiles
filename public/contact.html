@@ -71,11 +71,31 @@
 									<span class="input-group-text">Subject</span>
 								</div>
 								<input type="text" class="form-control" id="subject" placeholder="An Interesting Topic">
+								<div class="invalid-feedback">The message must have a subject line.</div>
 							</div>
 							<textarea rows="5" class="form-control" id="message"></textarea>
+							<div class="invalid-feedback">The message body cannot be empty.</div>
 						</div>
 						<div class="form-group">
-							<button type="submit" class="btn btn-primary">Submit</button>
+							<div class="row">
+								<div class="col-auto">
+									<button id="send" class="btn border-olive bg-olive-hover text-light-hover text-olive-dark-nohover">Send</button>
+								</div>
+								<div class="col-auto d-flex flex-column justify-content-center">
+									<div id="loading" class="h4 my-auto oi oi-loop-circular" style="display:none;"></div>
+								</div>
+								<div class="col">
+									<div id="send_result" class="toast text-olive-dark border-olive-dark shadow-none py-0" style="display:none;">
+										<div class="toast-body font-navigation py-2">
+											<span id="send_result_message">
+											</span>
+											<button type="button" class="ml-auto mb-1 close" data-dismiss="toast">
+										    	<span class="text-olive-dark" aria-hidden="true">&times;</span>
+										    </button>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

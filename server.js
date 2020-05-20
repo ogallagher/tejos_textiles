@@ -33,7 +33,7 @@ try {
 	const SITE = enums.site.TEXTILES; //select database to connect to
 	
 	app.set('port', process.env.PORT)
-
+	
 	//enable cross-origin requests for same origin html imports
 	const cors = require('cors')
 	const origins = [
@@ -249,6 +249,21 @@ try {
 						res.json({error: 'endpoint'})
 					}
 				})
+		})
+		
+	app
+		.route('/email')
+		.post(function(req,res) {
+			emailserver
+			.email(emailserver.TJ_EMAIL, emailserver.EMAIL_CUSTOM, req.body)
+			.then(function(err) {
+				if (err) {
+					res.json({error: 'email'})
+				}
+				else {
+					res.json({success: 'email'})
+				}
+			})
 		})
 	
 	//for enabling https by getting ssl cert from certbot
