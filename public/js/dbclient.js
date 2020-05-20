@@ -196,7 +196,7 @@ function dbclient_rate(username,puzzle_id,rating,callback) {
 			let result = data[0][0].result
 			
 			if (result == 'success') {
-				callback(true)
+				callback(data[0][0].avg_rating)
 			}
 			else {
 				callback(false)

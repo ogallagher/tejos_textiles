@@ -85,6 +85,7 @@ function index_on_login(account_info) {
 		dbclient_fetch_puzzles(new_admin, index_puzzles_onload)
 	}
 	
+	loaded_user_stats = false
 	account = account_info
 	
 	//toggle nav account button as account page link or login form
@@ -247,6 +248,9 @@ function index_puzzles_onload(dbdata) {
 			
 			if (!loaded_user_stats && account) {
 				index_on_login(account)
+			}
+			else {
+				$('#featured_rating').mouseleave()
 			}
 		}
 		
@@ -432,6 +436,7 @@ function index_featured_stars() {
 		stars.removeClass('text-warning').addClass('text-gray')
 		
 		if (user_rating) {
+			//display rating of current user
 			rating_key.html(account.username + ' rating')
 			
 			one.removeClass('text-gray').addClass('text-warning')
@@ -450,6 +455,25 @@ function index_featured_stars() {
 		}
 		else {
 			rating_key.html('rating')
+			
+			if (featured_puzzle) {
+				//display average rating
+				let avg_rating = Math.round(featured_puzzle.rating)
+				
+				one.removeClass('text-gray').addClass('text-warning')
+				if (avg_rating > 1) {
+					two.removeClass('text-gray').addClass('text-warning')
+				}
+				if (avg_rating > 2) {
+					three.removeClass('text-gray').addClass('text-warning')
+				}
+				if (avg_rating > 3) {
+					four.removeClass('text-gray').addClass('text-warning')
+				}
+				if (avg_rating > 4) {
+					five.removeClass('text-gray').addClass('text-warning')
+				}
+			}
 		}
 	})
 	
@@ -461,9 +485,10 @@ function index_featured_stars() {
 		
 		if (account) {
 			if (account.enabled) {
-				dbclient_rate(account.username, featured_puzzle.id, star_count, function(rated) {
-					if (rated) {
+				dbclient_rate(account.username, featured_puzzle.id, star_count, function(avg_rating) {
+					if (avg_rating) {
 						user_rating = star_count
+						featured_puzzle.rating = avg_rating
 					}
 					else {
 						alert('Error: rating failed!')

@@ -31,6 +31,7 @@ window.onload = function() {
 			
 			//assign login callback
 			login_on_login = textile_on_login
+			login_on_logout = textile_on_logout
 			
 			//load account
 			sessionclient_get_account(textile_on_login)
@@ -171,6 +172,15 @@ function textile_on_login(account_info) {
 	}
 }
 
+function textile_on_logout() {
+	account = null
+	user_rating = null
+	$('#featured_rating').mouseleave()
+	
+	//remove user stats tags
+	$('.textile-tag[data-tag-type="user-stats"]').remove()
+}
+
 function textile_load_puzzle(callback) {
 	let puzzle_id = url_params_get('puzzle_id')
 	
@@ -180,14 +190,14 @@ function textile_load_puzzle(callback) {
 		dbclient_fetch_puzzle(puzzle_id, function(dbdata) {
 			$('#title').html(dbdata.title)
 			
+			//load metadata
+			puzzle = new Puzzle(dbdata)
+			
 			let puzzle_title = $('#featured_title')
 			let puzzle_date = $('#featured_date')
 			let puzzle_canvas = $('#featured_puzzle')[0]
-			let puzzle_rating = $('#featured_rating')
+			let puzzle_rating = $('#featured_rating').mouseleave()
 			let puzzle_container = $('#featured_container')[0]
-			
-			//load metadata
-			puzzle = new Puzzle(dbdata)
 			
 			//load graphics
 			puzzle.feature(puzzle_title,puzzle_date,puzzle_canvas,puzzle_rating,puzzle_container)
@@ -355,6 +365,7 @@ function textile_load_puzzle(callback) {
 function textile_stars() {
 	//list of star buttons
 	let rating = $('#featured_rating')
+	let rating_key = $('#featured_rating_key')
 	let stars = rating.children()
 	let one = $('#featured_rating_1')
 	let two = $('#featured_rating_2')
@@ -393,6 +404,7 @@ function textile_stars() {
 		stars.removeClass('text-warning').addClass('text-gray')
 		
 		if (user_rating) {
+			rating_key.html(account.username + ' rating')
 			one.removeClass('text-gray').addClass('text-warning')
 			if (user_rating > 1) {
 				two.removeClass('text-gray').addClass('text-warning')
@@ -405,6 +417,28 @@ function textile_stars() {
 			}
 			if (user_rating > 4) {
 				five.removeClass('text-gray').addClass('text-warning')
+			}
+		}
+		else {
+			rating_key.html('rating')
+			
+			if (puzzle) {
+				//display average rating
+				let avg_rating = Math.round(puzzle.rating)
+			
+				one.removeClass('text-gray').addClass('text-warning')
+				if (avg_rating > 1) {
+					two.removeClass('text-gray').addClass('text-warning')
+				}
+				if (avg_rating > 2) {
+					three.removeClass('text-gray').addClass('text-warning')
+				}
+				if (avg_rating > 3) {
+					four.removeClass('text-gray').addClass('text-warning')
+				}
+				if (avg_rating > 4) {
+					five.removeClass('text-gray').addClass('text-warning')
+				}
 			}
 		}
 	})
@@ -422,9 +456,10 @@ function textile_stars() {
 		
 		if (account) {
 			if (account.enabled) {
-				dbclient_rate(account.username, puzzle.id, star_count, function(rated) {
-					if (rated) {
+				dbclient_rate(account.username, puzzle.id, star_count, function(avg_rating) {
+					if (avg_rating) {
 						user_rating = star_count
+						puzzle.rating = avg_rating
 					}
 					else {
 						alert('Error: rating failed!')

@@ -278,6 +278,14 @@ Custom classes
 	margin-top: -4px;
 }
 
+.lift-text-hover:hover {
+	text-shadow: 2px 2px #6c757d;
+	margin-right: 4px;
+	margin-bottom: 4px;
+	margin-left: -4px;
+	margin-top: -4px;
+}
+
 .editable[data-editing="true"] {
 	/*
 	required mention to enable attribute and pseudo
