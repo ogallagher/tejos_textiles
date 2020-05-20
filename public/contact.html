@@ -18,6 +18,8 @@
 		<!-- js internal -->
 		<script src="js/force_https.js"></script>
 		<script src="js/html_imports.js"></script>
+		<script src="js/cookies.js"></script>
+		<script src="js/sessionclient.js"></script>
 		<script src="js/contact.js"></script>
 		
 		<!-- css external -->
@@ -27,6 +29,8 @@
 	</head>
 	
 	<body>
+		<div id="import_login"></div>
+		
 		<header>
 			<div id="import_navbar"></div>
 		</header>
@@ -53,7 +57,11 @@
 							<div class="input-group">
 								<div class="input-group-prepend">
 									<span class="input-group-text">From</span>
-								</div><input class="form-control" type="email" id="email" placeholder="someone@somewhere.com">
+								</div>
+								<input class="form-control" type="email" id="email" placeholder="someone@somewhere.com">
+								<div class="input-group-append">
+									<button class="btn btn-outline-secondary" id="from_anonymous">Anonymous</button>
+								</div>
 							</div>
 						</div>
 						<div class="form-group">
@@ -61,7 +69,8 @@
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
 									<span class="input-group-text">Subject</span>
-								</div><input type="text" class="form-control" id="subject" placeholder="An Interesting Topic">
+								</div>
+								<input type="text" class="form-control" id="subject" placeholder="An Interesting Topic">
 							</div>
 							<textarea rows="5" class="form-control" id="message"></textarea>
 						</div>
@@ -75,13 +84,13 @@
 				<div class="col-lg-5 col-md-6 p-3">
 					<div class="font-navigation-md text-uppercase my-auto">
 						<div class="mb-2">
-							Email: <b class="font-content-lg">tejostextiles@somewhere.com</b>
+							Email: <b class="font-content-lg">contact@textilesjournal.org</b>
 						</div>
 						<div class="mb-2">
-							Phone: <b class="font-content-lg">+1 123 456 7890</b>
+							Phone: <b class="font-content-lg">+1 917 494 2955</b>
 						</div>
 						<div class="mb-2">
-							Address: <b class="font-content-lg">123 W 45 ST, City, PA, 67890</b>
+							Address: <b class="font-content-lg">520 E 90 St Apt 3K</b>
 						</div>
 					</div>
 				</div>

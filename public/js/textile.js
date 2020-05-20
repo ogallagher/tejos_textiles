@@ -27,6 +27,8 @@ window.onload = function() {
 	html_imports('navbar','#import_navbar', function() {
 		//import login modal
 		html_imports('login','#import_login', function() {
+			navbar_onload()
+			
 			//assign login callback
 			login_on_login = textile_on_login
 			
@@ -240,6 +242,9 @@ function textile_load_puzzle(callback) {
 						.html(fragment.title)
 						.attr('data-target','#' + tile_id + '_license_collapse') //enable expand/collapse
 						.removeClass('font-title-xlg').addClass('font-title-lg') //shrink from default font
+						
+						//date
+						tile.find('.work-tile-date').html(string_utils_date(fragment.date))
 						
 						//license
 						tile.find('.work-tile-license-collapse')

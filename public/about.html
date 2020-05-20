@@ -23,6 +23,8 @@
         <!-- js internal -->
 		<script src="js/force_https.js"></script>
         <script src="js/html_imports.js"></script>
+		<script src="js/cookies.js"></script>
+		<script src="js/sessionclient.js"></script>
         <script src="js/about.js"></script>
         
         <!-- css external -->
@@ -34,6 +36,8 @@
 	</head>
 	
 	<body>
+		<div id="import_login"></div>
+		
 		<header>
 			<div id="import_navbar"></div>
 		</header>
@@ -53,29 +57,33 @@
 		<article class="container">
 			<div class="row">
 				<!-- story -->
-				<div class="col-lg-8 font-content-md text-justify" id="col_main">
-					<h1>Dawn of the Textile</h1>
-					<div>
-						<div class="float-right ml-3 font-content-sm text-truncate bg-info text-light text-center" style="width:150px;height:150px;">
-							PHOTO
+				<div class="col-lg-8 font-content-md text-justify mb-3" id="col_main">
+					<section class="clearfix">
+						<h1>Dawn of the Textile</h1>
+						<div>
+							<div class="float-right ml-3 font-content-sm text-truncate bg-info text-light text-center" style="width:150px;height:150px;">
+								PHOTO
+							</div>
+							<p>
+								First paragraph of the first section.
+							</p>
 						</div>
-						<p>
-							First paragraph of the first section.
-						</p>
-					</div>
+					</section>
 					
-					<h1>The Story</h1>
-					<div>
-						<div class="float-right ml-3 font-content-sm text-truncate bg-info text-light text-center" style="width:200px;height:300px;">
-							PHOTO
+					<section class="clearfix">
+						<h1>The Story</h1>
+						<div>
+							<div class="float-right ml-3 font-content-sm text-truncate bg-info text-light text-center" style="width:200px;height:300px;">
+								PHOTO
+							</div>
+							<p>
+								This is the first paragraph of the second section.
+							</p>
+							<p>
+								Second paragraph, and a dependent clause.
+							</p>
 						</div>
-						<p>
-							This is the first paragraph of the second section.
-						</p>
-						<p>
-							Second paragraph, and a dependent clause.
-						</p>
-					</div>
+					</section>
 				</div>
 				
 				<!-- staff contact cards -->
