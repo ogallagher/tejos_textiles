@@ -15,7 +15,10 @@ try {
 	//web server
 	const express = require('express')
 	const app = express()
-
+	
+	//compression
+	const brotli_compress = require('brotli/compress')
+	
 	//handle POST request data with bodyparser
 	const bodyparser = require('body-parser')
 	app.use(bodyparser.json())

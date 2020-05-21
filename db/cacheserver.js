@@ -10,6 +10,8 @@ Works in tandem with the SQL server, supporting a subset of db data from a cache
 //external libs
 const memjs = require('memjs')
 const enums = require('../enums')
+const brotli_compress = require('brotli/compress')
+const brotli_decompress = require('brotli/decompress')
 
 //internal consts
 const expirations = {
@@ -27,9 +29,49 @@ let config = {
 	pass: null
 }
 
+let brotli_config = {
+	mode: 1,
+	quality: 8
+}
+
 let cache
 let saved_key
 
+//internal methods
+
+function utf8ArrayToStr(array) {
+	var charCache = new Array(128)  // Preallocate the cache for the common single byte chars
+	var charFromCodePt = String.fromCodePoint || String.fromCharCode
+	var result = []
+	
+    var codePt, byte1
+    var buffLen = array.length
+
+    result.length = 0
+
+    for (var i = 0; i < buffLen;) {
+        byte1 = array[i++]
+
+        if (byte1 <= 0x7F) {
+            codePt = byte1
+        } else if (byte1 <= 0xDF) {
+            codePt = ((byte1 & 0x1F) << 6) | (array[i++] & 0x3F)
+        } else if (byte1 <= 0xEF) {
+            codePt = ((byte1 & 0x0F) << 12) | ((array[i++] & 0x3F) << 6) | (array[i++] & 0x3F)
+        } else if (String.fromCodePoint) {
+            codePt = ((byte1 & 0x07) << 18) | ((array[i++] & 0x3F) << 12) | ((array[i++] & 0x3F) << 6) | (array[i++] & 0x3F)
+        } else {
+            codePt = 63    // Cannot convert four byte code points, so use "?" instead
+            i += 3
+        }
+
+        result.push(charCache[codePt] || (charCache[codePt] = charFromCodePt(codePt)))
+    }
+
+    return result.join('')
+}
+
+//external methods
 exports.init = function() {
 	return new Promise(function(resolve,reject) {
 		//get config from heroku env vars
@@ -97,7 +139,12 @@ exports.get = function(key) {
 						reject('cache server found no entry for ' + key)
 					}
 					else {
-						//console.log('cache server got ' + key)
+						if (key.match(/paths_.+/)) {
+							//decompress large puzzle paths entry
+							value = brotli_decompress(value)
+						}
+						
+						console.log('cache server got ' + key)
 						resolve(value)
 					}
 				})
@@ -135,6 +182,11 @@ exports.set_saved = function(value) {
 		}
 		else if (saved_key.match(/paths_.+/)) {
 			expiry = expirations.paths_x
+			
+			//compress large puzzle paths string memcached entry size limit = 1MB
+			value = brotli_compress(value, brotli_config)
+			console.log('compressed entry: ')
+			console.log(value)
 		}
 		else if (saved_key == 'collection_top_rated') {
 			expiry = expirations.collection_top_rated

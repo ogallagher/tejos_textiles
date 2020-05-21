@@ -238,11 +238,11 @@ exports.send_query = function(sql,callback) {
 				//release connection when no longer needed
 				conn.release()
 				
-				//try to cache result
-				cacheserver.set_saved(res)
-		
 				//return error if defined, and response results
 				callback(err,res)
+				
+				//try to cache result
+				cacheserver.set_saved(res)
 			})
 		}
 	})
