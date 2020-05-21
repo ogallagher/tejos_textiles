@@ -268,6 +268,7 @@ function dbclient_fetch_user(username, callback) {
 				account.enabled = (account_details.enabled.data[0] == 1)
 				account.admin = (account_details.admin.data[0] == 1)
 				account.deleted = (account_details.deleted.data[0] == 1)
+				account.anonymous = (account_details.anonymous.data[0] == 1)
 				
 				account.bio = account_details.bio
 				account.email = account_details.email

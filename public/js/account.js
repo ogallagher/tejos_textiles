@@ -332,55 +332,71 @@ function account_on_details(details) {
 	else {
 		//fill account page with account information
 		$('#username').html(details.username)
-	
-		if (details.name) {
-			//TODO include name?
-			$('#name').hide()
+		
+		if (details.anonymous) {
+			//this account was created by site admins to share work published elsewhere by an author that doesn't have a TJ account
+			//hide contact card
+			$('#contact_container').hide()
+			
+			//hide links
+			$('#links').hide()
+			
+			//show bio
+			$('#bio').html('This account was generated to share an author\'s work published elsewhere.')
 		}
 		else {
-			$('#name').hide()
-		}
+			//typical account
+			if (details.name) {
+				//TODO include name?
+				$('#name').hide()
+			}
+			else {
+				$('#name').hide()
+			}
 	
-		if (details.phone) {
-			//TODO include phone?
-			$('#phone').hide()
-		}
-		else {
-			$('#phone').hide()
-		}
+			if (details.phone) {
+				//TODO include phone?
+				$('#phone').hide()
+			}
+			else {
+				$('#phone').hide()
+			}
+		
+			$('#email').html(details.email).prop('href','mailto:' + details.email)
 	
-		$('#email').html(details.email).prop('href','mailto:' + details.email)
-	
-		if (details.photo) {
-			img_utils_prep_blob(details.photo.data, function (data_url) {
-				$('#photo').prop('src', data_url)
-			})
-		}
-	
-		if (details.bio) {
-			$('#bio').html(string_utils_tagify(details.bio))
-		}
-		else {
-			$('#bio').html('No bio information provided.')
-		}
-	
-		if (details.links) {
-			html_imports('link_row', function(jstring) {
-				let links = $('#import_links').html('')
+			if (details.photo) {
+				img_utils_prep_blob(details.photo.data, function (data_url) {
+					$('#photo').prop('src', data_url)
+				})
+			}
+			
+			if (details.bio) {
+				$('#bio').html(string_utils_tagify(details.bio))
+			}
+			else {
+				$('#bio').html('No bio information provided.')
+			}
+			
+			if (details.links) {
+				html_imports('link_row', function(jstring) {
+					let links = $('#import_links').html('')
 				
-				if (details.links.length == 0) {
-					links.html('No links provided.')
-				}
-				else {
-					for (let link of details.links) {
-						let jlink = $(jstring)
-						jlink.find('.link-name').html(link.name)
-						jlink.find('.link-link').html(link.link).prop('href',link.link)
-				
-						links.append(jlink)
+					if (details.links.length == 0) {
+						links.html('No links provided.')
 					}
-				}
-			})
+					else {
+						for (let link of details.links) {
+							let jlink = $(jstring)
+							jlink.find('.link-name').html(link.name)
+							jlink.find('.link-link').html(link.link).prop('href',link.link)
+				
+							links.append(jlink)
+						}
+					}
+				})
+			}
+			
+			//TODO load account activity
 		}
 	
 		//load contributions
@@ -399,7 +415,7 @@ function account_on_details(details) {
 				console.log('failed to load contributions for ' + details.username)
 			}
 		})
-	
+		
 		//enable more-contributions button
 		$('#more_contributions').click(account_more_works)
 		

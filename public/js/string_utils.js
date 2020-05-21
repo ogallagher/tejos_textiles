@@ -23,7 +23,7 @@ function string_utils_tagify(string) {
 		}
 		else {
 			//automatic urls
-			return '<a href="' + match + '">' + match + '</a>'
+			return '<a href="' + match + '" target="_none">' + match + '</a>'
 		}
 	})
 }

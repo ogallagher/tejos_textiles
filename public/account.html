@@ -4,6 +4,15 @@
         <meta charset="utf-8"/>
         <!--scales viewport depending on worldspace device width-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+		<link rel="manifest" href="/site.webmanifest">
+		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+		<meta name="msapplication-TileColor" content="#ffffff">
+		<meta name="theme-color" content="#ffffff">
+		
         <meta name="description" content="An online literary journal, presenting written word in a new medium"/>
         <meta name="author" content="Owen Gallagher"/>
         
@@ -183,7 +192,7 @@
 			</div>
 			
 			<!-- account useage data -->
-			<div id="activity" class="row" style="clear:left;">
+			<div id="activity" class="row px-2" style="clear:left;display:none;">
 				<div id="history" class="col-md p-2 font-title-lg">
 					<h3 class="text-dark text-capitalize">History</h3>
 					<div class="bg-slight bg-light-hover mb-2 px-2 clickable">
@@ -223,9 +232,9 @@
 			</div>
 			
 			<!-- contribution; works and fragments -->
-			<div id="contributions">
+			<div id="contributions" style="clear:left;">
 				<hr>
-				<h3 class="text-dark text-capitalize font-title">Contributions</h3>
+				<h1 class="text-dark text-capitalize font-title">Contributions</h1>
 				<div id="import_works" class="row px-2"></div>
 				<div class="row font-navigation p-2">
 					<button id="more_contributions" 
