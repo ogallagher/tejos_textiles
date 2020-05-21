@@ -141,7 +141,7 @@ exports.get = function(key) {
 					else {
 						if (key.match(/paths_.+/)) {
 							//decompress large puzzle paths entry
-							value = brotli_decompress(value)
+							value = utf8ArrayToStr(brotli_decompress(value))
 						}
 						
 						console.log('cache server got ' + key)
