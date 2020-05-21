@@ -15,8 +15,16 @@ function string_utils_xss_escape(string) {
 }
 
 function string_utils_tagify(string) {
-	return string.replace(/[\n]/g, function(char) {
-		return TAG_REPLACEMENTS[char] || char
+	return string.replace(/\n|(https?:\/\/\S+\.\S+)/g, function(match) {
+		let tag = TAG_REPLACEMENTS[match]
+		
+		if (tag) {
+			return tag
+		}
+		else {
+			//automatic urls
+			return '<a href="' + match + '">' + match + '</a>'
+		}
 	})
 }
 
