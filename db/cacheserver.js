@@ -141,10 +141,9 @@ exports.get = function(key) {
 					else {
 						if (key.match(/paths_.+/)) {
 							//decompress large puzzle paths entry
-							value = utf8ArrayToStr(brotli_decompress(value))
+							value = JSON.parse(utf8ArrayToStr(brotli_decompress(value)))
 						}
 						
-						console.log('cache server got ' + key)
 						resolve(value)
 					}
 				})
@@ -184,10 +183,7 @@ exports.set_saved = function(value) {
 			expiry = expirations.paths_x
 			
 			//compress large puzzle paths string memcached entry size limit = 1MB
-			value = brotli_compress(Buffer.from(value, 'utf8'), brotli_config)
-			
-			console.log('compressed entry: ')
-			console.log(value)
+			value = brotli_compress(Buffer.from(JSON.stringify(value), 'utf8'), brotli_config)
 		}
 		else if (saved_key == 'collection_top_rated') {
 			expiry = expirations.collection_top_rated
