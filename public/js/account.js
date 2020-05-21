@@ -513,7 +513,7 @@ function account_more_works() {
 					jwork.find('.work-tile-title')
 					.html(work.title)
 					.attr('data-target', '#work_' + work.id + '_license')
-				
+					
 					//header collapse
 					jwork.find('.work-tile-license-collapse').prop('id', 'work_' + work.id + '_license')
 				
