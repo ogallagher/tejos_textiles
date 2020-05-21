@@ -38,6 +38,12 @@ window.onload = function() {
 		})
 	})
 	
+	//import and enable puzzle instructions
+	html_imports('help','#import_puzzle_help')
+	$('#help_button').click(function() {
+		$('#help_modal').modal('show')
+	})
+	
 	//enable bootstrap tooltips
 	$('[data-toggle="tooltip"]').tooltip({
 		placement: 'auto',

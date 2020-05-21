@@ -27,7 +27,8 @@ const imports = [
 	'work_tile',
 	'work_tag',
 	'edit_link_row',
-	'win_screen'
+	'win_screen',
+	'help'
 ]
 
 /*

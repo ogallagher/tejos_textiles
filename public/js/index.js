@@ -29,7 +29,7 @@ window.onload = function() {
 	//enable interaction with rating stars
 	index_featured_stars()
 	
-	//import navbar and footer
+	//import navbar
 	html_imports('navbar','#import_navbar', function() {
 		//import login modal
 		html_imports('login','#import_login', function() {
@@ -43,6 +43,14 @@ window.onload = function() {
 			sessionclient_get_account(index_on_login)
 		})
 	})
+	
+	//import and enable puzzle instructions
+	html_imports('help','#import_puzzle_help')
+	$('#help_button').click(function() {
+		$('#help_modal').modal('show')
+	})
+	
+	//import footer
 	html_imports('footer','#import_footer')
 	
 	//import win screen
