@@ -99,9 +99,11 @@ window.onload = function() {
 			window.location.href = '#featured_container'
 			
 			//prevent scrolling
-			$('body').on('scroll touchmove mousewheel', function(e) {
+			$('body')
+			.on('scroll touchmove mousewheel', function(e) {
 				e.preventDefault()
 			})
+			.css('overflow','hidden')
 			
 			//button icon
 			$('#anchor_scroll_icon')
@@ -110,7 +112,9 @@ window.onload = function() {
 		}
 		else {
 			//enable scrolling
-			$('body').off('scroll touchmove mousewheel')
+			$('body')
+			.off('scroll touchmove mousewheel')
+			.css('overflow','auto')
 			
 			//button icon
 			$('#anchor_scroll_icon')
