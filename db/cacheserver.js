@@ -184,7 +184,8 @@ exports.set_saved = function(value) {
 			expiry = expirations.paths_x
 			
 			//compress large puzzle paths string memcached entry size limit = 1MB
-			value = brotli_compress(value, brotli_config)
+			value = brotli_compress(Buffer.from(value, 'utf8'), brotli_config)
+			
 			console.log('compressed entry: ')
 			console.log(value)
 		}
