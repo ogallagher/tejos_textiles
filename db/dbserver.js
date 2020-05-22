@@ -214,15 +214,22 @@ exports.get_query = function(endpoint, args, is_external) {
 								//args = [username, works]
 								let works = JSON.parse(args[1])
 								query = ''
-							
+								
 								for (let work of works) {
-									let subquery = 'update works set '
+									if (work.deleted) {
+										//delete work
+										query += 'delete from works where id=' + work.id + ';'
+									}
+									else {
+										//update work
+										let subquery = 'update works set '
 								
-									subquery += 'title=' + db.escape(work.title) + ','
-									subquery += 'description=' + db.escape(work.description) + ','
-									subquery += '`text`=' + db.escape(work.content)
+										subquery += 'title=' + db.escape(work.title) + ','
+										subquery += 'description=' + db.escape(work.description) + ','
+										subquery += '`text`=' + db.escape(work.content)
 								
-									query += subquery + ' where id=' + work.id + ';'
+										query += subquery + ' where id=' + work.id + ';'
+									}
 								}
 							}
 						}

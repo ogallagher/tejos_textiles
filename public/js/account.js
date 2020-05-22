@@ -134,7 +134,12 @@ window.onload = function() {
 						message.html(message.html() + 'Contributions update successful. ')
 						
 						for (let work of edited_works) {
-							$('#work_' + work.id).find('.work-tile-title').html(work.title)
+							if (work.deleted) {
+								$('#work_' + work.id).find('.work-tile-title').html('(deleted)')
+							}
+							else {
+								$('#work_' + work.id).find('.work-tile-title').html(work.title)
+							}
 						}
 					}
 					else {
@@ -274,17 +279,24 @@ window.onload = function() {
 			id: parseInt($(this).attr('data-work-id'))
 		}
 		
+		let deleted = $('#edit_work_delete').prop('checked')
 		let title = $('#edit_work_title').val()
-		if (title) {
-			work.title = string_utils_xss_escape(title)
-		}
 		let description = $('#edit_work_description').val()
-		if (description) {
-			work.description = string_utils_xss_escape(description)
-		}
 		let content = $('#edit_work_content').val()
-		if (content) {
-			work.content = string_utils_xss_escape(content)
+		
+		if (deleted) {
+			work.deleted = true
+		}
+		else {
+			if (title) {
+				work.title = string_utils_xss_escape(title)
+			}
+			if (description) {
+				work.description = string_utils_xss_escape(description)
+			}
+			if (content) {
+				work.content = string_utils_xss_escape(content)
+			}
 		}
 		
 		edits.works.push(work)
