@@ -352,6 +352,25 @@ function dbclient_update_user(username, edits, callback) {
 		})
 }
 
+function dbclient_update_works(username, works, callback) {
+	console.log('updating ' + works.length + ' works by ' + username)
+	
+	sessionclient_db_request('update_works', [username, JSON.stringify(works)])
+		.then(function(res) {
+			if (res.error) {
+				console.log('works update failed: ' + res.error)
+				callback(res.error)
+			}
+			else {
+				callback({success: res})
+			}
+		})
+		.catch(function(err) {
+			console.log('works update failed: ' + err)
+			callback('http')
+		})
+}
+
 function dbclient_contribute(author, title, content, description, license, callback) {
 	console.log('contributing work ' + title)
 	

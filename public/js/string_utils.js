@@ -8,6 +8,10 @@ const TAG_REPLACEMENTS = {
 	'\n': '<br>'
 }
 
+const TEXT_REPLACEMENTS = {
+	'<br>': '\n'
+}
+
 function string_utils_xss_escape(string) {
 	return string.replace(/[&<>]/g, function(xss_char) {
 		return XSS_REPLACEMENTS[xss_char] || xss_char
@@ -15,7 +19,7 @@ function string_utils_xss_escape(string) {
 }
 
 function string_utils_tagify(string) {
-	return string.replace(/\n|(https?:\/\/\S+\.\S+)/g, function(match) {
+	return string.replace(/\n|(https?:\/\/\S+\.\S+[\w\d])/g, function(match) {
 		let tag = TAG_REPLACEMENTS[match]
 		
 		if (tag) {
@@ -24,6 +28,20 @@ function string_utils_tagify(string) {
 		else {
 			//automatic urls
 			return '<a href="' + match + '" target="_none">' + match + '</a>'
+		}
+	})
+}
+
+function string_utils_detagify(string) {
+	return string.replace(/(<br>)|(<a\shref.+?<\/a>)/g, function(match) {
+		let text = TEXT_REPLACEMENTS[match]
+		
+		if (text) {
+			return text
+		}
+		else {
+			//undo automatic urls
+			return $(match).html()
 		}
 	})
 }

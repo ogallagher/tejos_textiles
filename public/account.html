@@ -135,6 +135,37 @@
 				</div>
 			</div>
 		</div>
+		<div id="edit_work" class="modal fade" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+				<div class="modal-content border-0 rounded-0">
+					<div class="modal-header text-center font-title-xlg text-light bg-raspberry rounded-0">
+						<span class="text-dark">Editing:</span>
+						<span id="edit_work_title_old"></span>
+					</div>
+					<div class="modal-body text-left bg-slight">
+						<div class="form-group">
+							<label for="edit_work_title" class="font-navigation-md">Title</label>
+							<input id="edit_work_title" class="form-control font-navigation-md"/>
+						</div>
+						<div class="form-group">
+							<label for="edit_work_description" class="font-navigation-md">Description</label>
+							<textarea id="edit_work_description" class="form-control font-content-md" rows="5"></textarea>
+						</div>
+						<div class="form-group">
+							<label for="edit_work_content" class="font-navigation-md">Content</label>
+							<textarea id="edit_work_content" class="form-control font-content-md" rows="8"></textarea>
+						</div>
+					</div>
+					<div class="modal-footer bg-slight border-top-0">
+						<div class="row">
+							<div class="col-sm font-navigation-lg">
+								<button type="button" id="edit_work_submit" class="btn btn-outline-dark font-navigation-md" onclick="$('#edit_work').modal('hide')">Done</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 		
         <header>
             <div id="import_navbar"></div>

@@ -6,6 +6,7 @@ Owen Gallagher
 
 let account
 let editing = false
+let editable
 let edits = {}
 let edit_links_rows = 0
 let works = []
@@ -63,7 +64,7 @@ window.onload = function() {
 	//edit controls
 	let edit_account = $('#edit_account')
 	let save_account = $('#save_account')
-	let editable = $('.editable')
+	editable = $('.editable')
 	
 	edit_account.click(function() {
 		editing = true
@@ -78,6 +79,7 @@ window.onload = function() {
 		.addClass('disabled')
 		.prop('data-href', $(this).prop('href'))
 		.prop('href','#')
+		.prop('target','_self')
 	})
 	
 	//push edits
@@ -93,9 +95,12 @@ window.onload = function() {
 		$('.link-link')
 		.removeClass('disabled')
 		.prop('href', $(this).attr('data-href'))
+		.prop('target','_blank')
 		
 		//send updates to server
 		if (account) {
+			let clear_edits = false
+			
 			dbclient_update_user(account.username, edits, function(result) {
 				//show result
 				if (result.success == 10) {
@@ -103,7 +108,7 @@ window.onload = function() {
 					$('#edit_toast_message').html('No changes to submit')
 				}
 				else if (result.success) {
-					$('#edit_toast_message').html('Account update successful')
+					$('#edit_toast_message').html('Update successful')
 				}
 				else {
 					console.log('user update result: ' + result)
@@ -112,8 +117,34 @@ window.onload = function() {
 				$('#edit_toast').toast('show')
 			
 				//clear edits object
-				edits = {}
+				if (clear_edits) {
+					edits = {}
+				}
+				else {
+					clear_edits = true
+				}
 			})
+			
+			if (edits.works && edits.works.length != 0) {
+				dbclient_update_works(account.username, edits.works, function(result) {
+					//show result
+					if (result.success) {
+						$('#edit_toast_message').html('Update successful')
+					}
+					else {
+						console.log('works update result: ' + result)
+					}
+					$('#edit_toast').toast('show')
+					
+					//clear edits object
+					if (clear_edits) {
+						edits = {}
+					}
+					else {
+						clear_edits = true
+					}
+				})
+			}
 		}
 		else {
 			//suspicious; maybe didn't log in and forced edits to be enabled
@@ -225,6 +256,35 @@ window.onload = function() {
 				dest.append(jlink)
 			}
 		})
+	})
+	
+	//work edits
+	$('#edit_work_submit').click(function() {
+		if (!edits.works) {
+			edits.works = []
+		}
+		
+		let work = {
+			id: parseInt($(this).attr('data-work-id'))
+		}
+		
+		let title = $('#edit_work_title').val()
+		if (title) {
+			work.title = string_utils_xss_escape(title)
+		}
+		let description = $('#edit_work_description').val()
+		if (description) {
+			work.description = string_utils_xss_escape(description)
+		}
+		let content = $('#edit_work_content').val()
+		if (content) {
+			work.content = string_utils_xss_escape(content)
+		}
+		
+		edits.works.push(work)
+		
+		//TODO reload work
+		console.log('TODO reload work')
 	})
 }
 
@@ -492,6 +552,27 @@ function account_edit() {
 		else if (src == 'links') {
 			$('#edit_links').modal('show')
 		}
+		else if (src.match(/work_\d+/)) {
+			if ($(this).attr('data-fixed')) {
+				//used in textile; cannot modify
+				alert('This work has already been included in a textile and can no longer be modified.\n\nIf you wish, you can submit a new version under a new title. You can even upload it with the same title as the previous version.')
+			}
+			else {
+				$('#edit_work_submit').attr('data-work-id', src.replace('work_',''))
+				
+				let title = $(this).find('.work-tile-title').html()
+				$('#edit_work_title_old').html(title)
+				$('#edit_work_title').val(title)
+			
+				$('#edit_work_description')
+				.val(string_utils_detagify($(this).find('.work-tile-description').html()))
+				
+				$('#edit_work_content')
+				.val(string_utils_detagify($(this).find('.work-tile-text').html()))
+				
+				$('#edit_work').modal('show')
+			}
+		}
 		else {
 			console.log('TODO enable edits for ' + src)
 		}
@@ -508,6 +589,11 @@ function account_more_works() {
 				for (let i=works_start; i<works.length && i<works_end; i++) {
 					let jwork = $(jwork_string)
 					let work = works[i]
+					
+					//card
+					jwork.find('.work-tile-card')
+					.prop('id', 'work_' + work.id)
+					.click(account_edit)
 					
 					//title
 					jwork.find('.work-tile-title')
@@ -593,6 +679,10 @@ function account_more_works() {
 					let fragments_list = jwork.find('.work-tile-fragments')
 					dbclient_fetch_work_fragments(work.id, function(fragments) {
 						if (fragments.length != 0) {
+							//mark as fixed; once used in a textile it cannot be modified...
+							jwork.find('.work-tile-card')
+							.attr('data-fixed',true)
+							
 							//clear fragments container
 							fragments_list.html('')
 						
@@ -611,6 +701,9 @@ function account_more_works() {
 					
 					works_start++
 				}
+				
+				//update editable array
+				editable = $('.editable')
 				
 				if (works_end >= works.length) {
 					//no more; hide more contributions button
