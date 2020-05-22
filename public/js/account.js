@@ -127,10 +127,15 @@ window.onload = function() {
 			})
 			
 			if (edits.works && edits.works.length != 0) {
-				dbclient_update_works(account.username, edits.works, function(result) {
+				let edited_works = edits.works
+				dbclient_update_works(account.username, edited_works, function(result) {
 					//show result
 					if (result.success) {
 						message.html(message.html() + 'Contributions update successful. ')
+						
+						for (let work of edited_works) {
+							$('#work_' + work.id).find('.work-tile-title').html(work.title)
+						}
 					}
 					else {
 						console.log('works update result: ' + result)
@@ -284,8 +289,11 @@ window.onload = function() {
 		
 		edits.works.push(work)
 		
-		//TODO reload work
-		console.log('TODO reload work')
+		//reload work
+		let edited = $('#work_' + work.id)
+		edited.find('.work-tile-title').html(title + ' (pending...)')
+		edited.find('.work-tile-description').html(string_utils_tagify(description))
+		edited.find('.work-tile-text').html(string_utils_tagify(content))
 	})
 }
 
