@@ -17,7 +17,11 @@ try {
 	const app = express()
 	
 	//compression
-	const brotli_compress = require('brotli/compress')
+	const brotli_compress = require('brotli/compress') //use brotli to compress large cacheserver entries
+	
+	app.use(require('compression')({
+		level: 5 //from 0 (fastest) to 9 (smallest)
+	})) //use gzip/deflate to compress HTTP request responses
 	
 	//handle POST request data with bodyparser
 	const bodyparser = require('body-parser')
@@ -131,7 +135,7 @@ try {
 			  			else {
 			  				res.json(data)
 			  			}
-			  		});
+			  		})
 			    }
 			})
 			.catch(function(problem) {
