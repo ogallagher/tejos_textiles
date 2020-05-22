@@ -137,6 +137,9 @@ try {
 			  			}
 			  		})
 			    }
+				else {
+					res.json({error: action})
+				}
 			})
 			.catch(function(problem) {
 				console.log('error in conversion from endpoint to sql: ' + problem)
@@ -251,6 +254,9 @@ try {
 					}
 					else if (err == sessionserver.STATUS_ACTIVATION) {
 						res.json({error: 'activation'})
+					}
+					else if (err == sessionserver.STATUS_XSS_ERR) {
+						res.json({error: 'xss'})
 					}
 					else {
 						res.json({error: 'endpoint'})

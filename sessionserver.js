@@ -30,6 +30,7 @@ const STATUS_DB_ERR =		6
 const STATUS_DELETE_ERR =	7
 const STATUS_FAST =			8
 const STATUS_ACTIVATION =	9
+const STATUS_XSS_ERR =		11
 
 exports.SUCCESS =				SUCCESS
 exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
@@ -41,6 +42,7 @@ exports.STATUS_DB_ERR =			STATUS_DB_ERR
 exports.STATUS_DELETE_ERR = 	STATUS_DELETE_ERR
 exports.STATUS_FAST =			STATUS_FAST
 exports.STATUS_ACTIVATION =		STATUS_ACTIVATION
+exports.STATUS_XSS_ERR =		STATUS_XSS_ERR
 
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
@@ -246,15 +248,22 @@ exports.handle_request = function(endpoint, args, dbserver) {
 						//pass request through to dbserver
 						dbserver.get_query(db_endpoint, db_args)
 							.then(function(action) {
-								dbserver.send_query(action.sql, function(err, res) {
-									if (err) {
-										console.log(err)
-										reject(STATUS_DB_ERR)
+								if (action.sql) {
+									dbserver.send_query(action.sql, function(err, res) {
+										if (err) {
+											console.log(err)
+											reject(STATUS_DB_ERR)
+										}
+										else {
+											resolve(res)
+										}
+									})
+								}
+								else {
+									if (action == 'xss') {
+										reject(STATUS_XSS_ERR)
 									}
-									else {
-										resolve(res)
-									}
-								})
+								}
 							})
 							.catch(function(err) {
 								console.log('db query not created for ' + db_endpoint + ': ' + err)

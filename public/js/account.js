@@ -100,22 +100,23 @@ window.onload = function() {
 		//send updates to server
 		if (account) {
 			let clear_edits = false
+			let message = $('#edit_toast_message').empty()
 			
 			dbclient_update_user(account.username, edits, function(result) {
 				//show result
 				if (result.success == 10) {
 					//10 = sessionserver.SUCCESS
-					$('#edit_toast_message').html('No changes to submit')
+					message.html(message.html() + 'No account changes. ')
 				}
 				else if (result.success) {
-					$('#edit_toast_message').html('Update successful')
+					message.html(message.html() + 'Account update successful. ')
 				}
 				else {
 					console.log('user update result: ' + result)
-					$('#edit_toast_message').html('Error: failed to update your account info on the server. Check browser logs for details.')
+					message.html(message.html() + 'Error: failed to update your account info on the server. Check browser logs for details. ')
 				}
 				$('#edit_toast').toast('show')
-			
+				
 				//clear edits object
 				if (clear_edits) {
 					edits = {}
@@ -129,7 +130,7 @@ window.onload = function() {
 				dbclient_update_works(account.username, edits.works, function(result) {
 					//show result
 					if (result.success) {
-						$('#edit_toast_message').html('Update successful')
+						message.html(message.html() + 'Contributions update successful. ')
 					}
 					else {
 						console.log('works update result: ' + result)
@@ -563,12 +564,14 @@ function account_edit() {
 				let title = $(this).find('.work-tile-title').html()
 				$('#edit_work_title_old').html(title)
 				$('#edit_work_title').val(title)
-			
-				$('#edit_work_description')
-				.val(string_utils_detagify($(this).find('.work-tile-description').html()))
 				
+				let description = $(this).find('.work-tile-description').html()
+				$('#edit_work_description')
+				.val(string_utils_xss_unescape(string_utils_detagify(description)))
+				
+				let content = $(this).find('.work-tile-text').html()
 				$('#edit_work_content')
-				.val(string_utils_detagify($(this).find('.work-tile-text').html()))
+				.val(string_utils_xss_unescape(string_utils_detagify(content)))
 				
 				$('#edit_work').modal('show')
 			}

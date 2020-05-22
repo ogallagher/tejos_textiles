@@ -4,6 +4,12 @@ const XSS_REPLACEMENTS = {
     '>': '&gt;'
 }
 
+const XSS_REPLACED = {
+	'&amp;': '&',
+	'&lt;': '<',
+	'&gt;': '>'
+}
+
 const TAG_REPLACEMENTS = {
 	'\n': '<br>'
 }
@@ -12,12 +18,25 @@ const TEXT_REPLACEMENTS = {
 	'<br>': '\n'
 }
 
+/*
+Validate user input prior to sending to server.
+*/
 function string_utils_xss_escape(string) {
 	return string.replace(/[&<>]/g, function(xss_char) {
 		return XSS_REPLACEMENTS[xss_char] || xss_char
 	})
 }
 
+function string_utils_xss_unescape(string) {
+	return string.replace(/&\w+?;/g, function(match) {
+		return XSS_REPLACED[match] || match
+	})
+}
+
+/*
+Improve presentation of db content by adding back some
+html tags (line breaks, automatic urls).
+*/
 function string_utils_tagify(string) {
 	return string.replace(/\n|(https?:\/\/\S+\.\S+[\w\d])/g, function(match) {
 		let tag = TAG_REPLACEMENTS[match]
@@ -27,11 +46,14 @@ function string_utils_tagify(string) {
 		}
 		else {
 			//automatic urls
-			return '<a href="' + match + '" target="_none">' + match + '</a>'
+			return '<a href="' + match + '" target="_blank">' + match + '</a>'
 		}
 	})
 }
 
+/*
+Strip away inserted html tags to retrieve raw db content.
+*/
 function string_utils_detagify(string) {
 	return string.replace(/(<br>)|(<a\shref.+?<\/a>)/g, function(match) {
 		let text = TEXT_REPLACEMENTS[match]
@@ -56,6 +78,9 @@ function string_utils_url(string) {
 }
 
 //TODO make bimodal for en/es
+/*
+Convert db standard date (timestamp with UTC) to legible DD MON YEAR format.
+*/
 function string_utils_date(string) {
 	let date = new Date(string)
 	

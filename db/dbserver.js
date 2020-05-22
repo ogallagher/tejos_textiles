@@ -117,105 +117,121 @@ exports.get_query = function(endpoint, args, is_external) {
 					let query = entry.query //sql query to be assembled
 					
 					if (entry.special) {
-						//handle endpoints with special implementations
-						if (endpoint == 'fetch_puzzles') {
-							for (let i=0; i<params.length; i++) {
-								let arg = args[i]
-								if (isNaN(args[i])) {
-									//is string, escaped
-									arg = db.escape(arg)
-								}
-								//else, is number, directly inserted
-							
-								query = query.replace(params[i], arg)
-							}
-							
-							let admin = args[0]
-							if (admin == false || admin == 'false') {
-								//is not admin, hide puzzles where puzzle.testing=1
-								query = query.replace('?where?','where testing=0')
-							}
-							else {
-								query = query.replace('?where?','')
+						//double check against JS injection (XSS)
+						let approved = true
+						for (let arg of args) {
+							let matches = arg.match(/[<>]/)
+							if (matches) {
+								approved = false
+								console.log('suspicious: blocked possible xss attempt with db query arg: ')
+								console.log(matches)
+								reject('xss')
 							}
 						}
-						else if (endpoint == 'search_puzzles') {
-							//build where clause from compound regexp with relevant columns
-							let columns = ['title','date']
-							let regexps = []
+						
+						if (approved) {
+							//handle endpoints with special implementations
+							if (endpoint == 'fetch_puzzles') {
+								for (let i=0; i<params.length; i++) {
+									let arg = args[i]
+									if (isNaN(args[i])) {
+										//is string, escaped
+										arg = db.escape(arg)
+									}
+									//else, is number, directly inserted
 							
-							for (let column of columns) {
-								//col regexp '.*((term_1)|(term_2)|...).*'
-								let regexp = column + " regexp '.*("
-								
-								let terms = []
-								for (let term of args) {
-									terms.push('(' + term + ')')
+									query = query.replace(params[i], arg)
 								}
-								
-								regexp += terms.join('|') + ").*'"
-								regexps.push(regexp)
-							}
 							
-							query = query.replace('?regexps?', regexps.join(' or '))
-						}
-						else if (endpoint == 'update_user') {
-							//args = [username, photo, bio, links]
-							let changes = []
-							let go = false
-							
-							if (args[1]) {
-								//update photo
-								changes.push('photo=' + db.escape(args[1]))
-								go = true
-							}
-							if (args[2]) {
-								//update bio
-								changes.push('bio=' + db.escape(args[2]))
-								go = true
-							}
-							if (args[3]) {
-								//update links
-								changes.push('links=' + db.escape(args[3]))
-								go = true
-							}
-							if (args[4] != null) { //can be true, false, or null/undefined
-								//update subscribed
-								let subscribed = 0
-								if (args[4]) {
-									subscribed = 1
+								let admin = args[0]
+								if (admin == false || admin == 'false') {
+									//is not admin, hide puzzles where puzzle.testing=1
+									query = query.replace('?where?','where testing=0')
 								}
-								changes.push('subscription=' + subscribed)
-								go = true
+								else {
+									query = query.replace('?where?','')
+								}
 							}
-							changes = changes.join(',')
+							else if (endpoint == 'search_puzzles') {
+								//build where clause from compound regexp with relevant columns
+								let columns = ['title','date']
+								let regexps = []
 							
-							if (go) {
-								query = query.replace('?changes?', changes).replace('?username?', db.escape(args[0]))
-							}
-							else {
-								reject('empty')
-							}
-						}
-						else if (endpoint == 'update_works') {
-							//args = [username, works]
-							let works = JSON.parse(args[1])
-							query = ''
+								for (let column of columns) {
+									//col regexp '.*((term_1)|(term_2)|...).*'
+									let regexp = column + " regexp '.*("
+								
+									let terms = []
+									for (let term of args) {
+										terms.push('(' + term + ')')
+									}
+								
+									regexp += terms.join('|') + ").*'"
+									regexps.push(regexp)
+								}
 							
-							for (let work of works) {
-								let subquery = 'update works set '
+								query = query.replace('?regexps?', regexps.join(' or '))
+							}
+							else if (endpoint == 'update_user') {
+								//args = [username, photo, bio, links]
+								let changes = []
+								let go = false
+							
+								if (args[1]) {
+									//update photo
+									changes.push('photo=' + db.escape(args[1]))
+									go = true
+								}
+								if (args[2]) {
+									//update bio
+									changes.push('bio=' + db.escape(args[2]))
+									go = true
+								}
+								if (args[3]) {
+									//update links
+									changes.push('links=' + db.escape(args[3]))
+									go = true
+								}
+								if (args[4] != null) { //can be true, false, or null/undefined
+									//update subscribed
+									let subscribed = 0
+									if (args[4]) {
+										subscribed = 1
+									}
+									changes.push('subscription=' + subscribed)
+									go = true
+								}
+								changes = changes.join(',')
+							
+								if (go) {
+									query = query.replace('?changes?', changes).replace('?username?', db.escape(args[0]))
+								}
+								else {
+									reject('empty')
+								}
+							}
+							else if (endpoint == 'update_works') {
+								//args = [username, works]
+								let works = JSON.parse(args[1])
+								query = ''
+							
+								for (let work of works) {
+									let subquery = 'update works set '
 								
-								subquery += 'title=' + db.escape(work.title) + ','
-								subquery += 'description=' + db.escape(work.description) + ','
-								subquery += '`text`=' + db.escape(work.content)
+									subquery += 'title=' + db.escape(work.title) + ','
+									subquery += 'description=' + db.escape(work.description) + ','
+									subquery += '`text`=' + db.escape(work.content)
 								
-								query += subquery + ' where id=' + work.id + ';'
+									query += subquery + ' where id=' + work.id + ';'
+								}
 							}
 						}
 					}
 					else {
+						let approved = true
+						
 						//handle general endpoints by inserting escaped params into the query directly
-						for (let i=0; i<params.length; i++) {
+						for (let i=0; i<params.length && approved; i++) {
 							let arg = args[i]
 							if (isNaN(args[i])) {
 								//is string, escaped
@@ -223,7 +239,18 @@ exports.get_query = function(endpoint, args, is_external) {
 							}
 							//else, is number, directly inserted
 							
-							query = query.replace(params[i], arg)
+							//double check against JS injection (XSS)
+							let matches = arg.match(/[<>]/)
+							if (matches) {
+								approved = false
+								console.log('suspicious: blocked possible xss attempt with db query arg: ')
+								console.log(matches)
+								reject('xss')
+							}
+							else {
+								//arg appears safe; approved for query
+								query = query.replace(params[i], arg)
+							}
 						}
 					}
 					
