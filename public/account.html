@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8"/>
-        <!--scales viewport depending on worldspace device width-->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<html lang="en" class="h-100">
+	<head>
+		<meta charset="utf-8"/>
+		<!--scales viewport depending on worldspace device width-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -13,36 +13,36 @@
 		<meta name="msapplication-TileColor" content="#ffffff">
 		<meta name="theme-color" content="#ffffff">
 		
-        <meta name="description" content="An online literary journal, presenting written word in a new medium"/>
-        <meta name="author" content="Owen Gallagher"/>
-        
-        <title>Account</title>
-        
-        <!-- js external -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-        
-        <!-- js internal -->
+		<meta name="description" content="An online literary journal, presenting written word in a new medium"/>
+		<meta name="author" content="Owen Gallagher"/>
+		
+		<title>Account</title>
+		
+		<!-- js external -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		
+		<!-- js internal -->
 		<script src="js/force_https.js"></script>
 		<script src="js/url_params.js"></script>
 		<script src="js/img_utils.js"></script>
 		<script src="js/string_utils.js"></script>
-        <script src="js/html_imports.js"></script>
-        <script src="js/dbclient.js"></script>
+		<script src="js/html_imports.js"></script>
+		<script src="js/dbclient.js"></script>
 		<script src="js/cookies.js"></script>
 		<script src="js/sessionclient.js"></script>
-        <script src="js/account.js"></script>
-        
-        <!-- css external -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-        
-        <!-- css internal -->
-        <link rel="stylesheet" type="text/css" href="css/style.css" />
-    </head>
-    
-    <body>
+		<script src="js/account.js"></script>
+		
+		<!-- css external -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+		
+		<!-- css internal -->
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+	</head>
+	
+	<body class="h-100 d-flex flex-column">
 		<div id="import_login"></div>
 		
 		<div id="edit_contact_card" class="modal fade" tabindex="-1" role="dialog">	
@@ -173,11 +173,11 @@
 			</div>
 		</div>
 		
-        <header>
-            <div id="import_navbar"></div>
-        </header>
-        
-        <article class="container">
+		<header>
+			<div id="import_navbar"></div>
+		</header>
+		
+		<article class="container">
 			<!-- header -->
 			<div class="mb-4 border-bottom border-dark d-flex flex-sm-row flex-column">
 				<div id="username" class='display-3 text-center text-raspberry font-content flex-fill'>
@@ -194,7 +194,7 @@
 			</div>
 			
 			<!-- contact card -->
-            <div id="contact_container" class="float-sm-left mr-3 mb-3 float-none">
+			<div id="contact_container" class="float-sm-left mr-3 mb-3 float-none">
 				<div id="contact" class="text-md-right text-center font-navigation border-bottom mb-1">
 					<div id="name"></div>
 					<div id="phone"></div>
@@ -293,8 +293,8 @@
 						<div class="toast-header">
 							Are you sure?
 							<button id="warning_toast_close" type="button" class="ml-auto mb-1 close" data-dismiss="toast">
-						      <span aria-hidden="true">&times;</span>
-						    </button>
+							  <span aria-hidden="true">&times;</span>
+							</button>
 						</div>
 						<div class="toast-body font-navigation text-center">
 							<button id="confirm_delete_account" class="btn btn-danger">Yes, delete my account</button>
@@ -302,11 +302,9 @@
 					</div>
 				</div>
 			</div>
-        </article>
-        
-        <footer>
-			<div id="import_footer"></div>
-        </footer>
-    </body>
+		</article>
+		
+		<footer id="import_footer" class="mt-auto"></footer>
+	</body>
 </html>
 

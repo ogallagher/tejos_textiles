@@ -114,7 +114,13 @@ window.onload = function() {
 function contact_on_login(account_info) {
 	//toggle nav account button as account page link or login form
 	navbar_toggle_account(account_info)
-	username = account_info.username
+	
+	if (account_info) {
+		username = account_info.username
+	}
+	else {
+		username = null
+	}
 }
 
 function contact_on_failure(error) {
