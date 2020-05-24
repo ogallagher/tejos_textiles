@@ -309,7 +309,7 @@ function sessionclient_generate_session_id() {
 		
 		if (char != '/') {
 			//non-path delim chars
-			if (char.test(/[\\`'"<>{}$#&;]/)) {
+			if (/[\\`'"<>{}$#&;=\[\]|]/.test(char)) {
 				//escape special chars
 				char = '\\' + char
 			}
