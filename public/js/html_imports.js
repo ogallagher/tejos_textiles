@@ -46,7 +46,7 @@ function html_imports(name,dest,callback) {
 	//return the element from imports[] where the element string matches name
 	var component = imports.find(function(c) {
 		return c == name
-	});
+	})
 	
 	if (component) {
 		$.get({
@@ -67,6 +67,6 @@ function html_imports(name,dest,callback) {
 				console.log(err)
 			},
 			dataType: 'html'
-		});
+		})
 	}
 }

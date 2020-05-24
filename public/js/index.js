@@ -4,6 +4,8 @@ Owen Gallagher
 26 July 2019
 */
 
+const WAS_HERE_COOKIE_KEY = 'was_here'
+
 let featured_puzzle
 let account //see sessionclient:Account class
 let user_rating
@@ -45,7 +47,14 @@ window.onload = function() {
 	})
 	
 	//import and enable puzzle instructions
-	html_imports('help','#import_puzzle_help')
+	html_imports('help', '#import_puzzle_help', function() {
+		//open help if new visitor
+		if (!cookies_get(WAS_HERE_COOKIE_KEY) && !cookies_get(SESSION_COOKIE_KEY)) {
+			cookies_set(WAS_HERE_COOKIE_KEY, 'true')
+		
+			$('#help_button').click()
+		}
+	})
 	$('#help_button').click(function() {
 		$('#help_modal').modal('show')
 	})
