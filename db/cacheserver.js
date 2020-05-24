@@ -141,7 +141,7 @@ exports.get = function(key) {
 					else {
 						if (key.match(/paths_.+/)) {
 							//decompress large puzzle paths entry
-							value = JSON.parse(utf8ArrayToStr(brotli_decompress(value)))
+							value = JSON.parse(Buffer.from(brotli_decompress(value)).toString('utf-8'))
 						}
 						
 						resolve(value)
@@ -172,7 +172,7 @@ exports.save_key = function(key) {
 Used in tandem with save_key(). Calls set with the saved key.
 Also unsets saved_key, so entry cannot be updated twice without resaving the key.
 */
-exports.set_saved = function(value) {
+exports.set_saved = function(value,callback) {
 	if (saved_key && cache) {
 		let expiry =  10 * enums.time.MINUTE / 1000
 		
@@ -183,7 +183,7 @@ exports.set_saved = function(value) {
 			expiry = expirations.paths_x
 			
 			//compress large puzzle paths string memcached entry size limit = 1MB
-			value = brotli_compress(Buffer.from(JSON.stringify(value), 'utf8'), brotli_config)
+			value = brotli_compress(Buffer.from(JSON.stringify(value),'utf-8'), brotli_config)
 		}
 		else if (saved_key == 'collection_top_rated') {
 			expiry = expirations.collection_top_rated
@@ -195,7 +195,7 @@ exports.set_saved = function(value) {
 			expiry = expirations.collection_top_played
 		}
 		
-		exports.set(saved_key, value, expiry)
+		exports.set(saved_key, value, expiry, callback)
 		saved_key = null
 	}
 }
