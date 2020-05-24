@@ -307,8 +307,13 @@ function sessionclient_generate_session_id() {
 	for (let i=0; i<SESSION_ID_LEN; i++) {
 		let char = String.fromCharCode(Math.floor(Math.random() * SESSION_ID_CHAR_RANGE) + SESSION_ID_CHAR_MIN)
 		
-		if (char != '/' && char != '\\') {
-			//char is valid; is not a path delimiter
+		if (char != '/') {
+			//non-path delim chars
+			if (char.test(/[\\`'"<>{}$#&;]/)) {
+				//escape special chars
+				char = '\\' + char
+			}
+			
 			session_id += char
 		}
 	}
