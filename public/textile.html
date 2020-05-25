@@ -132,11 +132,24 @@
                             </button>
                         </div>
                     </div>
+					<!--difficulty-->
+					<div class="input-group my-2">
+						<div class="input-group-prepend">
+							<div class="input-group-text rounded-0" id="featured_difficulty_key">
+								difficulty
+							</div>
+						</div>
+						<div class="input-group-append ml-auto">
+							<a class="btn btn-outline-secondary rounded-0 d-flex flex-column justify-content-center">
+								<input type="range" class="form-control-range" id="featured_difficulty" min="1" max="10" step="1"/>
+							</a>
+						</div>
+					</div>
 					<div id="rate_login_toast" class="toast fade hide" role="alert">
 						<div class="toast-body">
 							<div class="row">
 								<div class="col my-auto font-navigation text-raspberry">
-									Log in or register to rate this textile.
+									Log in or register to rate this textile's quality or difficulty.
 								</div>
 								<div class="col-2">
 									<button type="button" class="btn btn-sm" data-dismiss="toast">

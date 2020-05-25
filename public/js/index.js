@@ -313,144 +313,144 @@ function index_puzzles_onload(dbdata) {
 				$('#featured_difficulty_key').html('difficulty')
 				$('#featured_difficulty').val(Math.round(featured_puzzle.difficulty))
 			}
-		}
-		
-		//load authors and fragments
-		dbclient_fetch_puzzle_fragments(featured_puzzle.id, function(fragments) {		
-			html_imports('work_tile', function(tile_str) {
-				let fragments_list = $('#fragments_list')
-				let authors_list = $('#featured_authors').html('')
-				let author_button_str = '<a class="btn btn-outline-secondary" href="#"></a>'
-				let author_names = []
 			
-				for (let fragment of fragments) {
-					//load author
-					let author = fragment.author
-					if (!author_names.includes(author)) {
-						authors_list.append(
-							$(author_button_str)
-							.prop('href','account.html?username=' + author)
-							.html(fragment.author)
-						)
+			//load authors and fragments
+			dbclient_fetch_puzzle_fragments(featured_puzzle.id, function(fragments) {		
+				html_imports('work_tile', function(tile_str) {
+					let fragments_list = $('#fragments_list')
+					let authors_list = $('#featured_authors').html('')
+					let author_button_str = '<a class="btn btn-outline-secondary" href="#"></a>'
+					let author_names = []
+			
+					for (let fragment of fragments) {
+						//load author
+						let author = fragment.author
+						if (!author_names.includes(author)) {
+							authors_list.append(
+								$(author_button_str)
+								.prop('href','account.html?username=' + author)
+								.html(fragment.author)
+							)
 						
-						author_names.push(author)
-					}
+							author_names.push(author)
+						}
 					
-					//load fragment
-					let tile = $(tile_str)
+						//load fragment
+						let tile = $(tile_str)
 					
-					//id
-					let tile_id = 'fragment_' + fragment.id
-					tile.prop('id', tile_id)
+						//id
+						let tile_id = 'fragment_' + fragment.id
+						tile.prop('id', tile_id)
 				
-					//title
-					tile.find('.work-tile-title')
-					.html(fragment.title)
-					.attr('data-target','#' + tile_id + '_license_collapse') //enable expand/collapse
-					.removeClass('font-title-xlg').addClass('font-title-lg') //shrink from default font
+						//title
+						tile.find('.work-tile-title')
+						.html(fragment.title)
+						.attr('data-target','#' + tile_id + '_license_collapse') //enable expand/collapse
+						.removeClass('font-title-xlg').addClass('font-title-lg') //shrink from default font
 					
-					//date
-					tile.find('.work-tile-date').html(string_utils_date(fragment.date))
+						//date
+						tile.find('.work-tile-date').html(string_utils_date(fragment.date))
 					
-					//license
-					tile.find('.work-tile-license-collapse')
-					.prop('id', tile_id + '_license_collapse') //enable expand/collapse
-					.append('<br><a class="font-content" href="account.html?username=' + fragment.author + '#contributions">view original</a>') //link to original
+						//license
+						tile.find('.work-tile-license-collapse')
+						.prop('id', tile_id + '_license_collapse') //enable expand/collapse
+						.append('<br><a class="font-content" href="account.html?username=' + fragment.author + '#contributions">view original</a>') //link to original
+						
+						let license
+						let license_url
+						switch (fragment.license) {
+							case 'cc-0':
+								license = 'Public Domain'
+								license_url = 'https://creativecommons.org/licenses/zero/1.0'
+								break
+			
+							case 'cc-by':
+								license = 'Creative Commons BY'
+								license_url = 'https://creativecommons.org/licenses/by/4.0'
+								break
+			
+							case 'cc-by-sa':
+								license = 'Creative Commons BY-SA'
+								license_url = 'https://creativecommons.org/licenses/by-sa/4.0'
+								break
+			
+							case 'cc-by-nd':
+								license = 'Creative Commons BY-ND'
+								license_url = 'https://creativecommons.org/licenses/by-nd/4.0'
+								break
+			
+							case 'cc-by-nc':
+								license = 'Creative Commons BY-NC'
+								license_url = 'https://creativecommons.org/licenses/by-nc/4.0'
+								break
+			
+							case 'cc-by-nc-sa':
+								license = 'Creative Commons BY-NC-SA'
+								license_url = 'https://creativecommons.org/licenses/by-nc-sa/4.0'
+								break
+			
+							case 'cc-by-nc-nd':
+								license = 'Creative Commons BY-NC-ND'
+								license_url = 'https://creativecommons.org/licenses/by-nc-nd/4.0'
+								break
+			
+							default:
+								license = work.license
+								license_url = '#'
+								break
+						}
+						tile.find('.work-tile-license')
+						.html(license)
+						.prop('href', license_url)
 				
-					let license
-					let license_url
-					switch (fragment.license) {
-						case 'cc-0':
-							license = 'Public Domain'
-							license_url = 'https://creativecommons.org/licenses/zero/1.0'
-							break
-			
-						case 'cc-by':
-							license = 'Creative Commons BY'
-							license_url = 'https://creativecommons.org/licenses/by/4.0'
-							break
-			
-						case 'cc-by-sa':
-							license = 'Creative Commons BY-SA'
-							license_url = 'https://creativecommons.org/licenses/by-sa/4.0'
-							break
-			
-						case 'cc-by-nd':
-							license = 'Creative Commons BY-ND'
-							license_url = 'https://creativecommons.org/licenses/by-nd/4.0'
-							break
-			
-						case 'cc-by-nc':
-							license = 'Creative Commons BY-NC'
-							license_url = 'https://creativecommons.org/licenses/by-nc/4.0'
-							break
-			
-						case 'cc-by-nc-sa':
-							license = 'Creative Commons BY-NC-SA'
-							license_url = 'https://creativecommons.org/licenses/by-nc-sa/4.0'
-							break
-			
-						case 'cc-by-nc-nd':
-							license = 'Creative Commons BY-NC-ND'
-							license_url = 'https://creativecommons.org/licenses/by-nc-nd/4.0'
-							break
-			
-						default:
-							license = work.license
-							license_url = '#'
-							break
-					}
-					tile.find('.work-tile-license')
-					.html(license)
-					.prop('href', license_url)
+						//text collapse
+						tile.find('.work-tile-card-body')
+						.attr('data-target','#' + tile_id + '_text_collapse')
 				
-					//text collapse
-					tile.find('.work-tile-card-body')
-					.attr('data-target','#' + tile_id + '_text_collapse')
-				
-					tile.find('.work-tile-text-collapse')
-					.prop('id', tile_id + '_text_collapse')
+						tile.find('.work-tile-text-collapse')
+						.prop('id', tile_id + '_text_collapse')
 					
-					//text
-					if (!fragment.fragment) {
-						//complete fragment; load full text on request
-						tile.find('.work-tile-text')
-						.html(
-							'<button class="btn text-bold-hover col font-content-md" \
-							onclick="index_load_work_text(' + fragment.work_id + ',\'#' + tile_id + ' .work-tile-text\');">\
-							Load full text\
-							</button>'
+						//text
+						if (!fragment.fragment) {
+							//complete fragment; load full text on request
+							tile.find('.work-tile-text')
+							.html(
+								'<button class="btn text-bold-hover col font-content-md" \
+								onclick="index_load_work_text(' + fragment.work_id + ',\'#' + tile_id + ' .work-tile-text\');">\
+								Load full text\
+								</button>'
+							)
+					
+							tile.find('.work-tile-text-collapse').removeClass('collapse')
+						}
+						else {
+							tile.find('.work-tile-text')
+							.html(fragment.fragment)
+						}
+				
+						//description
+						if (fragment.description) {
+							tile.find('.work-tile-description').html(string_utils_tagify(fragment.description))
+						}
+						else {
+							tile.find('.work-tile-description').html('No description provided')
+						}
+				
+						//author
+						tile.find('.work-tile-fragments').html(
+							'<div class="col">\
+							<button class="btn text-raspberry-hover text-bold-hover text-dark-nohover col" \
+							role="button" onclick="window.location.href=\'account.html?username=' + author + '\';">' + 
+							author + 
+							'</button>\
+							</div>'
 						)
-					
-						tile.find('.work-tile-text-collapse').removeClass('collapse')
-					}
-					else {
-						tile.find('.work-tile-text')
-						.html(fragment.fragment)
-					}
-				
-					//description
-					if (fragment.description) {
-						tile.find('.work-tile-description').html(string_utils_tagify(fragment.description))
-					}
-					else {
-						tile.find('.work-tile-description').html('No description provided')
-					}
-				
-					//author
-					tile.find('.work-tile-fragments').html(
-						'<div class="col">\
-						<button class="btn text-raspberry-hover text-bold-hover text-dark-nohover col" \
-						role="button" onclick="window.location.href=\'account.html?username=' + author + '\';">' + 
-						author + 
-						'</button>\
-						</div>'
-					)
 			
-					fragments_list.append(tile)
-				}
+						fragments_list.append(tile)
+					}
+				})
 			})
-		})
+		}
 	})
 }
 

@@ -56,6 +56,38 @@ window.onload = function() {
 	//enable interaction with rating stars
 	textile_stars()
 	
+	//enable interaction with difficulty range
+	$('#featured_difficulty').mouseup(function() {
+		if (puzzle) { 
+			let updated = false
+			
+			if (account) {
+				if (account.enabled) {
+					updated = true
+					
+					dbclient_measure_difficulty(account.username, puzzle.id, $(this).val(), function(avg_difficulty) {
+						if (avg_difficulty) {
+							puzzle.difficulty = avg_difficulty
+						}
+						else {
+							alert('Error: difficulty measure failed!')
+						}
+					})
+				}
+				else {
+					$('#rate_enable_toast').toast('show')
+				}
+			}
+			else {
+				$('#rate_login_toast').toast('show')
+			}
+			
+			if (!updated) {
+				$(this).val(Math.round(puzzle.difficulty))
+			}
+		}
+	})
+	
 	//import footer
 	html_imports('footer','#import_footer')
 	
@@ -125,6 +157,7 @@ window.onload = function() {
 }
 
 function textile_on_login(account_info) {
+	loaded_user_stats = false
 	account = account_info
 	
 	//toggle nav account button as account page link or login form
@@ -133,51 +166,82 @@ function textile_on_login(account_info) {
 	if (account && !loaded_user_stats) {
 		console.log('index: account set to ' + account.username)
 		
-		//update featured puzzle rating to reflect this account's opinion
 		if (puzzle) {
 			loaded_user_stats = true
+			
+			//update featured puzzle rating to reflect this account's opinion
 			dbclient_fetch_user_rating(account.username, puzzle.id, function(data) {
 				if (data) {
 					user_rating = data.rating
 					$('#featured_rating').mouseleave()
 				}
-				
-				//add tags for account play stats: number of plays, fastest solve
-				dbclient_fetch_user_plays(account.username, puzzle.id, function(data) {
-					if (data) {
-						//add new user stats
-						let textile_tags = $('#textile_tags')
-						html_imports('textile_tag', function(jtemplate) {
-							try {
-								//plays tag
-								let jstring = jtemplate
-												.replace('?key?', account.username + ' plays')
-												.replace('?value?', data.times)
-								let jtag = $(jstring)
-								.attr('data-tag-type','user-stats')
-								.prop('id','user_plays')
-								textile_tags.append(jtag)
-								
-								//fastest solve
-								if (data.fastest) {
-									jstring = jtemplate
-												.replace('?key?', account.username + ' fastest solve')
-												.replace('?value?', (data.fastest / 1000) + 's')
-									jtag = $(jstring)
-									.attr('data-tag-type','user-stats')
-									.prop('id','user_fastest')
+			})
+			
+			//update difficulty to reflect this account's opinion
+			dbclient_fetch_user_difficulty(account.username, puzzle.id, function(data) {
+				if (data) {
+					$('#featured_difficulty_key').html(account.username + ' difficulty measure')
+					$('#featured_difficulty').val(data.difficulty)
+				}
+			})
+			
+			//add tags for account play stats: number of plays, fastest solve
+			dbclient_fetch_user_plays(account.username, puzzle.id, function(data) {
+				if (data) {
+					//add new user stats
+					let textile_tags = $('#textile_tags')
+					html_imports('textile_tag', function(jtemplate) {
+						try {
+							//plays tag
+							let jstring = jtemplate
+											.replace('?key?', account.username + ' plays')
+											.replace('?value?', data.times)
+							let jtag = $(jstring)
+							.attr('data-tag-type','user-stats')
+							.prop('id','user_plays')
+							textile_tags.append(jtag)
 							
-									textile_tags.append(jtag)
-								}
+							//fastest solve
+							if (data.fastest) {
+								jstring = jtemplate
+											.replace('?key?', account.username + ' fastest solve')
+											.replace('?value?', (data.fastest / 1000) + 's')
+								jtag = $(jstring)
+								.attr('data-tag-type','user-stats')
+								.prop('id','user_fastest')
+						
+								textile_tags.append(jtag)
 							}
-							catch (err) {
-								console.log(err)
-								console.log('account play stats fetch failed; perhaps user logged out?')
-							}
-						})
+						}
+						catch (err) {
+							console.log(err)
+							console.log('account play stats fetch failed; perhaps user logged out?')
+						}
+					})
+				}
+			})
+		}
+		
+		//recover anonymous user stats from cookies
+		let cookie_plays = cookies_get(PLAYS_COOKIE_KEY)
+		if (cookie_plays) {
+			let plays = cookie_plays.split(';')
+			
+			for (let play of plays) {
+				let entry = play.split(',')
+				
+				dbclient_play(account.username, entry[0], entry[1], function(err) {
+					if (err) {
+						//TODO handle error
+					}
+					else {
+						//TODO update user stats
+						
+						//delete plays cookie
+						cookies_delete(PLAYS_COOKIE_KEY)
 					}
 				})
-			})
+			}
 		}
 	}
 }
@@ -186,6 +250,8 @@ function textile_on_logout() {
 	account = null
 	user_rating = null
 	$('#featured_rating').mouseleave()
+	$('#featured_difficulty_key').html('difficulty')
+	$('#featured_difficulty').val(Math.round(puzzle.difficulty))
 	
 	//remove user stats tags
 	$('.textile-tag[data-tag-type="user-stats"]').remove()
@@ -206,11 +272,10 @@ function textile_load_puzzle(callback) {
 			let puzzle_title = $('#featured_title')
 			let puzzle_date = $('#featured_date')
 			let puzzle_canvas = $('#featured_puzzle')[0]
-			let puzzle_rating = $('#featured_rating').mouseleave()
 			let puzzle_container = $('#featured_container')[0]
 			
 			//load graphics
-			puzzle.feature(puzzle_title,puzzle_date,puzzle_canvas,puzzle_rating,puzzle_container)
+			puzzle.feature(puzzle_title,puzzle_date,puzzle_canvas,puzzle_container)
 				.then(function() {
 					$('#featured_placeholder').remove()
 					console.log('feature success')
@@ -224,6 +289,17 @@ function textile_load_puzzle(callback) {
 			
 			window.onresize = function() {
 				puzzle.resize(puzzle_container)
+			}
+			
+			if (!loaded_user_stats && account) {
+				textile_on_login(account)
+			}
+			else {
+				//update average rating and difficulty
+				$('#featured_rating').mouseleave()
+				
+				$('#featured_difficulty_key').html('difficulty')
+				$('#featured_difficulty').val(Math.round(puzzle.difficulty))
 			}
 			
 			//assign completion callback
