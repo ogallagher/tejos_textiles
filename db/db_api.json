@@ -1,13 +1,13 @@
 {
 	"fetch_puzzles": {
 		"params": [],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating,plays from puzzles ?where? order by `date` desc",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating,difficulty,plays from puzzles ?where? order by `date` desc",
 		"external": true,
 		"special": true
 	},
 	"fetch_puzzle": {
 		"params": ["?puzzle_id?"],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating,plays from puzzles where id=?puzzle_id?",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating,difficulty,plays from puzzles where id=?puzzle_id?",
 		"external": true
 	},
 	"fetch_puzzle_paths": {
@@ -41,9 +41,19 @@
 		"query": "call add_rating(?username?,?puzzle_id?,?rating?)",
 		"external": false
 	},
+	"measure_difficulty": {
+		"params": ["?username?","?puzzle_id?","?difficulty?"],
+		"query": "call add_difficulty(?username?,?puzzle_id?,?difficulty?)",
+		"external": false
+	},
 	"fetch_rating": {
 		"params": ["?username?","?puzzle_id?"],
 		"query": "select rating from ratings where username=?username? and puzzle_id=?puzzle_id?",
+		"external": false
+	},
+	"fetch_difficulty": {
+		"params": ["?username?","?puzzle_id?"],
+		"query": "select difficulty from difficulties where username=?username? and puzzle_id=?puzzle_id?",
 		"external": false
 	},
 	"login": {

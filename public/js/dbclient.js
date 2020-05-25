@@ -203,7 +203,7 @@ function dbclient_rate(username,puzzle_id,rating,callback) {
 			}
 		})
 		.catch(function(err) {
-			console.log('puzzle rating failed: ' + err) //TODO switch-case on err
+			console.log('puzzle rating failed: ' + err)
 			callback(false)
 		})
 }
@@ -223,6 +223,46 @@ function dbclient_fetch_user_rating(username,puzzle_id,callback) {
 		})
 		.catch(function(err) {
 			console.log('rating fetch failed: ' + err)
+			callback(null)
+		})
+}
+
+//rate puzzle difficulty on a scale from 1=easy to 10=hard
+function dbclient_measure_difficulty(username, puzzle_id, difficulty, callback) {
+	console.log('measuring puzzle ' + puzzle_id + ' difficulty as ' + difficulty)
+	
+	sessionclient_db_request('measure_difficulty', [username,puzzle_id,difficulty])
+		.then(function(data) {
+			let result = data[0][0].result
+			
+			if (result == 'success') {
+				callback(data[0][0].avg_difficulty)
+			}
+			else {
+				callback(false)
+			}
+		})
+		.catch(function(err) {
+			console.log('puzzle difficulty measure failed: ' + err)
+			callback(false)
+		})
+}
+
+function dbclient_fetch_user_difficulty(username,puzzle_id,callback) {
+	console.log('fetching ' + username + '\'s difficulty measure of ' + puzzle_id)
+	
+	sessionclient_db_request('fetch_difficulty', [username,puzzle_id])
+		.then(function(data) {
+			if (data.error) {
+				console.log('difficulty fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				callback(data[0])
+			}
+		})
+		.catch(function(err) {
+			console.log('difficulty fetch failed: ' + err)
 			callback(null)
 		})
 }

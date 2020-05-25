@@ -26,6 +26,7 @@ function Puzzle(dbdata) {
 	this.title = dbdata.title
 	this.date = dbdata.date
 	this.rating = dbdata.rating
+	this.difficulty = dbdata.difficulty
 	this.plays = dbdata.plays
 	
 	this.paper = new paper.PaperScope()
@@ -74,7 +75,7 @@ Puzzle.prototype.updateGraphics = function() {
 	}
 }
 
-Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,frating,fcontainer) {
+Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 	//update metadata fields
 	ftitle.html(this.title)
 	

@@ -31,6 +31,38 @@ window.onload = function() {
 	//enable interaction with rating stars
 	index_featured_stars()
 	
+	//enable interaction with difficulty range
+	$('#featured_difficulty').mouseup(function() {
+		if (featured_puzzle) { 
+			let updated = false
+			
+			if (account) {
+				if (account.enabled) {
+					updated = true
+					
+					dbclient_measure_difficulty(account.username, featured_puzzle.id, $(this).val(), function(avg_difficulty) {
+						if (avg_difficulty) {
+							featured_puzzle.difficulty = avg_difficulty
+						}
+						else {
+							alert('Error: difficulty measure failed!')
+						}
+					})
+				}
+				else {
+					$('#rate_enable_toast').toast('show')
+				}
+			}
+			else {
+				$('#rate_login_toast').toast('show')
+			}
+			
+			if (!updated) {
+				$(this).val(Math.round(featured_puzzle.difficulty))
+			}
+		}
+	})
+	
 	//import navbar
 	html_imports('navbar','#import_navbar', function() {
 		//import login modal
@@ -114,49 +146,56 @@ function index_on_login(account_info) {
 		if (featured_puzzle) {
 			loaded_user_stats = true
 			
-			//chain fetches to prevent issues with the sessionserver reading+writing a session at the same time
 			//update featured puzzle rating to reflect this account's opinion
 			dbclient_fetch_user_rating(account.username, featured_puzzle.id, function(data) {
 				if (data) {
 					user_rating = data.rating
 					$('#featured_rating').mouseleave()
 				}
-				
-				//add tags for account play stats: number of plays, fastest solve
-				dbclient_fetch_user_plays(account.username, featured_puzzle.id, function(data) {
-					if (data) {
-						//add new user stats
-						let featured_tags = $('#featured_tags')
-						html_imports('featured_tag', function(jtemplate) {
-							try {
-								//plays tag
-								let jstring = jtemplate
-												.replace('?key?', account.username + ' plays')
-												.replace('?value?', data.times)
-								let jtag = $(jstring)
+			})
+			
+			//update difficulty to reflect this account's opinion
+			dbclient_fetch_user_difficulty(account.username, featured_puzzle.id, function(data) {
+				if (data) {
+					$('#featured_difficulty_key').html(account.username + ' difficulty measure')
+					$('#featured_difficulty').val(data.difficulty)
+				}
+			})
+			
+			//add tags for account play stats: number of plays, fastest solve
+			dbclient_fetch_user_plays(account.username, featured_puzzle.id, function(data) {
+				if (data) {
+					//add new user stats
+					let featured_tags = $('#featured_tags')
+					html_imports('featured_tag', function(jtemplate) {
+						try {
+							//plays tag
+							let jstring = jtemplate
+											.replace('?key?', account.username + ' plays')
+											.replace('?value?', data.times)
+							let jtag = $(jstring)
+							.attr('data-tag-type','user-stats')
+							.prop('id','user_plays')
+							featured_tags.append(jtag)
+					
+							//fastest solve
+							if (data.fastest) {
+								jstring = jtemplate
+											.replace('?key?', account.username + ' fastest solve')
+											.replace('?value?', (data.fastest / 1000) + 's')
+								jtag = $(jstring)
 								.attr('data-tag-type','user-stats')
-								.prop('id','user_plays')
-								featured_tags.append(jtag)
+								.prop('id','user_fastest')
 						
-								//fastest solve
-								if (data.fastest) {
-									jstring = jtemplate
-												.replace('?key?', account.username + ' fastest solve')
-												.replace('?value?', (data.fastest / 1000) + 's')
-									jtag = $(jstring)
-									.attr('data-tag-type','user-stats')
-									.prop('id','user_fastest')
-							
-									featured_tags.append(jtag)
-								}
+								featured_tags.append(jtag)
 							}
-							catch (err) {
-								console.log(err)
-								console.log('account play stats fetch failed; perhaps user logged out?')
-							}
-						})
-					}
-				})
+						}
+						catch (err) {
+							console.log(err)
+							console.log('account play stats fetch failed; perhaps user logged out?')
+						}
+					})
+				}
 			})
 		}
 		
@@ -188,6 +227,8 @@ function index_on_logout() {
 	account = null
 	user_rating = null
 	$('#featured_rating').mouseleave()
+	$('#featured_difficulty_key').html('difficulty')
+	$('#featured_difficulty').val(Math.round(featured_puzzle.difficulty))
 	
 	//remove user stats tags
 	$('.featured-tag[data-tag-type="user-stats"]').remove()
@@ -244,13 +285,12 @@ function index_puzzles_onload(dbdata) {
 		let ftitle = $('#featured_title')
 		let fdate = $('#featured_date')
 		let fcanvas = $('#featured_puzzle')[0]
-		let frating = $('#featured_rating')
 		let fcontainer = $('#featured_container')[0]
 		
 		if (featured_puzzle) {
 			$('#featured_url').attr('href','textile.html?puzzle_id=' + featured_puzzle.id)
 			
-			featured_puzzle.feature(ftitle,fdate,fcanvas,frating,fcontainer)
+			featured_puzzle.feature(ftitle,fdate,fcanvas,fcontainer)
 				.then(function() {
 					$('#featured_placeholder').remove()
 					console.log('feature success')
@@ -267,7 +307,11 @@ function index_puzzles_onload(dbdata) {
 				index_on_login(account)
 			}
 			else {
+				//update average rating and difficulty
 				$('#featured_rating').mouseleave()
+				
+				$('#featured_difficulty_key').html('difficulty')
+				$('#featured_difficulty').val(Math.round(featured_puzzle.difficulty))
 			}
 		}
 		
