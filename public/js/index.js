@@ -189,6 +189,9 @@ function index_on_login(account_info) {
 						
 								featured_tags.append(jtag)
 							}
+							
+							//show contributions
+							$('#fragments_header').show()
 						}
 						catch (err) {
 							console.log(err)

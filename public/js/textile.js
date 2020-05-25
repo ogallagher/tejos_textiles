@@ -212,6 +212,9 @@ function textile_on_login(account_info) {
 						
 								textile_tags.append(jtag)
 							}
+							
+							//show contributions
+							$('#fragments_header').show()
 						}
 						catch (err) {
 							console.log(err)
