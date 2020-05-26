@@ -74,7 +74,7 @@ exports.init = function() {
 }
 
 exports.set = function(key,value,expiry,callback) {
-	if (key && cache) {
+	if (key && cache && value) {
 		cache.set(key, value, {
 			expires: expiry //seconds after which the cache entry expires
 		}, 

@@ -232,7 +232,7 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 					resolve()
 				}
 				else {
-					console.log('error loading ' + self.title + ': shapes_outline.length != shapes_inline.length')
+					console.log('error loading ' + self.title + ': outlines.length ' + shapesOut.length + ' != inlines.length ' + shapesIn.length)
 					reject()
 				}
 			}
