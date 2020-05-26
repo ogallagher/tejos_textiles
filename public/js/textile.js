@@ -348,7 +348,7 @@ function textile_load_puzzle(callback) {
 						//license
 						tile.find('.work-tile-license-collapse')
 						.prop('id', tile_id + '_license_collapse') //enable expand/collapse
-						.append('<br><a class="font-content" href="account.html?username=' + author + '#contributions">view original</a>') //link to original
+						.append('<br><a class="font-content" href="account.html?username=' + author + '#contributions" target="_blank">view original</a>') //link to original
 						
 						let license
 						let license_url
@@ -418,9 +418,9 @@ function textile_load_puzzle(callback) {
 						}
 						else {
 							tile.find('.work-tile-text')
-							.html(fragment.fragment)
+							.html(string_utils_tagify(fragment.fragment))
 						}
-				
+						
 						//description
 						if (fragment.description) {
 							tile.find('.work-tile-description').html(string_utils_tagify(fragment.description))
