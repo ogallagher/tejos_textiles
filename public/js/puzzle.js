@@ -22,37 +22,39 @@ const PUZZLE_Z_MIN = 0.5
 
 //Puzzle class
 function Puzzle(dbdata) {
-	this.id = dbdata.id
-	this.title = dbdata.title
-	this.date = dbdata.date
-	this.rating = dbdata.rating
-	this.difficulty = dbdata.difficulty
-	this.plays = dbdata.plays
+	if (dbdata) {
+		this.id = dbdata.id
+		this.title = dbdata.title
+		this.date = dbdata.date
+		this.rating = dbdata.rating
+		this.difficulty = dbdata.difficulty
+		this.plays = dbdata.plays
+	
+		this.forecolor = dbdata.forecolor.data
+		this.backcolor = dbdata.backcolor.data
+		this.textcolor = dbdata.textcolor.data
+	
+		this.foreground
+		this.foregroundCaps
+		this.background
+		this.text
+		this.textP = new paper.Point()
+		this.textS = new paper.Point()
+		this.shapes = [];
+	
+		this.scale = dbdata.scale //initial scale applied to puzzle on load
+		this.z_min = dbdata.z_min //how far out the user can zoom
+		this.pan = new paper.Point()
+		this.zoom = 1
+		this.dragBegin = new paper.Point()
+		this.anchor = new paper.Point()
+	
+		this.startTime = null
+		this.solveTime = 0
+		this.enabled = true
+	}
 	
 	this.paper = new paper.PaperScope()
-	
-	this.forecolor = dbdata.forecolor.data
-	this.backcolor = dbdata.backcolor.data
-	this.textcolor = dbdata.textcolor.data
-	
-	this.foreground
-	this.foregroundCaps
-	this.background
-	this.text
-	this.textP = new paper.Point()
-	this.textS = new paper.Point()
-	this.shapes = [];
-	
-	this.scale = dbdata.scale //initial scale applied to puzzle on load
-	this.z_min = dbdata.z_min //how far out the user can zoom
-	this.pan = new paper.Point()
-	this.zoom = 1
-	this.dragBegin = new paper.Point()
-	this.anchor = new paper.Point()
-	
-	this.startTime = null
-	this.solveTime = 0
-	this.enabled = true
 	this.onComplete = function(){} //callback for when the puzzle is completed
 }
 
@@ -325,4 +327,58 @@ Puzzle.compare_popularity = function(a,b) {
 	else {
 		return 0
 	}
+}
+
+Puzzle.clone = function(clone) {
+	let puzzle = new Puzzle()
+	
+	puzzle.id = clone.id
+	puzzle.title = clone.title
+	puzzle.date = clone.date
+	puzzle.rating = clone.rating
+	puzzle.difficulty = clone.difficulty
+	puzzle.plays = clone.plays
+
+	puzzle.forecolor = clone.forecolor
+	puzzle.backcolor = clone.backcolor
+	puzzle.textcolor = clone.textcolor
+
+	puzzle.foreground = clone.foreground
+	puzzle.foregroundCaps = clone.foregroundCaps
+	puzzle.background = clone.background
+	puzzle.text = clone.text
+	puzzle.textP = clone.textP
+	puzzle.textS = clone.textS
+	
+	puzzle.shapes = []
+	for (let shape of clone.shapes) {
+		puzzle.shapes.push(Shape.clone(shape))
+	}
+	
+	puzzle.scale = clone.scale
+	puzzle.z_min = clone.z_min
+	puzzle.pan = clone.pan
+	puzzle.zoom = clone.zoom
+	puzzle.dragBegin = new paper.Point()
+	puzzle.anchor = new paper.Point()
+	
+	puzzle.startTime = clone.startTime
+	puzzle.solveTime = clone.solveTime
+	puzzle.enabled = true
+	
+	return puzzle
+}
+
+Puzzle.serialize = function(puzzle) {	
+	return JSON.stringify(Puzzle.clone(puzzle))
+}
+
+Puzzle.deserialize = function(string) {
+	let puzzle = JSON.parse(string)
+	
+	for (let shape of puzzle.shapes) {
+		shape.puzzle = puzzle
+	}
+	
+	return puzzle
 }

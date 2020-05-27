@@ -64,7 +64,7 @@ function dbclient_fetch_puzzle_paths(id,callback) {
 }
 
 function dbclient_fetch_puzzle(id, callback) {
-	console.log('fetching puzzle[' + id + ']')
+	console.log('fetching puzzle ' + id)
 	
 	let req = {
 		endpoint: 'fetch_puzzle',

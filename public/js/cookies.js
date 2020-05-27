@@ -8,28 +8,44 @@ Owen Gallagher
 
 //config
 const COOKIE_EXPIRATION = 24 * 60 * 60 * 1000
+const COOKIE_MAX_BYTES = 4096 //max number of bytes in a cookie
+const COOKIE_MAX_CHARS = COOKIE_MAX_BYTES / 2
 
-//cookies expire in 1 day
+//if cookie is too large, cookie_key --> [cookie_key[0], cookie_key[1], ...]
 function cookies_set(key,val) {
     var date = new Date();
     date.setTime(date.getTime() + COOKIE_EXPIRATION);
-    document.cookie = key + '=' + val + '; expires=' + date.toUTCString() + '; path=/';
+	
+	if (val.length > COOKIE_MAX_BYTES) {
+		let i=0
+		while (i < val.length) {
+			document.cookie = key + '[' + i + ']=' + val.substring(i,COOKIE_MAX_CHARS) + '; expires=' + date.toUTCString() + '; path=/'
+			i += COOKIE_MAX_CHARS
+		}
+	}
+	else {
+		document.cookie = key + '=' + val + '; expires=' + date.toUTCString() + '; path=/';
+	}
 }
 
 function cookies_get(key) {
-    var key_eq = key + '=';
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
+    let key_eq = key + '='
+    let ca = document.cookie.split(';')
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i]
         while (c.charAt(0) == ' ') {
-            c = c.substring(1, c.length);
+            c = c.substring(1, c.length)
         }
         if (c.indexOf(key_eq) == 0) {
-            return c.substring(key_eq.length, c.length);
+            return c.substring(key_eq.length, c.length)
         }
+		else {
+			//TODO handle multipart cookies
+			return null
+		}
     }
     //no cookie found
-    return null;
+    return null
 }
 
 function cookies_delete(key) {

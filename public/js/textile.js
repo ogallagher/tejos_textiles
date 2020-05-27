@@ -17,11 +17,7 @@ let scroll_lock
 window.onload = function() {
 	force_https()
 	
-	textile_load_puzzle(function() {
-		if (!loaded_user_stats && account) {
-			textile_on_login(account)
-		}
-	})
+	textile_load_puzzle()
 	
 	//import navbar
 	html_imports('navbar','#import_navbar', function() {
@@ -260,23 +256,27 @@ function textile_on_logout() {
 	$('.textile-tag[data-tag-type="user-stats"]').remove()
 }
 
-function textile_load_puzzle(callback) {
+function textile_load_puzzle() {
 	let puzzle_id = url_params_get('puzzle_id')
 	
 	if (puzzle_id != null) {
-		console.log('loading textile ' + puzzle_id)
+		console.log('loading textile ' + puzzle_id + '...')
 		
+		//load puzzle from db
+		console.log('... from db')
 		dbclient_fetch_puzzle(puzzle_id, function(dbdata) {
+			//set page title
 			$('#title').html(dbdata.title)
 			
-			//load metadata
+			//init puzzle object
 			puzzle = new Puzzle(dbdata)
-			
+	
+			//load metadata
 			let puzzle_title = $('#featured_title')
 			let puzzle_date = $('#featured_date')
 			let puzzle_canvas = $('#featured_puzzle')[0]
 			let puzzle_container = $('#featured_container')[0]
-			
+
 			//load graphics
 			puzzle.feature(puzzle_title,puzzle_date,puzzle_canvas,puzzle_container)
 				.then(function() {
@@ -286,28 +286,25 @@ function textile_load_puzzle(callback) {
 				.catch(function() {
 					console.log('feature failed')
 				})
-				.finally(function() {
-					callback()
-				})
-			
+
 			window.onresize = function() {
 				puzzle.resize(puzzle_container)
 			}
-			
+
 			if (!loaded_user_stats && account) {
 				textile_on_login(account)
 			}
 			else {
 				//update average rating and difficulty
 				$('#featured_rating').mouseleave()
-				
+	
 				$('#featured_difficulty_key').html('difficulty')
 				$('#featured_difficulty').val(Math.round(puzzle.difficulty))
 			}
-			
+
 			//assign completion callback
 			puzzle.onComplete = textile_puzzle_on_complete
-			
+
 			//load authors and fragments
 			dbclient_fetch_puzzle_fragments(puzzle.id, function(fragments) {
 				html_imports('work_tile', function(tile_str) {
@@ -315,7 +312,7 @@ function textile_load_puzzle(callback) {
 					let authors_list = $('#featured_authors').html('')
 					let author_button_str = '<a class="btn btn-outline-secondary rounded-0" href="#"></a>'
 					let author_names = []
-					
+		
 					for (let fragment of fragments) {
 						//load author
 						let author = fragment.author
@@ -325,31 +322,31 @@ function textile_load_puzzle(callback) {
 								.prop('href','account.html?username=' + author)
 								.html(author)
 							)
-							
+				
 							author_names.push(author)
 						}
-						
+			
 						//load fragment
 						let tile = $(tile_str)
-						
+			
 						//id
 						let tile_id = 'fragment_' + fragment.id
 						tile.prop('id', tile_id)
-						
+			
 						//title
 						tile.find('.work-tile-title')
 						.html(fragment.title)
 						.attr('data-target','#' + tile_id + '_license_collapse') //enable expand/collapse
 						.removeClass('font-title-xlg').addClass('font-title-lg') //shrink from default font
-						
+			
 						//date
 						tile.find('.work-tile-date').html(string_utils_date(fragment.date))
-						
+			
 						//license
 						tile.find('.work-tile-license-collapse')
 						.prop('id', tile_id + '_license_collapse') //enable expand/collapse
 						.append('<br><a class="font-content" href="account.html?username=' + author + '#contributions" target="_blank">view original</a>') //link to original
-						
+			
 						let license
 						let license_url
 						switch (fragment.license) {
@@ -357,37 +354,37 @@ function textile_load_puzzle(callback) {
 								license = 'Public Domain'
 								license_url = 'https://creativecommons.org/licenses/zero/1.0'
 								break
-			
+
 							case 'cc-by':
 								license = 'Creative Commons BY'
 								license_url = 'https://creativecommons.org/licenses/by/4.0'
 								break
-			
+
 							case 'cc-by-sa':
 								license = 'Creative Commons BY-SA'
 								license_url = 'https://creativecommons.org/licenses/by-sa/4.0'
 								break
-			
+
 							case 'cc-by-nd':
 								license = 'Creative Commons BY-ND'
 								license_url = 'https://creativecommons.org/licenses/by-nd/4.0'
 								break
-			
+
 							case 'cc-by-nc':
 								license = 'Creative Commons BY-NC'
 								license_url = 'https://creativecommons.org/licenses/by-nc/4.0'
 								break
-			
+
 							case 'cc-by-nc-sa':
 								license = 'Creative Commons BY-NC-SA'
 								license_url = 'https://creativecommons.org/licenses/by-nc-sa/4.0'
 								break
-			
+
 							case 'cc-by-nc-nd':
 								license = 'Creative Commons BY-NC-ND'
 								license_url = 'https://creativecommons.org/licenses/by-nc-nd/4.0'
 								break
-			
+
 							default:
 								license = work.license
 								license_url = '#'
@@ -396,14 +393,14 @@ function textile_load_puzzle(callback) {
 						tile.find('.work-tile-license')
 						.html(license)
 						.prop('href', license_url)
-				
+	
 						//text
 						tile.find('.work-tile-card-body')
 						.attr('data-target','#' + tile_id + '_text_collapse')
-						
+			
 						tile.find('.work-tile-text-collapse')
 						.prop('id', tile_id + '_text_collapse')
-						
+			
 						if (!fragment.fragment) {
 							//complete fragment; load full text on request
 							tile.find('.work-tile-text')
@@ -413,14 +410,14 @@ function textile_load_puzzle(callback) {
 								Load full text\
 								</button>'
 							)
-					
+		
 							tile.find('.work-tile-text-collapse').removeClass('collapse')
 						}
 						else {
 							tile.find('.work-tile-text')
 							.html(string_utils_tagify(fragment.fragment))
 						}
-						
+			
 						//description
 						if (fragment.description) {
 							tile.find('.work-tile-description').html(string_utils_tagify(fragment.description))
@@ -428,7 +425,7 @@ function textile_load_puzzle(callback) {
 						else {
 							tile.find('.work-tile-description').html('No description provided')
 						}
-						
+			
 						//author
 						tile.find('.work-tile-fragments').html(
 							'<div class="col">\
@@ -438,7 +435,7 @@ function textile_load_puzzle(callback) {
 							'</button>\
 							</div>'
 						)
-			
+
 						fragments_list.append(tile)
 					}
 				})
@@ -446,8 +443,7 @@ function textile_load_puzzle(callback) {
 		})
 	}
 	else {
-		console.log('error: textile not defined')
-		//TODO handle undefined textile
+		alert('error: textile not defined')
 	}
 }
 
