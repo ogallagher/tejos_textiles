@@ -360,6 +360,62 @@ function account_on_login(account_info) {
 				}, 2000)
 			}
 		})
+		
+		//get account activity
+		html_imports('activity', function(activity_row) {
+			let activity_container = $('#history').empty().append('<h3 class="text-dark text-capitalize">History</h3>')
+			
+			dbclient_fetch_user_activity(username, function(activities) {
+				if (activities) {
+					for (let activity of activities) {
+						/*
+						{
+							activity:	play | rate | difficulty | author,
+							target:		puzzle_id | work_id,
+							details:	play_duration,puzzle_title | rating,puzzle_title | difficulty,puzzle_title | work_title
+						}
+						*/
+						let jactivity = $(activity_row)
+						.attr('data-target',activity.target)
+						
+						let key = jactivity.find('.activity-key')
+						let value = jactivity.find('.activity-value')
+						let type = activity.activity
+						if (type == 'play' || type == 'rate' || type == 'difficulty') {
+							let details = activity.details.split(',')
+							
+							key.html(details[1])
+							
+							switch(type) {
+								case 'play':
+									value.html(Math.round(details[0] / 60000) + ' min')
+									break
+									
+								case 'rate':
+									value.html('rating ' + details[0])
+									break
+									
+								case 'difficulty':
+									value.html('difficulty ' + details[0])
+									break
+							}
+						}
+						else if (type == 'author') {
+							key.html(activity.details)
+							value.html('contribution')
+						}
+						
+						activity_container.append(jactivity)
+					}
+					
+					$('#activity').show()
+				}
+				else {
+					console.log('error: activity fetch failed')
+					//TODO handle error
+				}
+			})
+		})
 	}
 }
 
@@ -688,7 +744,7 @@ function account_more_works() {
 					//text
 					jwork.find('.work-tile-text')
 					.html(string_utils_tagify(work.text))
-				
+					
 					//text collapse
 					jwork.find('.work-tile-card-body')
 					.attr('data-target', '#work_' + work.id + '_text')

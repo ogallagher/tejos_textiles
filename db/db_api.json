@@ -91,6 +91,11 @@
 		"query": "select count(*) as times, min(duration) as fastest from plays where username=?username? and puzzle_id=?puzzle_id?",
 		"external": false
 	},
+	"fetch_user_activity": {
+		"params": ["?username?"],
+		"query": "call user_activity(?username?)",
+		"external": true
+	},
 	"fetch_works": {
 		"params": ["?username?"],
 		"query": "select id,title,`text`,`date`,description,license from works where author=?username? order by `date` desc, title asc",

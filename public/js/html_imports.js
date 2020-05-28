@@ -28,7 +28,8 @@ const imports = [
 	'work_tag',
 	'edit_link_row',
 	'win_screen',
-	'help'
+	'help',
+	'activity'
 ]
 
 /*

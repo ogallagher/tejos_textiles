@@ -39,10 +39,6 @@ function cookies_get(key) {
         if (c.indexOf(key_eq) == 0) {
             return c.substring(key_eq.length, c.length)
         }
-		else {
-			//TODO handle multipart cookies
-			return null
-		}
     }
     //no cookie found
     return null
