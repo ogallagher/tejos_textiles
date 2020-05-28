@@ -230,39 +230,43 @@
 			
 			<!-- account useage data -->
 			<div id="activity" class="row px-2" style="clear:left;display:none;">
-				<div id="history" class="col-md p-2 font-title-lg">
-					<h3 class="text-dark text-capitalize">History</h3>
-					<div class="bg-slight bg-light-hover mb-2 px-2 clickable">
-						<div class="row">
-							<div class="col my-auto">alphabet soup</div>
-							<div class="col my-auto text-raspberry text-right text-uppercase">10 min</div>
+				<div id="history_section" class="col-md p-2 font-title-lg">
+					<h3 class="text-dark-nohover text-raspberry-hover text-capitalize clickable" data-toggle="collapse" data-target="#history_collapse">History</h3>
+					<div id="history_collapse" class="collapse">
+						<div id="history">
+							<!-- raw account activity -->
 						</div>
-					</div>
-					<div class="bg-slight bg-light-hover mb-2 px-2 clickable">
-						<div class="row">
-							<div class="col my-auto">bucket wars</div>
-							<div class="col my-auto text-raspberry text-right text-uppercase">50 min</div>
-						</div>
-					</div>
-					<div class="bg-slight bg-light-hover mb-2 px-2 clickable">
-						<div class="row">
-							<div class="col my-auto">cherry tree hill</div>
-							<div class="col my-auto text-raspberry text-right text-uppercase">comment</div>
+						<div class="row font-navigation mb-2 mx-1 px-2">
+							<button id="more_history" 
+								class="col btn text-light-hover text-raspberry text-uppercase rounded border-raspberry bg-slight bg-dark-hover" role="button">
+								load more history
+							</button>
 						</div>
 					</div>
 				</div>
-				<div id="records" class="col-md p-2 font-title-lg text-light">
-					<h3 class="text-dark text-capitalize">Records</h3>
-					<div class="bg-dark-nohover bg-secondary-hover mb-2 px-2 clickable">
-						<div class="row">
-							<div class="col my-auto">alphabet soup</div>
-							<div class="col my-auto text-raspberry-light text-right text-uppercase">2 min</div>
+				<div id="records_section" class="col-md p-2 font-title-lg text-light">
+					<h3 class="text-dark-nohover text-raspberry-hover text-capitalize clickable" data-toggle="collapse" data-target="#records_collapse">Records</h3>
+					<div id="records_collapse" class="collapse">
+						<div id="records">
+							<!-- account statistics (fastest solves) -->
+							<div class="bg-dark-nohover bg-secondary-hover mb-2 px-2 clickable">
+								<div class="row">
+									<div class="col my-auto">placeholder 1</div>
+									<div class="col my-auto text-raspberry-light text-right text-uppercase">2 min</div>
+								</div>
+							</div>
+							<div class="bg-dark-nohover bg-secondary-hover mb-2 px-2 clickable">
+								<div class="row">
+									<div class="col my-auto">placeholder 2</div>
+									<div class="col my-auto text-raspberry-light text-right text-uppercase">15 min</div>
+								</div>
+							</div>
 						</div>
-					</div>
-					<div class="bg-dark-nohover bg-secondary-hover mb-2 px-2 clickable">
-						<div class="row">
-							<div class="col my-auto">barnacle mazes</div>
-							<div class="col my-auto text-raspberry-light text-right text-uppercase">15 min</div>
+						<div class="row font-navigation mb-2 mx-1 px-2">
+							<button id="more_history" 
+								class="col btn text-raspberry-hover text-light-nohover text-uppercase rounded border-raspberry bg-dark-nohover bg-slight-hover" role="button">
+								load more records
+							</button>
 						</div>
 					</div>
 				</div>

@@ -12,10 +12,15 @@ let edit_links_rows = 0
 let works = []
 let works_start = 0
 let works_end = 0
+let activities = []
+let activities_start = 0
+let activities_end = 0
 
 const ACCOUNT_PHOTO_SIZE = 460 //somewhat arbitrary, based on github profile photo size
 const WORKS_BATCH_START = 4 //how many works are loaded initially
 const WORKS_BATCH_SIZE = 8 //how many works to load each time more are requested
+const ACTIVITIES_BATCH_START = 10 //how many activities are loaded initially
+const ACTIVITIES_BATCH_SIZE = 15 //how many activities to load each time more are requested
 
 window.onload = function() {
 	force_https()
@@ -362,60 +367,23 @@ function account_on_login(account_info) {
 		})
 		
 		//get account activity
-		html_imports('activity', function(activity_row) {
-			let activity_container = $('#history').empty().append('<h3 class="text-dark text-capitalize">History</h3>')
+		dbclient_fetch_user_activity(username, function(activity) {
+			activities = []
+			activities_end = ACTIVITIES_BATCH_START
 			
-			dbclient_fetch_user_activity(username, function(activities) {
-				if (activities) {
-					for (let activity of activities) {
-						/*
-						{
-							activity:	play | rate | difficulty | author,
-							target:		puzzle_id | work_id,
-							details:	play_duration,puzzle_title | rating,puzzle_title | difficulty,puzzle_title | work_title
-						}
-						*/
-						let jactivity = $(activity_row)
-						.attr('data-target',activity.target)
-						
-						let key = jactivity.find('.activity-key')
-						let value = jactivity.find('.activity-value')
-						let type = activity.activity
-						if (type == 'play' || type == 'rate' || type == 'difficulty') {
-							let details = activity.details.split(',')
-							
-							key.html(details[1])
-							
-							switch(type) {
-								case 'play':
-									value.html(Math.round(details[0] / 60000) + ' min')
-									break
-									
-								case 'rate':
-									value.html('rating ' + details[0])
-									break
-									
-								case 'difficulty':
-									value.html('difficulty ' + details[0])
-									break
-							}
-						}
-						else if (type == 'author') {
-							key.html(activity.details)
-							value.html('contribution')
-						}
-						
-						activity_container.append(jactivity)
-					}
-					
-					$('#activity').show()
-				}
-				else {
-					console.log('error: activity fetch failed')
-					//TODO handle error
-				}
-			})
+			if (activity) {
+				activities = activity
+				account_more_activity()
+				$('#activity').show()
+			}
+			else {
+				console.log('error: activity fetch failed')
+				//TODO handle error
+			}
 		})
+		
+		//enable more-activity (history) button
+		$('#more_history').click(account_more_activity)
 	}
 }
 
@@ -798,6 +766,77 @@ function account_more_works() {
 	else {
 		//none; hide contributions section
 		$('#contributions').hide()
+	}
+}
+
+function account_more_activity() {
+	if (activities.length > 0) {
+		let activity_container = $('#history')
+		
+		html_imports('activity', function(activity_row) {
+			for (let i=activities_start; i<activities.length && i<activities_end; i++) {
+				/*
+				{
+					activity:	play | rate | difficulty | author,
+					target:		puzzle_id | work_id,
+					details:	play_duration,puzzle_title | rating,puzzle_title | difficulty,puzzle_title | work_title
+				}
+				*/
+				let activity = activities[i]
+				
+				let jactivity = $(activity_row)
+				.attr('data-target',activity.target)
+				
+				let key = jactivity.find('.activity-key')
+				let value = jactivity.find('.activity-value')
+				let type = activity.activity
+				if (type == 'play' || type == 'rate' || type == 'difficulty') {
+					let details = activity.details.split(',')
+					
+					key.html(details[1])
+					
+					switch(type) {
+						case 'play':
+							let duration = details[0] / 60000 //minutes
+							if (duration < 2) {
+								value.html((Math.round(duration * 60 * 100)/100) + ' sec') //seconds
+							}
+							else {
+								value.html((Math.round(duration * 100)/100) + ' min') //minutes
+							}
+							
+							break
+							
+						case 'rate':
+							value.html('rating ' + details[0])
+							break
+							
+						case 'difficulty':
+							value.html('difficulty ' + details[0])
+							break
+					}
+				}
+				else if (type == 'author') {
+					key.html(activity.details)
+					value.html('contribution')
+				}
+				
+				activity_container.append(jactivity)
+				activities_start++
+			}
+			
+			if (activities_end >= activities.length) {
+				//no more; hide more contributions button
+				$('#more_history').hide()
+			}
+			else {
+				//ready for more
+				activities_end += ACTIVITIES_BATCH_SIZE
+			}
+		})
+	}
+	else {
+		//TODO handle no activity
 	}
 }
 

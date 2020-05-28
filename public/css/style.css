@@ -164,6 +164,9 @@ Custom classes
 .text-light-hover:hover {
 	color: #f8f9fa;
 }
+.text-light-nohover {
+	color: #f8f9fa;
+}
 
 .text-dark-nohover {
 	color: #343a40;
