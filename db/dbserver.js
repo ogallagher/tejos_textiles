@@ -153,24 +153,30 @@ exports.get_query = function(endpoint, args, is_external) {
 								}
 							}
 							else if (endpoint == 'search_puzzles') {
-								//build where clause from compound regexp with relevant columns
-								let columns = ['title','date']
-								let regexps = []
-							
-								for (let column of columns) {
-									//col regexp '.*((term_1)|(term_2)|...).*'
-									let regexp = column + " regexp '.*("
+								if (args) {
+									//build where clause from compound regexp with relevant columns
+									let columns = ['title','date']
+									let regexps = []
 								
-									let terms = []
-									for (let term of args) {
-										terms.push('(' + term + ')')
+									for (let column of columns) {
+										//col regexp '.*((term_1)|(term_2)|...).*'
+										let regexp = column + " regexp '.*("
+								
+										let terms = []
+										for (let term of args) {
+											terms.push('(' + term + ')')
+										}
+								
+										regexp += terms.join('|') + ").*'"
+										regexps.push(regexp)
 									}
-								
-									regexp += terms.join('|') + ").*'"
-									regexps.push(regexp)
-								}
 							
-								query = query.replace('?regexps?', regexps.join(' or '))
+									query = query.replace('?regexps?', regexps.join(' or '))
+								}
+								else {
+									//blank search; return all puzzles
+									query = api['fetch_puzzles'].query
+								}
 							}
 							else if (endpoint == 'update_user') {
 								//args = [username, photo, bio, links]

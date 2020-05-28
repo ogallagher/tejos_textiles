@@ -95,7 +95,7 @@ window.onload = function() {
 		}
 		else {
 			//get all puzzles
-			dbclient_fetch_puzzles(load_search_results)
+			dbclient_fetch_puzzles(null,load_search_results)
 		}
 	})
 	
@@ -299,11 +299,12 @@ function search_gallery() {
     }
 	else {
 		//get all puzzles
-		dbclient_fetch_puzzles(load_search_results)
+		dbclient_fetch_puzzles(null,load_search_results)
 	}
 }
 
 function load_search_results(results) {
+	console.log(results)
 	//clear puzzles array
 	puzzles = []
 	

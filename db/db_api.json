@@ -32,7 +32,7 @@
 	},
 	"search_puzzles": {
 		"params": [],
-		"query": "select id,title,date,forecolor,backcolor,textcolor,scale,z_min,preview,rating,plays from puzzles where ?regexps?",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating,difficulty,plays from puzzles where ?regexps?",
 		"external": true,
 		"special": true
 	},
