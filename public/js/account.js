@@ -15,12 +15,17 @@ let works_end = 0
 let activities = []
 let activities_start = 0
 let activities_end = 0
+let records = []
+let records_start = 0
+let records_end = 0
 
 const ACCOUNT_PHOTO_SIZE = 460 //somewhat arbitrary, based on github profile photo size
 const WORKS_BATCH_START = 4 //how many works are loaded initially
 const WORKS_BATCH_SIZE = 8 //how many works to load each time more are requested
 const ACTIVITIES_BATCH_START = 10 //how many activities are loaded initially
 const ACTIVITIES_BATCH_SIZE = 15 //how many activities to load each time more are requested
+const RECORDS_BATCH_START = 10 //how many records are loaded initially
+const RECORDS_BATCH_SIZE = 15 //how many records to load each time more are requested
 
 window.onload = function() {
 	force_https()
@@ -384,6 +389,23 @@ function account_on_login(account_info) {
 		
 		//enable more-activity (history) button
 		$('#more_history').click(account_more_activity)
+		
+		dbclient_fetch_user_records(username, function(records_data) {
+			records = []
+			records_end = RECORDS_BATCH_START
+			
+			if (records_data) {
+				records = records_data
+				account_more_records()
+			}
+			else {
+				console.log('error: records fetch failed')
+				//TODO handle error
+			}
+		})
+		
+		//enable more-records button
+		$('#more_records').click(account_more_records)
 	}
 }
 
@@ -785,7 +807,8 @@ function account_more_activity() {
 				let activity = activities[i]
 				
 				let jactivity = $(activity_row)
-				.attr('data-target',activity.target)
+				.attr('data-target', activity.target)
+				.click(activity_click)
 				
 				let key = jactivity.find('.activity-key')
 				let value = jactivity.find('.activity-value')
@@ -838,6 +861,62 @@ function account_more_activity() {
 	else {
 		//TODO handle no activity
 	}
+}
+
+function account_more_records() {
+	if (records.length > 0) {
+		let records_container = $('#records')
+		
+		html_imports('record', function(record_row) {
+			for (let i=records_start; i<records.length && i<records_end; i++) {
+				/*
+				{
+					record:		solve
+					target:		puzzle_id
+					details:	duration,puzzle_title
+				}
+				*/
+				let record = records[i]
+				
+				let jrecord = $(record_row)
+				.attr('data-target', record.target)
+				.click(activity_click)
+				
+				let key = jrecord.find('.record-key')
+				let value = jrecord.find('.record-value')
+				let details = record.details.split(',')
+				
+				key.html(details[1])
+				
+				let duration = details[0] / 60000 //minutes
+				if (duration < 2) {
+					value.html((Math.round(duration * 60 * 100)/100) + ' sec') //seconds
+				}
+				else {
+					value.html((Math.round(duration * 100)/100) + ' min') //minutes
+				}
+				
+				records_container.append(jrecord)
+				records_start++
+			}
+			
+			if (records_end >= records.length) {
+				//no more; hide more contributions button
+				$('#more_records').hide()
+			}
+			else {
+				//ready for more
+				records_end += RECORDS_BATCH_SIZE
+			}
+		})
+	}
+	else {
+		//TODO handle no records
+	}
+}
+
+function activity_click() {
+	window.location.href = 'textile.html?puzzle_id=' + $(this).attr('data-target')
 }
 
 function account_delete() {

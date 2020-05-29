@@ -29,7 +29,8 @@ const imports = [
 	'edit_link_row',
 	'win_screen',
 	'help',
-	'activity'
+	'activity',
+	'record'
 ]
 
 /*

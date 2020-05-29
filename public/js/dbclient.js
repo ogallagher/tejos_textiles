@@ -364,6 +364,33 @@ function dbclient_fetch_user_activity(username, callback) {
 	})
 }
 
+function dbclient_fetch_user_records(username, callback) {
+	console.log('fetching records for ' + username)
+	
+	let req = {
+		endpoint: 'fetch_user_records',
+		args: [username]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('error: records fetch failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				callback(data[0])
+			}
+		},
+		error: function(err) {
+			console.log('error: records fetch failed: ' + err.responseText)
+			callback(null)
+		}
+	})
+}
+
 function dbclient_fetch_works(username, callback) {
 	console.log('fetching works by ' + username)
 	

@@ -96,6 +96,11 @@
 		"query": "call user_activity(?username?)",
 		"external": true
 	},
+	"fetch_user_records": {
+		"params": ["?username?"],
+		"query": "call user_records(?username?)",
+		"external": true
+	},
 	"fetch_works": {
 		"params": ["?username?"],
 		"query": "select id,title,`text`,`date`,description,license from works where author=?username? order by `date` desc, title asc",
