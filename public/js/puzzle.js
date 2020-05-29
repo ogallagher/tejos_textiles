@@ -302,15 +302,7 @@ Puzzle.compare_rating = function(a,b) {
 	let a_val = parseFloat(a.rating)
 	let b_val = parseFloat(b.rating)
 	
-	if (a_val < b_val) {
-		return 1
-	}
-	else if (a_val > b_val) {
-		return -1
-	}
-	else {
-		return 0
-	}
+	return b_val-a_val
 }
 
 //reverse order (higher popularity first)
@@ -318,15 +310,23 @@ Puzzle.compare_popularity = function(a,b) {
 	let a_val = parseInt(a.plays)
 	let b_val = parseInt(b.plays)
 	
-	if (a_val < b_val) {
-		return -1
-	}
-	else if (a_val > b_val) {
-		return 1
-	}
-	else {
-		return 0
-	}
+	return b_val-a_val
+}
+
+//forward order (easiest first)
+Puzzle.compare_difficulty_asc = function(a,b) {
+	let a_val = parseFloat(a.difficulty)
+	let b_val = parseFloat(b.difficulty)
+	
+	return a_val-b_val
+}
+
+//reverse order (hardest first)
+Puzzle.compare_difficulty_desc = function(a,b) {
+	let a_val = parseFloat(a.difficulty)
+	let b_val = parseFloat(b.difficulty)
+	
+	return b_val-a_val
 }
 
 Puzzle.clone = function(clone) {

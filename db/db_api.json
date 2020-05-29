@@ -22,7 +22,7 @@
 	},
 	"fetch_collection_editors_choice": {
 		"params": [],
-		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating from puzzles where featured=1",
+		"query": "select id,title,`date`,forecolor,backcolor,textcolor,scale,z_min,preview,rating from puzzles where featured=1 order by `date` desc",
 		"external": true
 	},
 	"fetch_collection_top_played": {

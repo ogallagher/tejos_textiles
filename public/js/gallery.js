@@ -311,36 +311,14 @@ function load_search_results(results) {
     //clear old results
 	puzzle_list.empty()
 	
-    //show search results
+    //load search results
 	results.forEach(function(pstring) {
 		let puzzle = new Puzzle(pstring)
 		puzzles.push(puzzle)
-		
-		let jpuzzle = $(jpuzzle_str)
-		
-		jpuzzle.find('.textile-row-card')
-		.attr('data-puzzle-id',puzzle.id)
-		.attr('data-target', '#puzzle_details_' + puzzle.id)
-		
-		jpuzzle.find('.textile-row-title').html(puzzle.title)
-		
-		jpuzzle.find('.textile-row-details')
-		.prop('id', 'puzzle_details_' + puzzle.id)
-		
-		jpuzzle.find('.textile-row-date')
-		.html(string_utils_date(puzzle.date))
-		
-		jpuzzle.find('.textile-row-rating')
-		.html(puzzle.rating)
-		
-		jpuzzle.find('.textile-row-plays')
-		.html(puzzle.plays)
-		
-		jpuzzle.find('.textile-row-play')
-		.prop('href', 'textile.html?puzzle_id=' + puzzle.id)
-		
-		puzzle_list.append(jpuzzle)
 	})
+	
+	//order and display
+	order_gallery($('#orderby').html())
 }
 
 function order_gallery(sort_col) {
@@ -360,6 +338,14 @@ function order_gallery(sort_col) {
 			
 		case 'popularity':
 			puzzles = puzzles.sort(Puzzle.compare_popularity)
+			break
+			
+		case 'hardest':
+			puzzles = puzzles.sort(Puzzle.compare_difficulty_desc)
+			break
+			
+		case 'easiest':
+			puzzles = puzzles.sort(Puzzle.compare_difficulty_asc)
 			break
 			
 		default:
