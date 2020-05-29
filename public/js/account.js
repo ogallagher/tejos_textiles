@@ -808,13 +808,14 @@ function account_more_activity() {
 				
 				let jactivity = $(activity_row)
 				.attr('data-target', activity.target)
-				.click(activity_click)
 				
 				let key = jactivity.find('.activity-key')
 				let value = jactivity.find('.activity-value')
 				let type = activity.activity
 				if (type == 'play' || type == 'rate' || type == 'difficulty') {
-					let details = activity.details.split(',')
+					jactivity.click(activity_click)
+					
+					let details = activity.details.split(',,')
 					
 					key.html(details[1])
 					
@@ -884,7 +885,7 @@ function account_more_records() {
 				
 				let key = jrecord.find('.record-key')
 				let value = jrecord.find('.record-value')
-				let details = record.details.split(',')
+				let details = record.details.split(',,')
 				
 				key.html(details[1])
 				

@@ -54,7 +54,7 @@
 		<!-- page banner -->
 	    <div class="container-fluid">
 	  		<div class="jumbotron row p-0" id="mission_banner">
-	  			<div class="display-1 font-title py-3 px-1 col-lg-4 bg-dark text-light d-flex flex-column justify-content-center" id="mission_statement_title">
+	  			<div class="display-1 font-title py-3 px-1 col-lg-4 bg-sea text-light d-flex flex-column justify-content-center" id="mission_statement_title">
 	  				Our Mission
 	  			</div>
 	  			<div class="display-4 font-title col-lg bg-light text-dark" id="mission_statement_main">
@@ -63,10 +63,61 @@
 	  		</div>
 	    </div>
 		
-		<article class="container">
+		<article class="container-fluid">
 			<div class="row">
-				<!-- story -->
-				<div class="col-lg-8 font-content-md text-justify mb-3" id="col_main">
+				<!-- staff contact cards -->
+				<div class="col-lg-4 order-lg-1 order-2" id="col_contacts">
+					<div class="card mb-3">
+						<div class="card-header font-navigation-md">
+							Allen Albedos
+						</div>
+						<div class="card-body">
+							<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
+								PROFILE PHOTO
+							</div>
+							<p class="card-text font-content-sm">
+								Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the
+								card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to 
+								see how more lines look.
+							</p>
+						</div>
+					</div>
+					
+					<div class="card mb-3">
+						<div class="card-header font-navigation-md">
+							Beatrice Blecking
+						</div>
+						<div class="card-body">
+							<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
+								PROFILE PHOTO
+							</div>
+							<p class="card-text font-content-sm">
+								Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the
+								card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to 
+								see how more lines look.
+							</p>
+						</div>
+					</div>
+					
+					<div class="card mb-3">
+						<div class="card-header font-navigation-md">
+							Charlie Carranza
+						</div>
+						<div class="card-body">
+							<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
+								PROFILE PHOTO
+							</div>
+							<p class="card-text font-content-sm">
+								Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the
+								card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to 
+								see how more lines look.
+							</p>
+						</div>
+					</div>
+				</div>
+				
+				<!-- main -->
+				<div class="col-lg-8 order-lg-2 order-1 font-content-md text-justify mb-3" id="col_main">
 					<section class="clearfix">
 						<h1>Textiles</h1>
 						<div>
@@ -107,7 +158,7 @@
 							<p>
 								This has not been strictly a losing battle for literature, however. There are countless ways that artists of letters– authors,
 								journalists, screen writers, poets, song writers– have combated their rival art forms, and have found means of adapting to fit
-								in with new media. The Textiles Journal is but one of these. With this journal we are attempting to create a new medium for
+								in with new media. <strong>Textiles Journal</strong> is but one of these. With this journal we are attempting to create a new medium for
 								literature, taking cues from its rivals: it’s available online, it’s both textual and visual, and it’s interactive.
 							</p>
 							<p>
@@ -122,7 +173,7 @@
 							<p>
 								This is still a newborn project with few visitors, few registered accounts, few contributors, a tiny team, missing features,
 								errors... you get the picture. That said, we’d like all the help we can get! If you’re interested in the site, register an account with us.
-								If you are a writer and are looking for somewhere to share, look no further; see the Contribute page for more details. If you’re up for the
+								If you are a writer and are looking for somewhere to share, look no further; see the <a href="contribute.html">Contribute</a> page for more details. If you’re up for the
 								challenge you can even send us a whole textile to publish! See <a href="#how_its_made">How it’s Made</a> for how to do so. If you’re
 								knowledgable in web development and would like to test/review/debug/improve the source, visit the
 								<a href="https://github.com/ogallagher/tejos_textiles">Github page</a>.
@@ -179,46 +230,45 @@
 											You can use something like the following shell script, which uses
 											<a href="https://www.ffmpeg.org/download.html">ffmpeg</a> and <a href="http://potrace.sourceforge.net/">potrace</a>.
 										</li>
-										<div class="bg-dark py-3 px-4">
-											<code class="text-left text-light" style="font-size:1rem;">
-												#!/bin/bash<br>
-												# vectorize_img<br>
-												# Owen Gallagher<br>
-												# 1 August 2019<br>
-												<br>
-												# usage to convert ./image.png to ./image.svg:    $vectorize_img image png;<br>
-												#set input file, filetype, and destination directory<br>
-												if [[ -z $1 ]]<br>
-												then<br>
-												<div class="pl-3">
-													echo 'Error arg1: no input filename included'<br>
-													exit 1<br>
-												</div>
-												else<br>
-												<div class="pl-3">
-													if [[ -z $2 ]]<br>
-													then<br>
-													<div class="pl-3">
-														echo 'Error arg2: no input filetype included'<br>
-														exit 2<br>
-													</div>
-													fi<br>
-												</div>
-												fi<br>
-												<br>
-												img=$1<br>
-												ext=$2<br>
-												<br>
-												#convert to bitmap image<br>
-												ffmpeg -i ${img}.${ext} ${img}.bmp<br>
-												<br>
-												#vectorize<br>
-												#customize blacklevel to set threshold for vectorization<br>
-												potrace --svg --progress --blacklevel 0.5 ${img}.bmp<br>
-												<br>
-												#see results<br>
-												open ${img}.svg -a /Applications/Safari.app
-											</code>
+										<div class="border-top border-bottom mt-3 mb-1">
+											<button class="btn clickable text-bold-hover" data-toggle="collapse" data-target="#vectorize_img">
+												<code>vectorize_img</code>
+											</button>
+											<div id="vectorize_img" class="bg-dark p-3 collapse">
+<pre><code class="text-left text-light" style="font-size:1rem;">
+#!/bin/bash
+# vectorize_img
+# Owen Gallagher
+# 1 August 2019
+
+# usage to convert ./image.png to ./image.svg:    $vectorize_img image png;
+#set input file, filetype, and destination directory
+if [[ -z $1 ]]
+then
+	echo 'Error arg1: no input filename included'
+	exit 1
+else
+	if [[ -z $2 ]]
+	then
+		echo 'Error arg2: no input filetype included'
+		exit 2
+	fi
+fi
+
+img=$1
+ext=$2
+
+#convert to bitmap image
+ffmpeg -i ${img}.${ext} ${img}.bmp
+
+#vectorize
+#customize blacklevel to set threshold for vectorization
+potrace --svg --progress --blacklevel 0.5 ${img}.bmp
+
+#see results
+open ${img}.svg -a &lt;path_to_browser&gt;.app
+</code></pre>
+											</div>
 										</div>
 									</ol>
 								</li>
@@ -247,57 +297,6 @@
 							</ol>
 						</div>
 					</section>
-				</div>
-				
-				<!-- staff contact cards -->
-				<div class="col-lg" id="col_contacts">
-					<div class="card mb-3">
-						<div class="card-header font-navigation-md">
-							Allen Albedos
-						</div>
-						<div class="card-body">
-							<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
-								PROFILE PHOTO
-							</div>
-							<p class="card-text font-content-sm">
-								Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the
-								card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to 
-								see how more lines look.
-							</p>
-						</div>
-					</div>
-					
-					<div class="card mb-3">
-						<div class="card-header font-navigation-md">
-							Beatrice Blecking
-						</div>
-						<div class="card-body">
-							<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
-								PROFILE PHOTO
-							</div>
-							<p class="card-text font-content-sm">
-								Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the
-								card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to 
-								see how more lines look.
-							</p>
-						</div>
-					</div>
-					
-					<div class="card mb-3">
-						<div class="card-header font-navigation-md">
-							Charlie Carranza
-						</div>
-						<div class="card-body">
-							<div class="float-left mr-3 img-thumbnail font-content-sm text-truncate bg-dark text-light" style="width:100px;height:100px;">
-								PROFILE PHOTO
-							</div>
-							<p class="card-text font-content-sm">
-								Biographical information about this person, as well as their position in the team. I'm not sure what else will be in the
-								card, but preferably the balance between profile thumbnail and bio info will be better. Here's another sentence just to 
-								see how more lines look.
-							</p>
-						</div>
-					</div>
 				</div>
 			</div>
 		</article>
