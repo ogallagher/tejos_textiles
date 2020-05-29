@@ -337,7 +337,6 @@ function textile_load_puzzle() {
 						tile.find('.work-tile-title')
 						.html(fragment.title)
 						.attr('data-target','#' + tile_id + '_license_collapse') //enable expand/collapse
-						.removeClass('font-title-xlg').addClass('font-title-lg') //shrink from default font
 			
 						//date
 						tile.find('.work-tile-date').html(string_utils_date(fragment.date))

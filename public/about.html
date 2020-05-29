@@ -91,18 +91,160 @@
 					</section>
 					
 					<section class="clearfix">
-						<h1>The Story</h1>
+						<h1>The Big Ideas</h1>
 						<div>
 							<div class="float-right ml-3 font-content-sm text-truncate bg-info text-light text-center text-uppercase" 
 								style="width:200px;height:300px;">
 								PHOTO
 							</div>
 							<p>
-								
+								I’ve felt one of the principle struggles of literature in recent years has been a war waged against new forms of communication
+								and entertainment: photography, movies, television, social media, video games. Each one has offered something new and exciting
+								that simple text has had to compete with. A picture is worth 1000 words, after all. Movies are worth thousands of pictures
+								(not to mention the audio). Social media incorporates multimedia presentation and instant connection. Video games add interaction
+								and the infinity of virtual space.
 							</p>
 							<p>
-								Yeah...
+								This has not been strictly a losing battle for literature, however. There are countless ways that artists of letters– authors,
+								journalists, screen writers, poets, song writers– have combated their rival art forms, and have found means of adapting to fit
+								in with new media. The Textiles Journal is but one of these. With this journal we are attempting to create a new medium for
+								literature, taking cues from its rivals: it’s available online, it’s both textual and visual, and it’s interactive.
 							</p>
+							<p>
+								So, depending on how you see it, one might even call us revolutionary.
+							</p>
+						</div>
+					</section>
+					
+					<section class="clearfix">
+						<h1>Participating</h1>
+						<div>
+							<p>
+								This is still a newborn project with few visitors, few registered accounts, few contributors, a tiny team, missing features,
+								errors... you get the picture. That said, we’d like all the help we can get! If you’re interested in the site, register an account with us.
+								If you are a writer and are looking for somewhere to share, look no further; see the Contribute page for more details. If you’re up for the
+								challenge you can even send us a whole textile to publish! See <a href="#how_its_made">How it’s Made</a> for how to do so. If you’re
+								knowledgable in web development and would like to test/review/debug/improve the source, visit the
+								<a href="https://github.com/ogallagher/tejos_textiles">Github page</a>.
+							</p>
+							<p>
+								The basic takeaway is: if you want to get involved in some way, please do!
+							</p>
+						</div>
+					</section>
+					
+					<section class="clearfix" id="how_its_made">
+						<h1>How it's Made</h1>
+						<div>
+							<p>
+								Our methodology for creating a new textile is fairly low-tech and requires no software or equipment purchases. If you’re interested,
+								give it a go yourself and send us the result to <a href="mailto:contact@textilesjournal.org">contact@textilesjournal.org</a>!
+							</p>
+							<ol>
+								<li class="mt-2">
+									<h3>Literature Content</h3>
+									To start you need some text fragments. There are essentially no rules here, though it can’t bee too long since it’ll all need to
+									fit inside the space of the textile. It can be from a single work, or from multiple. A work is a source text that the textile will
+									use, and a fragment is an excerpt that is found verbatim in the textile. Make sure you’re allowed to use the work(s), of course.
+									Keep track of what gets used in the textile so that we can publish it with references to included works.
+								</li>
+								<li class="mt-2">
+									<h3>Shapes</h3>
+									Next you need some shapes (by the way, steps (1) and (2) can be done simultaneously or in reverse order, too. Not all songs are
+									lyrics with music added after, or all music with lyrics added after). Each shape will act as a piece in the puzzle, and as a window
+									to view the text behind it. The shapes should in some way relate to the text where they belong.
+								</li>
+								<li class="mt-2">
+									<h3>Composition</h3>
+									Before you can put it all together together, here are some questions to think about. How do the shapes relate to each other?
+									Where should they go? Also, what will go between the shapes? A good textile will probably not just have white space between each area
+									where a shape goes.
+								</li>
+								<li class="mt-2">
+									<h3>Execute</h3>
+									It’s finally time to create something. There is more than one way to do this step, but I'll describe our specific method here.
+									
+									<ol>
+										<li>
+											Get two pieces of blank paper that are not too think (printer paper is good). On one page, draw the shapes with a clearly
+											visible pen that won’t smudge too much. On the other page, draw the text. To make the two pages line up, you can place
+											them in a stack on a light box or over a window, “onion-skinning” as one would do for consecutive frames in 2D animation.
+										</li>
+										<li>
+											Once the pages are done, scan each one to an image (something like a png or jpeg should work). If you don’t have a scanner
+											available I suggest trying <a href="https://evernote.com/intl/es/products/scannable">Scannable</a>, by Evernote.
+										</li>
+										<li>
+											Each scan is then binarized (turned to a black-or-white image) and vectorized (from pixel raster to scalable geometry).
+											You can use something like the following shell script, which uses
+											<a href="https://www.ffmpeg.org/download.html">ffmpeg</a> and <a href="http://potrace.sourceforge.net/">potrace</a>.
+										</li>
+										<div class="bg-dark py-3 px-4">
+											<code class="text-left text-light" style="font-size:1rem;">
+												#!/bin/bash<br>
+												# vectorize_img<br>
+												# Owen Gallagher<br>
+												# 1 August 2019<br>
+												<br>
+												# usage to convert ./image.png to ./image.svg:    $vectorize_img image png;<br>
+												#set input file, filetype, and destination directory<br>
+												if [[ -z $1 ]]<br>
+												then<br>
+												<div class="pl-3">
+													echo 'Error arg1: no input filename included'<br>
+													exit 1<br>
+												</div>
+												else<br>
+												<div class="pl-3">
+													if [[ -z $2 ]]<br>
+													then<br>
+													<div class="pl-3">
+														echo 'Error arg2: no input filetype included'<br>
+														exit 2<br>
+													</div>
+													fi<br>
+												</div>
+												fi<br>
+												<br>
+												img=$1<br>
+												ext=$2<br>
+												<br>
+												#convert to bitmap image<br>
+												ffmpeg -i ${img}.${ext} ${img}.bmp<br>
+												<br>
+												#vectorize<br>
+												#customize blacklevel to set threshold for vectorization<br>
+												potrace --svg --progress --blacklevel 0.5 ${img}.bmp<br>
+												<br>
+												#see results<br>
+												open ${img}.svg -a /Applications/Safari.app
+											</code>
+										</div>
+									</ol>
+								</li>
+								<li class="mt-4">
+									<h3>Create the SVG</h3>
+									Import the shapes and text vector (svg) files into an <a href="https://inkscape.org/">Inkscape</a> project,
+									and resize them so they are properly aligned. You can use the app to modify the shapes as well. We always
+									replace the shapes with simplified ones drawn in Inkscape, to shrink the file size. If you have the
+									patience, you can also simplify the paths of the text, which greatly reduces the file size for us.
+								</li>
+								<li class="mt-2">
+									<h3>Export the SVG</h3>
+									This step is not necessary, and if you send us the result from step (5) we’ll take care of the rest.
+									However, if you can, it makes things a lot quicker for us if you combine all the text into one path,
+									and keep the shapes each as its own path. Also, don’t use any transforms (be careful with
+									<code>&lt;g&gt;</code> groups; they will often have transforms which need to be applied to child
+									nodes). Then, open the svg file in a text editor, and open a new blank text file also. In the blank text
+									file, paste the path data (<code>&lt;path d="copy me"/&gt;</code>) for the text and label it. Then, do the same for each shape.
+								</li>
+								<li class="mt-2">
+									<h3>Send it to Us</h3>
+									Finally, send us the text fragments, the text file with the path data, and (optional) the svg file.
+									We’ll review them, let you know whether we add them to the site, and credit you as the textile designer
+									for it.
+								</li>
+							</ol>
 						</div>
 					</section>
 				</div>
