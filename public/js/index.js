@@ -183,17 +183,6 @@ function index_on_login(account_info) {
 		if (featured_puzzle) {
 			loaded_user_stats = true
 			
-			//resume from partial play
-			featured_puzzle.onLoad = function() {
-				sessionclient_resume_partial_play(featured_puzzle.id)
-				.then(function(data) {
-					if (data) {
-						console.log('resuming play')
-						featured_puzzle.resume(data)
-					}
-				})
-			}
-			
 			//update featured puzzle rating to reflect this account's opinion
 			dbclient_fetch_user_rating(account.username, featured_puzzle.id, function(data) {
 				if (data) {
@@ -341,6 +330,17 @@ function index_puzzles_onload(dbdata) {
 		
 		if (featured_puzzle) {
 			$('#featured_url').attr('href','textile.html?puzzle_id=' + featured_puzzle.id)
+			
+			//resume from partial play
+			featured_puzzle.onLoad = function() {
+				sessionclient_resume_partial_play(featured_puzzle.id)
+				.then(function(data) {
+					if (data) {
+						console.log('resuming play')
+						featured_puzzle.resume(data)
+					}
+				})
+			}
 			
 			featured_puzzle.feature(ftitle,fdate,fcanvas,fcontainer)
 				.then(function() {

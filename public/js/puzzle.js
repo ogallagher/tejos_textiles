@@ -307,7 +307,6 @@ Puzzle.prototype.resume = function(partial_play) {
 	let completes = partial_play.completes
 	let shape = null
 	console.log(partial_play)
-	console.log(this.shapes)
 	for (let i=0; i<completes.length; i++) {
 		if (completes[i] == '1') {
 			shape = this.shapes[i]

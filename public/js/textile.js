@@ -187,17 +187,6 @@ function textile_on_login(account_info) {
 		if (puzzle) {
 			loaded_user_stats = true
 			
-			//resume from partial play
-			puzzle.onLoad = function() {
-				sessionclient_resume_partial_play(puzzle.id)
-				.then(function(data) {
-					if (data) {
-						console.log('resuming play')
-						puzzle.resume(data)
-					}
-				})
-			}
-			
 			//update featured puzzle rating to reflect this account's opinion
 			dbclient_fetch_user_rating(account.username, puzzle.id, function(data) {
 				if (data) {
@@ -301,6 +290,17 @@ function textile_load_puzzle() {
 			
 			//init puzzle object
 			puzzle = new Puzzle(dbdata)
+			
+			//resume from partial play
+			puzzle.onLoad = function() {
+				sessionclient_resume_partial_play(puzzle.id)
+				.then(function(data) {
+					if (data) {
+						console.log('resuming play')
+						puzzle.resume(data)
+					}
+				})
+			}
 	
 			//load metadata
 			let puzzle_title = $('#featured_title')
