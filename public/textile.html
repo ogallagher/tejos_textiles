@@ -60,21 +60,35 @@
 				<div class="col display-4 font-title text-center text-uppercase bg-dark text-light ml-3" id="featured_title">
 					Loading title...
 				</div>
-				<button id="help_button"
-					class="btn px-3 my-auto mr-1 ml-3 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-					title="instructions">
-					<span class="oi oi-question-mark"></span>
-				</button>
-				<button id="featured_again"
-					class="col-auto btn px-3 my-auto ml-2 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-					title="play again" data-toggle="tooltip" style="display:none;">
-					<span class="oi oi-reload"></span>
-				</button>
-				<button id="anchor_scroll"
-					class="btn px-3 my-auto mr-3 ml-2 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-					title="anchor scroll on textile" data-toggle="tooltip">
-					<span id="anchor_scroll_icon" class="oi oi-link-broken"></span>
-				</button>
+				<div class="col-auto font-title-md d-flex flex-row justify-content-end">
+					<button id="help_button"
+						class="btn px-3 my-auto mr-1 ml-3 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+						title="instructions">
+						<span class="oi oi-question-mark"></span>
+					</button>
+					<button id="featured_again"
+						class="btn px-3 my-auto ml-2 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+						title="play again" style="display:none;">
+						<span class="oi oi-reload"></span>
+					</button>
+					<button id="save"
+						class="btn px-3 my-auto ml-2 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+						title="save progress" style="display:none;">
+						<span class="oi oi-file"></span>
+					</button>
+					<button id="anchor_scroll"
+						class="btn px-3 my-auto mr-3 ml-2 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+						title="anchor scroll on textile">
+						<span id="anchor_scroll_icon" class="oi oi-link-broken"></span>
+					</button>
+				</div>
+				<div id="save_toast" class="toast fade hide col-auto my-auto mx-2 px-2" role="alert">
+					<div class="toast-body">
+						<div class="font-navigation text-raspberry" id="save_toast_message">
+							message
+						</div>
+					</div>
+				</div>
             </div>
             <div class="mx-2" style="overflow:visible;">
                 <div>

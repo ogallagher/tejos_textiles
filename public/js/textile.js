@@ -40,15 +40,6 @@ window.onload = function() {
 		$('#help_modal').modal('show')
 	})
 	
-	//enable bootstrap tooltips
-	$('[data-toggle="tooltip"]').tooltip({
-		placement: 'auto',
-		delay: {
-			show: 250,
-			hide: 100
-		}
-	})
-	
 	//enable interaction with rating stars
 	textile_stars()
 	
@@ -117,6 +108,37 @@ window.onload = function() {
 		$(this).hide()
 	})
 	
+	//enable save button
+	$('#save').click(function() {
+		//save partial play before leaving
+		if (account && puzzle.startTime) {
+			console.log('saving partial play')
+			sessionclient_partial_play(puzzle.pause())
+			.then(function(saved) {
+				if (saved) {
+					$('#save_toast_message').html('Saved successfully')
+					$('#save_toast').toast('show')
+				}
+				else {
+					$('#save_toast_message').html('No progress to save.')
+					$('#save_toast').toast('show')
+				}
+			})
+			.catch(function() {
+				$('#save_toast_message').html('An error occurred!')
+				$('#save_toast').toast('show')
+			})
+		}
+		else {
+			console.log('not logged in or puzzle not begun; nothing to save')
+			$('#save_toast_message').html('Account required to save progress')
+			$('#save_toast').toast('show')
+		}
+	})
+	$('#save_toast').toast({
+		delay: 2500
+	})
+	
 	//enable scroll-lock button
 	scroll_lock = false
 	$('#anchor_scroll').click(function() {
@@ -164,6 +186,17 @@ function textile_on_login(account_info) {
 		
 		if (puzzle) {
 			loaded_user_stats = true
+			
+			//resume from partial play
+			puzzle.onLoad = function() {
+				sessionclient_resume_partial_play(puzzle.id)
+				.then(function(data) {
+					if (data) {
+						console.log('resuming play')
+						puzzle.resume(data)
+					}
+				})
+			}
 			
 			//update featured puzzle rating to reflect this account's opinion
 			dbclient_fetch_user_rating(account.username, puzzle.id, function(data) {
@@ -260,10 +293,8 @@ function textile_load_puzzle() {
 	let puzzle_id = url_params_get('puzzle_id')
 	
 	if (puzzle_id != null) {
-		console.log('loading textile ' + puzzle_id + '...')
-		
 		//load puzzle from db
-		console.log('... from db')
+		console.log('loading textile ' + puzzle_id + ' from db')
 		dbclient_fetch_puzzle(puzzle_id, function(dbdata) {
 			//set page title
 			$('#title').html(dbdata.title)
@@ -301,7 +332,13 @@ function textile_load_puzzle() {
 				$('#featured_difficulty_key').html('difficulty')
 				$('#featured_difficulty').val(Math.round(puzzle.difficulty))
 			}
-
+			
+			//assign start callback
+			puzzle.onStart = function() {
+				//show save button
+				$('#save').show()
+			}
+			
 			//assign completion callback
 			puzzle.onComplete = textile_puzzle_on_complete
 
@@ -561,13 +598,15 @@ function textile_stars() {
 	})
 }
 
-//TODO handle puzzle completion
 function textile_puzzle_on_complete(puzzle) {
 	console.log('puzzle completed!')
 	
 	//show win screen
 	$('#solve_time').html(puzzle.solveTime / 1000) //solve time in seconds
 	$('#win_screen').show()
+	
+	//hide save button
+	$('#save').hide()
 	
 	//show again button
 	$('#featured_again').show()

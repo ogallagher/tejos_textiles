@@ -26,6 +26,8 @@ const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
 const ENDPOINT_DB = 'db'
 const ENDPOINT_ACTIVATE = 'activate'
+const ENDPOINT_SAVE_PLAY = 'save_play'
+const ENDPOINT_RESUME_PLAY = 'resume_play'
 
 function Account(session,username) {
 	this.session = session		//session cookie
@@ -185,6 +187,76 @@ function sessionclient_logout(id) {
 		}
 		else {
 			cookies_delete(USERNAME_COOKIE_KEY)
+		}
+	})
+}
+
+function sessionclient_partial_play(play) {
+	let session_id = cookies_get(SESSION_COOKIE_KEY)
+	
+	return new Promise(function(resolve, reject) {
+		if (session_id) {
+			$.post({
+				url: URL_SESSIONS,
+				data: {
+					endpoint: ENDPOINT_SAVE_PLAY,
+					args: [
+						session_id,
+						play.puzzle_id,
+						play.duration,
+						play.completes
+					]
+				},
+				success: function(res) {
+					if (res.error) {
+						console.log('partial play not saved: ' + res.error)
+						reject() //error
+					}
+					else {
+						console.log('partial play successfully saved to session')
+						resolve(true) //did save
+					}
+				},
+				error: function(err) {
+					console.log('partial play not saved: ' + err.responseJSON.message)
+					reject() //error
+				}
+			})
+		}
+		else {
+			resolve(false) //did not save, no errors
+		}	
+	})
+}
+
+function sessionclient_resume_partial_play(puzzle_id) {
+	let session_id = cookies_get(SESSION_COOKIE_KEY)
+	
+	return new Promise(function(resolve) {
+		if (session_id) {
+			console.log('resuming partial play of ' + puzzle_id)
+			
+			$.post({
+				url: URL_SESSIONS,
+				data: {
+					endpoint: ENDPOINT_RESUME_PLAY,
+					args: [
+						session_id,
+						puzzle_id
+					]
+				},
+				success: function(data) {
+					if (data.error) {
+						console.log('partial play not recovered: ' + data.error)
+					}
+					else {
+						resolve(data.success)
+					}
+				},
+				error: function(err) {
+					console.log('partial play not recovered: ' + err.responseJSON.message)
+				}
+			})
 		}
 	})
 }

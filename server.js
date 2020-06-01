@@ -249,7 +249,7 @@ try {
 					else if (err == sessionserver.STATUS_DB_ERR) {
 						res.json({error: 'db'})
 					}
-					else if (err = sessionserver.STATUS_DELETE_ERR) {
+					else if (err == sessionserver.STATUS_DELETE_ERR) {
 						res.json({error: 'delete'})
 					}
 					else if (err == sessionserver.STATUS_ACTIVATION) {
@@ -258,8 +258,12 @@ try {
 					else if (err == sessionserver.STATUS_XSS_ERR) {
 						res.json({error: 'xss'})
 					}
+					else if (err == sessionserver.STATUS_NO_PLAY) {
+						res.json({error: 'no_play'})
+					}
 					else {
 						res.json({error: 'endpoint'})
+						console.log(err)
 					}
 				})
 		})

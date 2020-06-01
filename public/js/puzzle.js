@@ -51,11 +51,14 @@ function Puzzle(dbdata) {
 	
 		this.startTime = null
 		this.solveTime = 0
+		this.resumeTime = 0
 		this.enabled = true
 	}
 	
 	this.paper = new paper.PaperScope()
-	this.onComplete = function(){} //callback for when the puzzle is completed
+	this.onStart = function(){}		//callback for when the puzzle begins (startTime is set)
+	this.onComplete = function(){}	//callback for when the puzzle is completed
+	this.onLoad = function(){}		//callback for when featured (loaded/graphics ready)
 }
 
 //instance methods
@@ -159,6 +162,7 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 		//begin solve timer
 		if (self.enabled && self.startTime == null) {
 			self.startTime = new Date()
+			self.onStart()
 		}
 	}
 	paper.view.onDoubleClick = function(event) {
@@ -226,11 +230,12 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 					var holes = new paper.Group(holeClips, self.background, self.text)
 					holes.clipped = true
 					var caps = new paper.Group(capClips, self.foregroundCaps)
-					caps.clipped = true;
+					caps.clipped = true
 	
-					self.updateGraphics();
+					self.updateGraphics()
 	
 					console.log('finished loading graphics for ' + self.title)
+					self.onLoad()
 					resolve()
 				}
 				else {
@@ -251,7 +256,7 @@ Puzzle.prototype.resize = function(container) {
 
 Puzzle.prototype.complete = function() {
 	//calculate solve time (ms)
-	this.solveTime = new Date().getTime() - this.startTime.getTime()
+	this.solveTime = new Date().getTime() - this.startTime.getTime() + this.resumeTime
 	
 	//disable interaction
 	this.enabled = false
@@ -270,6 +275,46 @@ Puzzle.prototype.enable = function() {
 	}
 	
 	this.updateGraphics()
+}
+
+Puzzle.prototype.pause = function() {
+	//return data for partial completion
+	let partial_play = {
+		puzzle_id: this.id,
+		duration: new Date().getTime() - this.startTime.getTime(),
+		completes: '' //char flags for completed shapes
+	}
+	
+	let flags = ''
+	for (let shape of this.shapes) {
+		if (shape.isComplete) {
+			flags += '1'
+		}
+		else {
+			flags += '0'
+		}
+	}
+	partial_play.completes = flags
+	
+	return partial_play
+}
+
+Puzzle.prototype.resume = function(partial_play) {
+	//load data from partial completion
+	this.resumeTime = partial_play.duration //load time so far
+	
+	//load shapes
+	let completes = partial_play.completes
+	let shape = null
+	console.log(partial_play)
+	console.log(this.shapes)
+	for (let i=0; i<completes.length; i++) {
+		if (completes[i] == '1') {
+			shape = this.shapes[i]
+			shape.drag = new paper.Point(0,0)
+			shape.complete()
+		}
+	}
 }
 
 //static methods

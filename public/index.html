@@ -71,8 +71,13 @@
 									</button>
 									<button id="featured_again" 
 										class="btn px-3 my-auto mr-3 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-										title="play again" data-toggle="tooltip" style="display:none;">
+										title="play again" style="display:none;">
 										<span class="oi oi-reload"></span>
+									</button>
+									<button id="save"
+										class="btn px-3 my-auto mr-3 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+										title="save progress" style="display:none;">
+										<span class="oi oi-file"></span>
 									</button>
 									<a id="featured_url" 
 										class="btn px-3 my-auto text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
@@ -80,6 +85,13 @@
 	                                    <span class="oi oi-fullscreen-enter"></span>
 									</a>
                                 </div>
+								<div id="save_toast" class="toast fade hide col-auto my-auto mx-2 px-2" role="alert">
+									<div class="toast-body">
+										<div class="font-navigation text-raspberry" id="save_toast_message">
+											message
+										</div>
+									</div>
+								</div>
                             </div>
                         </div>
                         <div class="card-content">

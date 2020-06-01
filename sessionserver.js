@@ -31,6 +31,7 @@ const STATUS_DELETE_ERR =	7
 const STATUS_FAST =			8
 const STATUS_ACTIVATION =	9
 const STATUS_XSS_ERR =		11
+const STATUS_NO_PLAY =		12
 
 exports.SUCCESS =				SUCCESS
 exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
@@ -43,18 +44,23 @@ exports.STATUS_DELETE_ERR = 	STATUS_DELETE_ERR
 exports.STATUS_FAST =			STATUS_FAST
 exports.STATUS_ACTIVATION =		STATUS_ACTIVATION
 exports.STATUS_XSS_ERR =		STATUS_XSS_ERR
+exports.STATUS_NO_PLAY =		STATUS_NO_PLAY
 
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
 const ENDPOINT_DB = 'db' //user wants to access database, but is doing an action that requires authentication
 const ENDPOINT_ACTIVATE = 'activate'
+const ENDPOINT_SAVE_PLAY = 'save_play'
+const ENDPOINT_RESUME_PLAY = 'resume_play'
 
 exports.ENDPOINT_CREATE = ENDPOINT_CREATE
 exports.ENDPOINT_VALIDATE = ENDPOINT_VALIDATE
 exports.ENDPOINT_DELETE = ENDPOINT_DELETE
 exports.ENDPOINT_DB = ENDPOINT_DB
 exports.ENDPOINT_ACTIVATE = ENDPOINT_ACTIVATE
+exports.ENDPOINT_SAVE_PLAY = ENDPOINT_SAVE_PLAY
+exports.ENDPOINT_RESUME_PLAY = ENDPOINT_RESUME_PLAY
 
 //private vars
 const AUTH_ATTEMPT_MAX = 5
@@ -345,6 +351,81 @@ exports.handle_request = function(endpoint, args, dbserver) {
 					})
 				
 				break
+					
+			case ENDPOINT_SAVE_PLAY:
+				session_id = args[0]
+				let play = {
+					puzzle_id: parseInt(args[1]),
+					duration: parseInt(args[2]),
+					completes: args[3]
+				}
+				
+				console.log('saving partial play to ' + session_id)
+				get_session(session_id)
+					.then(function(session) {
+						if (!session.partial_plays) {
+							session.partial_plays = []
+						}
+						else {
+							//remove existing partial plays for the same puzzle
+							for (let p=0; p<session.partial_plays.length; p++) {
+								if (session.partial_plays[p].puzzle_id == play.puzzle_id) {
+									session.partial_plays.splice(p,1)
+									p--
+								}
+							}
+						}
+						
+						//save partial play to session
+						session.partial_plays.push(play)
+						resolve(true)
+					})
+					.catch(function(error_code) {
+						//no session found to which to store play
+						reject(STATUS_NO_SESSION)
+					})
+					
+				break
+					
+			case ENDPOINT_RESUME_PLAY:
+				session_id = args[0]
+				let puzzle_id = args[1]
+				
+				get_session(session_id)
+				.then(function(session) {
+					if (session.partial_plays) {
+						let pi
+						let play = session.partial_plays.find(function(p, i) {
+							if (p.puzzle_id == puzzle_id) {
+								pi = i
+								return true
+							}
+							else {
+								return false
+							}
+						})
+						
+						if (play) {
+							//remove partial play
+							session.partial_plays.splice(pi,1)
+							
+							//return result
+							console.log('retrieved partial play for ' + session_id)
+							resolve(play)
+						}
+						else {
+							reject(STATUS_NO_PLAY)
+						}
+					}
+					else {
+						reject(STATUS_NO_PLAY)
+					}
+				})
+				.catch(function(error_code) {
+					reject(STATUS_NO_SESSION)
+				})
+				
+				break
 				
 			default:
 				console.log('error: invalid session endpoint ' + endpoint)
@@ -390,6 +471,7 @@ exports.request_activate = function(session_id) {
 function get_session(id) {
 	return new Promise(function(resolve,reject) {
 		//check session_cache
+		let cached = false
 		for (let i=session_cache.length-1; i>=0; i--) {
 			if (session_cache[i].id == id) {
 				let session = session_cache[i]
@@ -403,47 +485,63 @@ function get_session(id) {
 					session.data.login = new Date().getTime() //update session
 					resolve(session.data)
 				}
+				
+				cached = true
+				break
 			}
 		}
 		
-		//check session file
-		let session_file = SESSIONS_PATH + id
-		fs.readFile(session_file, function(err,data) {
-			if (err) {
-				//session does not exist
-				reject(STATUS_NO_SESSION)
-			}
-			else {
-				try {
-					let session = JSON.parse(data)
+		if (!cached) {
+			//check session file
+			let session_file = SESSIONS_PATH + id
+			fs.readFile(session_file, function(err,data) {
+				if (err) {
+					//session does not exist
+					reject(STATUS_NO_SESSION)
+				}
+				else {
+					try {
+						let session = JSON.parse(data)
 					
-					if (expired(session)) {
-						//session expired; delete session and notify to reauthenticate
-						delete_session(id)
-						reject(STATUS_EXPIRE)
-					}
-					else {
-						//session exists and is still valid; update timestamp
-						update_session(id, session)
-						
-						//add to session_cache, don't exceed SESSION_CACHE_MAX
-						session_cache.push({
-							id: id,
-							data: session
-						})
-						while (session_cache.length > SESSION_CACHE_MAX) {
-							session_cache.shift() //removes first (oldest) element
+						if (expired(session)) {
+							//session expired; delete session and notify to reauthenticate
+							delete_session(id)
+							reject(STATUS_EXPIRE)
 						}
+						else {
+							//session exists and is still valid; update timestamp
+							update_session(id, session)
 						
-						//return session info
-						resolve(session)
+							//add to session_cache, don't exceed SESSION_CACHE_MAX
+							let cached = session_cache.find(function(si) {
+								return si.id == id
+							})
+							if (!cached) {
+								//append
+								session_cache.push({
+									id: id,
+									data: session
+								})
+							
+								while (session_cache.length > SESSION_CACHE_MAX) {
+									session_cache.shift() //removes first (oldest) element
+								}
+							}
+							else {
+								//replace
+								cached.data = session	
+							}
+						
+							//return session info
+							resolve(session)
+						}
+					}
+					catch(err) {
+						reject(STATUS_FAST)
 					}
 				}
-				catch(err) {
-					reject(STATUS_FAST)
-				}
-			}
-		})
+			})
+		}
 	})
 }
 

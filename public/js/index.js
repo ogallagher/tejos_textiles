@@ -14,15 +14,6 @@ let loaded_user_stats
 window.onload = function() {
 	force_https()
 	
-	//enable bootstrap tooltips
-	$('[data-toggle="tooltip"]').tooltip({
-		placement: 'auto',
-		delay: {
-			show: 250,
-			hide: 100
-		}
-	})
-	
 	//enable toasts
 	$('.toast').toast({
 		delay: 4000
@@ -124,6 +115,52 @@ window.onload = function() {
 		//hide play-again button
 		$(this).hide()
 	})
+	
+	//enable save button
+	$('#save').click(function() {
+		//save partial play before leaving
+		if (account && featured_puzzle.startTime) {
+			console.log('saving partial play')
+			sessionclient_partial_play(featured_puzzle.pause())
+			.then(function(saved) {
+				if (saved) {
+					$('#save_toast_message').html('Saved successfully')
+					$('#save_toast').toast('show')
+				}
+				else {
+					$('#save_toast_message').html('No progress to save.')
+					$('#save_toast').toast('show')
+				}
+			})
+			.catch(function() {
+				$('#save_toast_message').html('An error occurred!')
+				$('#save_toast').toast('show')
+			})
+		}
+		else {
+			console.log('not logged in or puzzle not begun; nothing to save')
+			$('#save_toast_message').html('Account required to save progress')
+			$('#save_toast').toast('show')
+		}
+	})
+	$('#save_toast').toast({
+		delay: 2500
+	})
+}
+
+window.onbeforeunload = function() {
+	//save partial play before leaving
+	if (account && featured_puzzle && featured_puzzle.startTime) {
+		console.log('saving partial play')
+		
+		sessionclient_partial_play(featured_puzzle.pause())
+		.then(function() {
+			console.log('partial play saved!')
+		})
+	}
+	else {
+		console.log('not logged in or puzzle not begun; nothing to save')
+	}
 }
 
 function index_on_login(account_info) {
@@ -145,6 +182,17 @@ function index_on_login(account_info) {
 		
 		if (featured_puzzle) {
 			loaded_user_stats = true
+			
+			//resume from partial play
+			featured_puzzle.onLoad = function() {
+				sessionclient_resume_partial_play(featured_puzzle.id)
+				.then(function(data) {
+					if (data) {
+						console.log('resuming play')
+						featured_puzzle.resume(data)
+					}
+				})
+			}
 			
 			//update featured puzzle rating to reflect this account's opinion
 			dbclient_fetch_user_rating(account.username, featured_puzzle.id, function(data) {
@@ -248,6 +296,7 @@ function index_puzzles_onload(dbdata) {
 		let first = true
 		for (let p of dbdata) {
 			let puzzle = new Puzzle(p) //see puzzle.js
+			
 			puzzle.onComplete = index_puzzle_on_complete //handle puzzle completion
 			
 			let jpuzzle = $(jstring)
@@ -315,6 +364,12 @@ function index_puzzles_onload(dbdata) {
 				
 				$('#featured_difficulty_key').html('difficulty')
 				$('#featured_difficulty').val(Math.round(featured_puzzle.difficulty))
+			}
+			
+			//handle puzzle start
+			featured_puzzle.onStart = function() {
+				//show save button
+				$('#save').show()
 			}
 			
 			//load authors and fragments
@@ -575,6 +630,9 @@ function index_puzzle_on_complete(puzzle) {
 	//show win screen
 	$('#solve_time').html(puzzle.solveTime / 1000) //solve time in seconds
 	$('#win_screen').show()
+	
+	//hide save button
+	$('#save').hide()
 	
 	//show again button
 	$('#featured_again').show()
