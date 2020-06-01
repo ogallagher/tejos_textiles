@@ -194,7 +194,7 @@
 							<ol>
 								<li class="mt-2">
 									<h3>Literature Content</h3>
-									To start you need some text fragments. There are essentially no rules here, though it can’t bee too long since it’ll all need to
+									To start you need some text fragments. There are essentially no rules here, though it can’t be too long since it’ll all need to
 									fit inside the space of the textile. It can be from a single work, or from multiple. A work is a source text that the textile will
 									use, and a fragment is an excerpt that is found verbatim in the textile. Make sure you’re allowed to use the work(s), of course.
 									Keep track of what gets used in the textile so that we can publish it with references to included works.
@@ -207,7 +207,7 @@
 								</li>
 								<li class="mt-2">
 									<h3>Composition</h3>
-									Before you can put it all together together, here are some questions to think about. How do the shapes relate to each other?
+									Before you can put it all together, there are some questions to think about. How do the shapes relate to each other?
 									Where should they go? Also, what will go between the shapes? A good textile will probably not just have white space between each area
 									where a shape goes.
 								</li>
@@ -217,7 +217,7 @@
 									
 									<ol>
 										<li>
-											Get two pieces of blank paper that are not too think (printer paper is good). On one page, draw the shapes with a clearly
+											Get two pieces of blank paper that are not too thick (printer paper is good). On one page, draw the shapes with a clearly
 											visible pen that won’t smudge too much. On the other page, draw the text. To make the two pages line up, you can place
 											them in a stack on a light box or over a window, “onion-skinning” as one would do for consecutive frames in 2D animation.
 										</li>
@@ -242,7 +242,7 @@
 # 1 August 2019
 
 # usage to convert ./image.png to ./image.svg:    $vectorize_img image png;
-#set input file, filetype, and destination directory
+#set input filename and filetype
 if [[ -z $1 ]]
 then
 	echo 'Error arg1: no input filename included'
@@ -265,7 +265,7 @@ ffmpeg -i ${img}.${ext} ${img}.bmp
 #customize blacklevel to set threshold for vectorization
 potrace --svg --progress --blacklevel 0.5 ${img}.bmp
 
-#see results
+#see results (open &lt;file&gt; is a mac command)
 open ${img}.svg -a &lt;path_to_browser&gt;.app
 </code></pre>
 											</div>
@@ -290,7 +290,7 @@ open ${img}.svg -a &lt;path_to_browser&gt;.app
 								</li>
 								<li class="mt-2">
 									<h3>Send it to Us</h3>
-									Finally, send us the text fragments, the text file with the path data, and (optional) the svg file.
+									Finally, send us the text fragments, the text file with the path data, and the svg file (optional).
 									We’ll review them, let you know whether we add them to the site, and credit you as the textile designer
 									for it.
 								</li>

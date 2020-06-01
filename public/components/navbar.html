@@ -25,23 +25,40 @@
         <span class="navbar-toggler-icon text-light"></span>
     </button>
     
-    <div class="collapse navbar-collapse text-right row justify-content-end" id="navbar_navigation">
-        <div class="col-auto d-flex flex-column justify-content-center">
-            <ul class="form-inline my-auto">
-                <a id="nav_contact" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="contact.html">CONTACT</a>
-                <a id="nav_about" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="about.html">ABOUT</a>
-                <a id="nav_contribute" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="contribute.html">CONTRIBUTE</a>
-                <a id="nav_gallery" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="gallery.html">GALLERY</a>
-				
-				<div class="dropdown pr-2">
-	                <button id="nav_account" class="btn btn-outline-dark font-navigation ml-2 my-1" type="button" data-toggle="dropdown">ACCOUNT</button>
-					
-					<div id="nav_account_dropdown" class="dropdown-menu dropdown-menu-right font-navigation text-center p-0 d-none" style="z-index:2000;">
-						<button id="nav_account_profile" class="dropdown-item bg-dark-hover clickable text-dark-nohover text-light-hover">PROFILE</button>
-						<button id="nav_account_logout" class="dropdown-item bg-dark-hover clickable text-dark-nohover text-light-hover">LOGOUT</button>
+    <div class="collapse navbar-collapse row" id="navbar_navigation">
+		<div class="col-lg order-lg-1 order-2">
+			<div id="search_collapse" class="py-1 px-2 collapse">
+				<div class="input-group">
+					<input class="form-control border-dark font-navigation" id="search_input" type="text" placeholder="search site" />
+					<div class="input-group-append">
+						<button class="btn btn-outline-dark" id="search_button">
+							<span class="oi oi-magnifying-glass"></span>
+						</button>
 					</div>
 				</div>
-            </ul>
+			</div>
+		</div>
+        <div class="col-lg-auto d-flex flex-row justify-content-end order-lg-2 order-1">
+			<div class="d-flex flex-column justify-content-center">
+	            <ul class="form-inline my-auto pl-0">
+					<button class="btn btn-outline-dark my-1" data-toggle="collapse" data-target="#search_collapse">
+						<span class="oi oi-magnifying-glass"></span>
+					</button>
+	                <a id="nav_contact" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="contact.html">CONTACT</a>
+	                <a id="nav_about" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="about.html">ABOUT</a>
+	                <a id="nav_contribute" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="contribute.html">CONTRIBUTE</a>
+	                <a id="nav_gallery" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="gallery.html">GALLERY</a>
+					
+					<div class="dropdown pr-2">
+		                <button id="nav_account" class="btn btn-outline-dark font-navigation ml-2 my-1" type="button" data-toggle="dropdown">ACCOUNT</button>
+					
+						<div id="nav_account_dropdown" class="dropdown-menu dropdown-menu-right font-navigation text-center p-0 d-none" style="z-index:2000;">
+							<button id="nav_account_profile" class="dropdown-item bg-dark-hover clickable text-dark-nohover text-light-hover">PROFILE</button>
+							<button id="nav_account_logout" class="dropdown-item bg-dark-hover clickable text-dark-nohover text-light-hover">LOGOUT</button>
+						</div>
+					</div>
+	            </ul>
+			</div>
         </div>
     </div>
 	

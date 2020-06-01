@@ -58,11 +58,11 @@ window.onload = function() {
 	search_input.on('keyup', function (e) {
         if (e.which === 13) { //13 = newline
             if (document.activeElement instanceof HTMLElement) {
-                document.activeElement.blur();
+                document.activeElement.blur()
             }
-            search_gallery();
+            search_gallery()
         }
-    });
+    })
 	
 	search_button = $('#search_button')
 	//enable the search button

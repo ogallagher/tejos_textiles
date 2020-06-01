@@ -44,6 +44,19 @@ function navbar_onload(page) {
 			}
 		}
 	})
+	
+	//enable site search
+	$('#search_input').on('keyup', function (e) {
+        if (e.which === 13) { //13 = newline
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur()
+            }
+			
+            navbar_search()
+        }
+    })
+	
+	$('#search_button').click(navbar_search)
 }
 
 /*
@@ -80,4 +93,8 @@ function navbar_toggle_account(account) {
 		//enable account actions dropdown
 		$('#nav_account_dropdown').removeClass('d-none')
 	}
+}
+
+function navbar_search() {
+	alert('TODO search')
 }
