@@ -289,9 +289,7 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				break
 			
 			case ENDPOINT_DELETE:
-				session_id = args[0]
-				
-				console.log('deleting session')
+				session_id = args //not args[0] for... reasons
 				
 				delete_session(session_id, function(err) {
 					if (err) {
@@ -568,7 +566,7 @@ function create_session(session_id, activation_code) {
 }
 
 function delete_session(id,callback) {
-	fs.unlink(SESSION_PATH + id, function(err) {
+	fs.unlink(SESSIONS_PATH + id, function(err) {
 		if (err) {
 			let message = 'error: session for ' + id + ' failed to be deleted'
 			

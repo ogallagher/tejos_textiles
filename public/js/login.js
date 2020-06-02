@@ -58,12 +58,14 @@ function submit_login_register() {
 				console.log('logging into account ' + username)
 				login_register(username,password)
 			}
-			else if (validate_email()) {
-				let email = $('#email_input').val()
-				let subscribed = $('#subscribe_check').prop('checked')
+			else {
+				validate_email().then(function() {
+					let email = $('#email_input').val()
+					let subscribed = $('#subscribe_check').prop('checked')
 				
-				console.log('creating new account ' + username)
-				login_register(username,password,email,subscribed)
+					console.log('creating new account ' + username)
+					login_register(username,password,email,subscribed)
+				})
 			}
 		}
 	})
@@ -150,18 +152,30 @@ function validate_password() {
 	}
 }
 
-//validate email
+//validate email (valid against regex and unique)
 const regex_email = /.+@.+\..+/
 function validate_email() {
 	let input = $('#email_input')
-	let email = input.val()
+	let email = input.val().toLowerCase()
 	
-	if (email && email.match(regex_email)) {
-		input.removeClass('is-invalid').addClass('is-valid')
-		return true
-	}
-	else {
-		input.removeClass('is-valid').addClass('is-invalid')
-		return false
-	}
+	return new Promise(function(resolve) {
+		//check regex pattern
+		if (email && email.match(regex_email)) {
+			//check if email taken
+			dbclient_email_exists(email, function(taken) {
+				if (taken){
+					$('#email_feedback').html('There\'s already an account registered with that email. Try logging in?')
+					input.removeClass('is-valid').addClass('is-invalid')
+				}
+				else {
+					input.removeClass('is-invalid').addClass('is-valid')
+					resolve()
+				}
+			})
+		}
+		else {
+			$('#email_feedback').html('Please input a valid email address.')
+			input.removeClass('is-valid').addClass('is-invalid')
+		}
+	})
 }

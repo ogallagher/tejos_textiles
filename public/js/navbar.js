@@ -30,6 +30,10 @@ function navbar_onload(page) {
 					//session deleted from server and client cookies; ready to re-enable login
 					navbar_toggle_account(null)
 					
+					//delete info from login form
+					$('#username_input').val('')
+					$('#password_input').val('')
+					
 					//pass execution to page to clean up evidence of user info
 					if (login_on_logout) {
 						login_on_logout()

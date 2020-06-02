@@ -216,6 +216,33 @@ function dbclient_user_exists(username,callback) {
 	})
 }
 
+function dbclient_email_exists(email,callback) {
+	console.log('checking if email ' + email + ' is taken')
+	
+	let req = {
+		endpoint: 'email_exists',
+		args: [email]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('error: email check failed: ' + data.error)
+				callback(false)
+			}
+			else {
+				callback(data[0].taken)
+			}
+		},
+		error: function(err) {
+			console.log('error: email check failed: ' + err.responseText)
+			callback(false)
+		}
+	})
+}
+
 function dbclient_rate(username,puzzle_id,rating,callback) {
 	console.log('rating puzzle ' + puzzle_id + ' as ' + rating)
 	
