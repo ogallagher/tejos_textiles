@@ -178,6 +178,18 @@ exports.get_query = function(endpoint, args, is_external) {
 									query = api['fetch_puzzles'].query
 								}
 							}
+							else if (endpoint == 'search_all') {
+								let regex = "'.*("
+								
+								let terms = []
+								for (let term of args) {
+									terms.push('(' + term + ')')
+								}
+								
+								regex += terms.join('|') + ").*'"
+								
+								query = query.replace('?terms?', regex)
+							}
 							else if (endpoint == 'update_user') {
 								//args = [username, photo, bio, links]
 								let changes = []

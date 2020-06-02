@@ -161,6 +161,34 @@ function dbclient_fetch_search(terms,callback) {
 	})
 }
 
+function dbclient_site_search(terms,callback) {
+	console.log('searching site for ' + terms.join())
+	
+	let req = {
+		endpoint: 'search_all',
+		args: terms
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('error: site search failed: ' + data.error)
+				callback(false)
+			}
+			else {
+				console.log('site search success')
+				callback(data[0])
+			}
+		},
+		error: function(err) {
+			console.log('error: site search failed: ' + err.responseText)
+			callback(false)
+		}
+	})
+}
+
 function dbclient_user_exists(username,callback) {
 	console.log('checking if username ' + username + ' is taken')
 	

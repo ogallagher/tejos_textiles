@@ -36,6 +36,12 @@
 		"external": true,
 		"special": true
 	},
+	"search_all": {
+		"params": [],
+		"query": "call search_all(?terms?)",
+		"external": true,
+		"special": true
+	},
 	"rate": {
 		"params": ["?username?","?puzzle_id?","?rating?"],
 		"query": "call add_rating(?username?,?puzzle_id?,?rating?)",

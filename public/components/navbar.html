@@ -27,13 +27,33 @@
     
     <div class="collapse navbar-collapse row" id="navbar_navigation">
 		<div class="col-lg order-lg-1 order-2">
-			<div id="search_collapse" class="py-1 px-2 collapse">
+			<div id="navbar_search_collapse" class="py-1 px-2 collapse">
 				<div class="input-group">
-					<input class="form-control border-dark font-navigation" id="search_input" type="text" placeholder="search site" />
+					<input class="form-control border-dark font-navigation" id="navbar_search_input" type="text" placeholder="search site" />
 					<div class="input-group-append">
-						<button class="btn btn-outline-dark" id="search_button">
+						<button class="btn btn-outline-dark" id="navbar_search_button">
 							<span class="oi oi-magnifying-glass"></span>
 						</button>
+					</div>
+				</div>
+				<div id="navbar_search_results" class="font-nagivation rounded mt-2 collapse">
+					<div class="clickable border-top border-right border-left border-dark rounded-top p-2 bg-slight" data-toggle="collapse" href="#navbar_textiles">
+						<span class="font-weight-bold">textiles</span>
+						(<span id="navbar_textiles_count">0</span>)
+					</div>
+					<div id="navbar_textiles" class="collapse border-top border-right border-left border-dark">
+					</div>
+					<div class="clickable border-top border-right border-left border-dark p-2 bg-slight" data-toggle="collapse" href="#navbar_accounts">
+						<span class="font-weight-bold">people</span>
+						(<span id="navbar_accounts_count">0</span>)
+					</div>
+					<div id="navbar_accounts" class="collapse border-top border-right border-left border-dark">
+					</div>
+					<div class="clickable border border-dark p-2 bg-slight" data-toggle="collapse" href="#navbar_works">
+						<span class="font-weight-bold">works</span>
+						(<span id="navbar_works_count">0</span>)
+					</div>
+					<div id="navbar_works" class="collapse border-right border-bottom border-left border-dark rounded-bottom">
 					</div>
 				</div>
 			</div>
@@ -41,7 +61,7 @@
         <div class="col-lg-auto d-flex flex-row justify-content-end order-lg-2 order-1">
 			<div class="d-flex flex-column justify-content-center">
 	            <ul class="form-inline my-auto pl-0">
-					<button class="btn btn-outline-dark my-1" data-toggle="collapse" data-target="#search_collapse">
+					<button class="btn btn-outline-dark my-1" data-toggle="collapse" data-target="#navbar_search_collapse">
 						<span class="oi oi-magnifying-glass"></span>
 					</button>
 	                <a id="nav_contact" class="btn btn-outline-dark font-navigation ml-2 my-1" role="button" href="contact.html">CONTACT</a>

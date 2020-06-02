@@ -288,14 +288,12 @@ function circular_offset(base, offset, max) {
 }
 
 function search_gallery() {
-    var search_val = search_input.val().toString().toLowerCase();
-    console.log('searching gallery for ' + search_val);
+    var search_val = search_input.val().toString().toLowerCase()
+    console.log('searching gallery for ' + search_val)
 	
     if (search_val != '') {
-        var search_vals = search_val.split(/[\s,]+/);
-		
         //send search query
-		dbclient_fetch_search(search_vals, load_search_results)
+		dbclient_fetch_search(search_val.split(/[\s,]+/), load_search_results)
     }
 	else {
 		//get all puzzles

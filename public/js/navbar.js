@@ -46,7 +46,7 @@ function navbar_onload(page) {
 	})
 	
 	//enable site search
-	$('#search_input').on('keyup', function (e) {
+	$('#navbar_search_input').on('keyup', function (e) {
         if (e.which === 13) { //13 = newline
             if (document.activeElement instanceof HTMLElement) {
                 document.activeElement.blur()
@@ -56,7 +56,7 @@ function navbar_onload(page) {
         }
     })
 	
-	$('#search_button').click(navbar_search)
+	$('#navbar_search_button').click(navbar_search)
 }
 
 /*
@@ -96,5 +96,59 @@ function navbar_toggle_account(account) {
 }
 
 function navbar_search() {
-	alert('TODO search')
+    var search_val = $('#navbar_search_input').val().toString().toLowerCase();
+    console.log('searching site for ' + search_val)
+	
+    if (search_val != '') {
+        //send site search query
+		dbclient_site_search(search_val.split(/[\s,]+/), function(data) {
+			console.log(data)
+			
+			let result_str = '<a class="d-block clickable bg-slight-hover p-2 text-reset text-decoration-none" href></a>'
+			
+			let navbar_textiles = $('#navbar_textiles').empty()
+			let tn = 0
+			let navbar_accounts = $('#navbar_accounts').empty()
+			let an = 0
+			let navbar_works = $('#navbar_works').empty()
+			let wn = 0
+			
+			for (let result of data) {
+				switch (result.table) {
+					case 'puzzles':
+						navbar_textiles.append(
+							$(result_str)
+							.html(result.details)
+							.prop('href','textile.html?puzzle_id=' + result.id)
+						)
+						tn++
+						break
+						
+					case 'people':
+						navbar_accounts.append(
+							$(result_str)
+							.html(result.id)
+							.prop('href','account.html?username=' + result.id)
+						)
+						an++
+						break
+						
+					case 'works':
+						navbar_works.append(
+							$(result_str)
+							.html(result.id)
+							.prop('href','account.html?username=' + result.details)
+						)
+						wn++
+						break
+				}	
+			}
+			
+			$('#navbar_textiles_count').html(tn)
+			$('#navbar_accounts_count').html(an)
+			$('#navbar_works_count').html(wn)
+			
+			$('#navbar_search_results').show()
+		})
+    }
 }
