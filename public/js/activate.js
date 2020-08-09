@@ -57,7 +57,7 @@ window.onload = function() {
 		html_imports('login','#import_login', function() {
 			navbar_onload('account')
 			
-			//TODO assign login callbacks
+			//assign login callbacks
 			login_on_login = activate_on_login
 			
 			//load account

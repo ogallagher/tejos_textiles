@@ -163,5 +163,15 @@
 		"params": ["?username?"],
 		"query": "update people set deleted=0 where username=?username?",
 		"external": false
+	},
+	"match_email": {
+		"params": ["?username?","?email?"],
+		"query": "select 1 from people where username=?username? and email=?email?",
+		"external": true
+	},
+	"reset_password": {
+		"params": ["?username?","?new_password?"],
+		"query": "update people set `password`=?new_password? where username=?username?",
+		"external": false
 	}
 }

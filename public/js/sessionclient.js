@@ -19,6 +19,7 @@ const SESSION_ID_CHAR_RANGE = SESSION_ID_CHAR_MAX - SESSION_ID_CHAR_MIN //includ
 const SESSION_COOKIE_KEY = 'session_id'
 const USERNAME_COOKIE_KEY = 'username'
 const PLAYS_COOKIE_KEY = 'plays'
+const RECOVERY_COOKIE_KEY = 'is_password_reset_session'
 
 const URL_SESSIONS = '/sessions'
 const ENDPOINT_CREATE = 'create'
@@ -28,6 +29,7 @@ const ENDPOINT_DB = 'db'
 const ENDPOINT_ACTIVATE = 'activate'
 const ENDPOINT_SAVE_PLAY = 'save_play'
 const ENDPOINT_RESUME_PLAY = 'resume_play'
+const ENDPOINT_RESET_PASSWORD ='reset_password'
 
 function Account(session,username) {
 	this.session = session		//session cookie
@@ -48,23 +50,37 @@ function sessionclient_get_account(callback) {
 	let username = cookies_get(USERNAME_COOKIE_KEY)
 	
 	if (session && username) {
-		//check if expired
-		sessionclient_validate(session,username)
+		if (cookies_get(RECOVERY_COOKIE_KEY)) {
+			//the current session is for password reset; the client did not log in
+			console.log('found password reset session cookie')
+			callback(null)
+		}
+		else {
+			//check if expired
+			sessionclient_validate(session,username)
 			.then(function(account_summary) {
 				//session is valid; return account info
 				let account = new Account(session, username)
 				account.enabled = account_summary.enabled
 				account.admin = account_summary.admin
-				
+			
 				callback(account)
 			})
 			.catch(function(err) {
-				//session is invalid/expired; clean cookies
-				cookies_delete(SESSION_COOKIE_KEY)
-				cookies_delete(USERNAME_COOKIE_KEY)
-				console.log('session expired')
+				if (err == 'reset') {
+					//session is for password reset; the client did not log in
+					cookies_set(RECOVERY_COOKIE_KEY,'1')
+					console.log('session is for password reset; updating cookies')
+				}
+				else {
+					//session is invalid/expired; clean cookies
+					cookies_delete(SESSION_COOKIE_KEY)
+					cookies_delete(USERNAME_COOKIE_KEY)
+					console.log('session expired')
+				}
 				callback(null)
 			})
+		}
 	}
 	else {
 		console.log('no session cookie found')
@@ -177,8 +193,10 @@ function sessionclient_logout(id) {
 					cookies_delete(SESSION_COOKIE_KEY)
 					cookies_delete(USERNAME_COOKIE_KEY)
 					console.log('session deleted from server and cookies')
-				
-					resolve()
+					
+					if (resolve) {
+						resolve()
+					}
 				},
 				error: function(err) {
 					console.log('session delete failed: ' + err.responseJSON.message)
@@ -187,6 +205,10 @@ function sessionclient_logout(id) {
 		}
 		else {
 			cookies_delete(USERNAME_COOKIE_KEY)
+			
+			if (resolve) {
+				resolve()
+			}
 		}
 	})
 }
@@ -369,6 +391,85 @@ function sessionclient_recover(username) {
 			console.log('account recovery failed: ' + err)
 			reject(err)
 		})
+	})
+}
+
+function sessionclient_request_reset(username, email) {
+	return new Promise(function(resolve,reject) {
+		session_id = cookies_get(SESSION_COOKIE_KEY)
+		
+		function request_reset_logged_out() {
+			/*
+			Create session for account and "log in", storing the reset code 
+			server-side. This session will only be valid to complete the 
+			password reset, and not to access any of this account's data.
+			*/
+			session_id = sessionclient_generate_session_id()
+			
+			//add reset session to cookies
+			cookies_set(SESSION_COOKIE_KEY, session_id)
+			cookies_set(USERNAME_COOKIE_KEY, username)
+			cookies_set(RECOVERY_COOKIE_KEY, '1')
+			
+			$.post({
+				url: URL_SESSIONS,
+				data: {
+					endpoint: ENDPOINT_RESET_PASSWORD,
+					args: [session_id, username, email]
+				},
+				success: function(result) {
+					if (result.success) {
+						resolve()
+					}
+					else {
+						reject(result.error)
+					}
+				},
+				error: function(err) {
+					reject('http')
+				}
+			})
+		}
+		
+		if (session_id) {
+			//log out of current session
+			sessionclient_logout(session_id)
+			.then(request_reset_logged_out)
+		}
+		else {
+			request_reset_logged_out()
+		}
+	})
+}
+
+//update the account's password in the database
+function sessionclient_reset_password(username, reset_code, password) {
+	let session_id = cookies_get(SESSION_COOKIE_KEY)
+	
+	return new Promise(function(resolve,reject) {
+		if (session_id) {
+			$.post({
+				url: URL_SESSIONS,
+				data: {
+					endpoint: ENDPOINT_RESET_PASSWORD,
+					args: [session_id, username, reset_code, password]
+				},
+				success: function(data) {
+					if (data.success) {
+						resolve()
+					}
+					else {
+						reject(data.error)
+					}
+				},
+				error: function(err) {
+					reject('http')
+				}
+			})
+		}
+		else {
+			reject('session')
+		}
 	})
 }
 

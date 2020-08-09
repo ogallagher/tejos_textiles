@@ -177,26 +177,44 @@ try {
 						//args = [username, password, session_id, email, subscribed]
 						//create activation code
 						sessionserver
-							.request_activate(args[2])
-							.then(function(activation_code) {
-								res.json({success: data})
-								
-								//send registration/activation email
-								emailserver.email(args[3], emailserver.EMAIL_REGISTER, {
-									username: args[0],
-									subscribed: args[4],
-									activation_code: activation_code
-								})
+						.request_activate(args[2])
+						.then(function(activation_code) {
+							res.json({success: data})
+							
+							//send registration/activation email
+							emailserver.email(args[3], emailserver.EMAIL_REGISTER, {
+								username: args[0],
+								subscribed: args[4],
+								activation_code: activation_code
 							})
-							.catch(function() {
-								res.json({error: 'activation'})
+						})
+						.catch(function() {
+							res.json({error: 'activation'})
+						})
+					}
+					else if (endpoint == sessionserver.ENDPOINT_RESET_PASSWORD) {
+						if (!args[3]) {
+							//new password not provided; requesting reset, not completing reset
+							let reset_code = data
+							
+							//send password reset email
+							emailserver.email(args[2], emailserver.EMAIL_PASSWORD_RESET, {
+								username: args[1],
+								reset_code: reset_code
 							})
+						}
+						
+						res.json({success: true})
 					}
 					else {
 						res.json({success: data})
 					}
 				})
 				.catch(function(err) {
+					/*
+					Session server status codes are used internally, but converted to strings when passed to
+					the client.
+					*/
 					if (err == sessionserver.STATUS_CREATE_ERR) {
 						res.json({error: 'create'})
 					}
@@ -260,6 +278,9 @@ try {
 					}
 					else if (err == sessionserver.STATUS_NO_PLAY) {
 						res.json({error: 'no_play'})
+					}
+					else if (err == sessionserver.STATUS_RESET) {
+						res.json({error: 'reset'})
 					}
 					else {
 						res.json({error: 'endpoint'})

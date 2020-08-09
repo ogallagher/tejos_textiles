@@ -636,3 +636,30 @@ function dbclient_play(username, puzzle_id, duration, callback) {
 			callback(err)
 		})
 }
+
+function dbclient_match_email(username, email, callback) {
+	console.log('checking ' + username + ' associated email against ' + email)
+	
+	let req = {
+		endpoint: 'match_email',
+		args: [username, email]
+	}
+	
+	$.get({
+		url: '/db',
+		data: req,
+		success: function(data) {
+			if (data.error) {
+				console.log('email match failed: ' + data.error)
+				callback(null)
+			}
+			else {
+				callback(data.length) //positive is array with 1=1, negative is empty array
+			}
+		},
+		error: function(err) {
+			console.log('email match failed: ' + err.responseText)
+			callback(null)
+		}
+	})
+}

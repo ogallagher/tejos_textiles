@@ -179,3 +179,58 @@ function validate_email() {
 		}
 	})
 }
+
+//password reset button
+function login_reset_password() {
+	//get username for account
+	let username = $('#username_input').val()
+	if (!username || username.length == 0) {
+		username = prompt('Please provide the username for the account you wish to recover.')
+	}
+	
+	if (username && username.length != 0) {
+		//confirm account exists and get email
+		dbclient_user_exists(username, function(taken) {
+			if (taken) {
+				//get email for account
+				let email = $('#email_input').val()
+				if (!email || email.length == 0) {
+					email = prompt('Please provide the account\'s associated email address.')
+				}
+				
+				if (email && email.match(regex_email)) {
+					//confirm that email matches
+					dbclient_match_email(username, email, function(email_match) {
+						if (email_match) {
+							console.log('email match success')
+							
+							//generate reset code and send email
+							sessionclient_request_reset(username, email)
+							.then(function() {
+								//confirm email was sent
+								alert('Success! A password reset email was sent to the following address: ' + email)
+							})
+							.catch(function(err) {
+								//TODO handle reset error
+								console.log('reset request failed: ' + err)
+							})
+						}
+						else {
+							//email incorrect
+							alert('The given email address does not match the one registered for ' + username)
+						}
+					})
+				}
+				else {
+					//invalid email; abort
+					alert('Valid email address not provided; password reset aborted.')
+				}
+			}
+			else {
+				//account not found
+				alert(username + ' is not associated with any account, so it should be free to register.')
+			}
+		})
+	}
+	//else, abort
+}

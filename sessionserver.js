@@ -32,6 +32,7 @@ const STATUS_FAST =			8
 const STATUS_ACTIVATION =	9
 const STATUS_XSS_ERR =		11
 const STATUS_NO_PLAY =		12
+const STATUS_RESET =		13 //session is only to be used to reset an account password
 
 exports.SUCCESS =				SUCCESS
 exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
@@ -45,6 +46,7 @@ exports.STATUS_FAST =			STATUS_FAST
 exports.STATUS_ACTIVATION =		STATUS_ACTIVATION
 exports.STATUS_XSS_ERR =		STATUS_XSS_ERR
 exports.STATUS_NO_PLAY =		STATUS_NO_PLAY
+exports.STATUS_RESET =			STATUS_RESET
 
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
@@ -53,6 +55,7 @@ const ENDPOINT_DB = 'db' //user wants to access database, but is doing an action
 const ENDPOINT_ACTIVATE = 'activate'
 const ENDPOINT_SAVE_PLAY = 'save_play'
 const ENDPOINT_RESUME_PLAY = 'resume_play'
+const ENDPOINT_RESET_PASSWORD ='reset_password'
 
 exports.ENDPOINT_CREATE = ENDPOINT_CREATE
 exports.ENDPOINT_VALIDATE = ENDPOINT_VALIDATE
@@ -61,6 +64,7 @@ exports.ENDPOINT_DB = ENDPOINT_DB
 exports.ENDPOINT_ACTIVATE = ENDPOINT_ACTIVATE
 exports.ENDPOINT_SAVE_PLAY = ENDPOINT_SAVE_PLAY
 exports.ENDPOINT_RESUME_PLAY = ENDPOINT_RESUME_PLAY
+exports.ENDPOINT_RESET_PASSWORD = ENDPOINT_RESET_PASSWORD
 
 //private vars
 const AUTH_ATTEMPT_MAX = 5
@@ -79,6 +83,24 @@ const ACTIVATION_CODE_RANGE = (NUM_MAX-NUM_MIN) + (UPPER_MAX-UPPER_MIN) + (LOWER
 let session_cache		//see issue https://github.com/ogallagher/tejos_textiles/issues/14 for more info
 let session_cleaner
 let session_saver
+
+/*
+A session object is flexible, allowing for new properties to be added. At most, it will
+have the following stricture:
+{
+	login: <timestamp of latest login>,
+	partial_plays: [
+		{
+			puzzle_id: <id of puzzle that was partially played>,
+			duration: <play time so far>,
+			completes: <ordered array of booleans corresponding to each shape's (in)complete status>
+		}
+	],
+	code: <activation code>,
+	reset: <password reset code; if set, this session is only valid to reset the account, not to access it>
+}
+*/
+
 
 //global methods
 exports.init = function() {
@@ -119,29 +141,35 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				console.log('validating session ' + session_id + ' for ' + username)
 				
 				get_session(session_id)
-					.then(function(session) {
+				.then(function(session) {
+					if (session_id.reset) {
+						//session is given to client to reset user's password; they are not logged in
+						reject(STATUS_RESET)
+					}
+					else {
 						//return account summary for login
 						dbserver
-							.get_query('fetch_user', [username])
-							.then(function(action) {
-								dbserver.send_query(action.sql, function(err, res) {
-									if (err) {
-										console.log(err)
-										reject(STATUS_DB_ERR)
-									}
-									else {
-										resolve(res[0])
-									}
-								})
+						.get_query('fetch_user', [username])
+						.then(function(action) {
+							dbserver.send_query(action.sql, function(err, res) {
+								if (err) {
+									console.log(err)
+									reject(STATUS_DB_ERR)
+								}
+								else {
+									resolve(res[0])
+								}
 							})
-							.catch(function(err) {
-								console.log('error: failed to fetch user summary')
-								reject(STATUS_DB_ERR)
-							})
-					})
-					.catch(function(error_code) {
-						reject(error_code)
-					})
+						})
+						.catch(function(err) {
+							console.log('error: failed to fetch user summary')
+							reject(STATUS_DB_ERR)
+						})
+					}
+				})
+				.catch(function(error_code) {
+					reject(error_code)
+				})
 				break
 			
 			case ENDPOINT_CREATE:
@@ -250,41 +278,41 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				console.log('checking credential ' + session_id + ' for db --> ' + db_endpoint)
 				
 				get_session(session_id)
-					.then(function(session) {
-						//pass request through to dbserver
-						dbserver.get_query(db_endpoint, db_args)
-							.then(function(action) {
-								if (action.sql) {
-									dbserver.send_query(action.sql, function(err, res) {
-										if (err) {
-											console.log(err)
-											reject(STATUS_DB_ERR)
-										}
-										else {
-											resolve(res)
-										}
-									})
-								}
-								else {
-									if (action == 'xss') {
-										reject(STATUS_XSS_ERR)
-									}
-								}
-							})
-							.catch(function(err) {
-								console.log('db query not created for ' + db_endpoint + ': ' + err)
-								
-								if (err == 'empty') {
-									resolve(SUCCESS)
-								}
-								else {
+				.then(function(session) {
+					//pass request through to dbserver
+					dbserver.get_query(db_endpoint, db_args)
+					.then(function(action) {
+						if (action.sql) {
+							dbserver.send_query(action.sql, function(err, res) {
+								if (err) {
+									console.log(err)
 									reject(STATUS_DB_ERR)
 								}
+								else {
+									resolve(res)
+								}
 							})
+						}
+						else {
+							if (action == 'xss') {
+								reject(STATUS_XSS_ERR)
+							}
+						}
 					})
-					.catch(function(error_code) {
-						reject(error_code)
+					.catch(function(err) {
+						console.log('db query not created for ' + db_endpoint + ': ' + err)
+					
+						if (err == 'empty') {
+							resolve(SUCCESS)
+						}
+						else {
+							reject(STATUS_DB_ERR)
+						}
 					})
+				})
+				.catch(function(error_code) {
+					reject(error_code)
+				})
 					
 				break
 			
@@ -310,43 +338,105 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				console.log('attempting to activate account ' + username)
 				
 				get_session(session_id)
-					.then(function(session) {
-						if (session.code) {
-							if (session.code == args[2]) {
-								console.log(username + ' activation successful!')
-							
-								//update server
-								dbserver.get_query('activate', [username])
-									.then(function(action) {
-										dbserver.send_query(action.sql, function(err) {
-											if (err) {
-												console.log(err)
-												reject(STATUS_DB_ERR)
-											}
-											else {
-												resolve(true)
-											}
-										})
-									})
-									.catch(function(err) {
-										console.log('error: failed to get db-->activate query')
+				.then(function(session) {
+					if (session.code) {
+						if (session.code == args[2]) {
+							console.log(username + ' activation successful!')
+						
+							//update database
+							dbserver.get_query('activate', [username])
+							.then(function(action) {
+								dbserver.send_query(action.sql, function(err) {
+									if (err) {
+										console.log(err)
 										reject(STATUS_DB_ERR)
+									}
+									else {
+										resolve(true)
+									}
+								})
+							})
+							.catch(function(err) {
+								console.log('error: failed to get db-->activate query')
+								reject(STATUS_DB_ERR)
+							})
+						}
+						else {
+							console.log('suspicious: incorrect activation code for ' + username)
+							reject(STATUS_ACTIVATION)
+						}
+					}
+					else {
+						//no code found; count as expired code
+						reject(STATUS_EXPIRE)
+					}
+				})
+				.catch(function(error_code) {
+					//server will take care of creating new session with new code and email
+					reject(STATUS_EXPIRE)
+				})
+				
+				break
+					
+			case ENDPOINT_RESET_PASSWORD:
+				session_id = args[0]
+				username = args[1]
+				password_new = args[3]
+				
+				if (password_new) {
+					//finish password reset; validate code and reset password
+					code = args[2]
+					get_session(session_id)
+					.then(function(session) {
+						if (session.reset) {
+							if (session.reset == code) {
+								//password reset code is correct; reset password
+								dbserver
+								.get_query('reset_password',[username,password_new])
+								.then(function(action) {
+									dbserver.send_query(action.sql, function(err) {
+										if (err) {
+											console.log(err)
+											reject(STATUS_DB_ERR)
+										}
+										else {
+											//password reset success; remote reset code from session and resolve
+											session.reset = null
+											resolve()
+										}
 									})
+								})
 							}
 							else {
-								console.log('suspicious: incorrect activation code for ' + username)
-								reject(STATUS_ACTIVATION)
+								//reset code incorrect
+								reject(STATUS_LOGIN_WRONG)
 							}
 						}
 						else {
-							//no code found; count as expired code
-							reject(STATUS_EXPIRE)
+							//password reset code not found
+							reject(STATUS_RESET)
 						}
 					})
 					.catch(function(error_code) {
-						//server will take care of creating new session with new code and email
+						//session not found; must have expired
 						reject(STATUS_EXPIRE)
 					})
+				}
+				else {
+					//request password reset; create code and send email
+					reset_code = create_code()
+					
+					create_session(session_id, null, reset_code)
+					.then(function(session) {
+						console.log('[' + session_id + '].reset = ' + reset_code)
+						resolve(reset_code)
+						//email send handled in server, calling emailserver
+					})
+					.catch(function(err) {
+						console.log('failed to create session ' + session_id + ': ' + err)
+						reject(STATUS_CREATE_ERR)
+					})
+				}
 				
 				break
 					
@@ -434,22 +524,7 @@ exports.handle_request = function(endpoint, args, dbserver) {
 
 exports.request_activate = function(session_id) {
 	//create activation code
-	let activation_code = ''
-	for (let i=0; i<ACTIVATION_CODE_LEN; i++) {
-		let char = Math.floor(Math.random() * ACTIVATION_CODE_RANGE) + ACTIVATION_CODE_MIN
-		
-		if (char > NUM_MAX) {
-			char += NUM_UPPER_GAP
-			
-			if (char > UPPER_MAX) {
-				//lowercase
-				char += UPPER_LOWER_GAP
-			}
-			//else, uppercase
-		}
-		//else, number
-		activation_code += String.fromCharCode(char)
-	}
+	let activation_code = create_code()
 	
 	return new Promise(function(resolve,reject) {
 		//create session with new activation code
@@ -463,6 +538,29 @@ exports.request_activate = function(session_id) {
 				reject(STATUS_CREATE_ERR)
 			})
 	})
+}
+
+//used to create activation and password reset codes
+function create_code() {
+	let code = ''
+	
+	for (let i=0; i<ACTIVATION_CODE_LEN; i++) {
+		let char = Math.floor(Math.random() * ACTIVATION_CODE_RANGE) + ACTIVATION_CODE_MIN
+		
+		if (char > NUM_MAX) {
+			char += NUM_UPPER_GAP
+			
+			if (char > UPPER_MAX) {
+				//lowercase
+				char += UPPER_LOWER_GAP
+			}
+			//else, uppercase
+		}
+		//else, number
+		code += String.fromCharCode(char)
+	}
+	
+	return code
 }
 
 //local methods
@@ -543,12 +641,15 @@ function get_session(id) {
 	})
 }
 
-function create_session(session_id, activation_code) {
+function create_session(session_id, activation_code, reset_code) {
 	let session = {
 		login: new Date().getTime()
 	}
 	if (activation_code) {
 		session.code = activation_code
+	}
+	if (reset_code) {
+		session.reset = reset_code
 	}
 	
 	return new Promise(function(resolve,reject) {

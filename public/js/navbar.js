@@ -26,19 +26,19 @@ function navbar_onload(page) {
 		
 		if (session_id) {
 			sessionclient_logout(session_id)
-				.then(function() {
-					//session deleted from server and client cookies; ready to re-enable login
-					navbar_toggle_account(null)
-					
-					//delete info from login form
-					$('#username_input').val('')
-					$('#password_input').val('')
-					
-					//pass execution to page to clean up evidence of user info
-					if (login_on_logout) {
-						login_on_logout()
-					}
-				})
+			.then(function() {
+				//session deleted from server and client cookies; ready to re-enable login
+				navbar_toggle_account(null)
+				
+				//delete info from login form
+				$('#username_input').val('')
+				$('#password_input').val('')
+				
+				//pass execution to page to clean up evidence of user info
+				if (login_on_logout) {
+					login_on_logout()
+				}
+			})
 		}
 		else {
 			//same as above, but session in the case that the session has already deleted (manually deleting cookies, deleting account, etc)

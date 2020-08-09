@@ -5,5 +5,3 @@ Link to English edition: [Textiles Journal](https://textilesjournal.org)<br>
 Link to Spanish edition: Revista Tejos (tbd)
 
 # Used technologies
-
-# Agenda

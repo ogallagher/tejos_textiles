@@ -15,11 +15,13 @@ const emailserver_EMAIL_REGISTER		= 0
 const emailserver_EMAIL_NEW_PUZZLE		= 1
 const emailserver_EMAIL_CONTRIBUTION	= 2
 const emailserver_EMAIL_CUSTOM			= 3
+const emailserver_EMAIL_PASSWORD_RESET	= 4
 
 exports.EMAIL_REGISTER = emailserver_EMAIL_REGISTER
 exports.EMAIL_NEW_PUZZLE = emailserver_EMAIL_NEW_PUZZLE
 exports.EMAIL_CONTRIBUTION = emailserver_EMAIL_CONTRIBUTION
 exports.EMAIL_CUSTOM = emailserver_EMAIL_CUSTOM
+exports.EMAIL_PASSWORD_RESET = emailserver_EMAIL_PASSWORD_RESET
 
 const TJ_EMAIL = 'contact@textilesjournal.org'
 exports.TJ_EMAIL = process.env.EMAIL
@@ -31,12 +33,14 @@ const PATH_EMAIL_REGISTER = PATH_EMAIL_TEMPLATES + 'register'
 const PATH_EMAIL_NEW_PUZZLE = PATH_EMAIL_TEMPLATES + 'new_puzzle'
 const PATH_EMAIL_CONTRIBUTION = PATH_EMAIL_TEMPLATES + 'contribution'
 const PATH_EMAIL_CUSTOM = PATH_EMAIL_TEMPLATES + 'custom'
+const PATH_EMAIL_PASSWORD_RESET = PATH_EMAIL_TEMPLATES + 'password_reset'
 
 const PATH_EMAIL_CSS = PATH_EMAIL_TEMPLATES + 'email_style.css'
 const EMAIL_CSS_PLACEHOLDER = '<!--?email_style.css?-->'
 const EMAIL_USERNAME_PLACEHOLDER = /\?username\?/g
 const EMAIL_SUBSCRIBED_PLACEHOLDER = /\?subscribed\?/g
 const EMAIL_ACTIVATION_CODE_PLACEHOLDER = /\?activation_code\?/g
+const EMAIL_RESET_CODE_PLACEHOLDER = /\?reset_code\?/g
 
 //local vars
 let defaults
@@ -87,6 +91,29 @@ exports.init = function() {
 				//new puzzle
 				
 				//contribution
+				
+				//password reset
+				templates.password_reset = {}
+				fs.readFile(PATH_EMAIL_PASSWORD_RESET + '.html', function(err,data) {
+					if (err) {
+						console.log('error: read from password reset html template failed: ' + err)
+						reject()
+					}
+					else {
+						templates.password_reset.html = data.toString()
+						.replace(/\s+/g,' ')
+						.replace(EMAIL_CSS_PLACEHOLDER, '<style>' + css + '</style>')
+					}
+				})
+				fs.readFile(PATH_EMAIL_PASSWORD_RESET + '.txt', function(err,data) {
+					if (err) {
+						console.log('error: read from password reset txt template failed: ' + err)
+						reject()
+					}
+					else {
+						templates.password_reset.text = data.toString()
+					}
+				})
 			}
 		})
 		
@@ -179,6 +206,19 @@ exports.email = function(dest_email, type, args) {
 				text = args.message + '\n\n' + from
 				html = undefined
 				console.log(args)
+				
+				break
+				
+			case emailserver_EMAIL_PASSWORD_RESET:
+				out += 'password reset'
+				subject = 'Password reset requested'
+				
+				text = templates.password_reset.text
+					.replace(EMAIL_USERNAME_PLACEHOLDER, args.username)
+					.replace(EMAIL_RESET_CODE_PLACEHOLDER, args.reset_code)
+				html = templates.password_reset.html
+					.replace(EMAIL_USERNAME_PLACEHOLDER, args.username)
+					.replace(EMAIL_RESET_CODE_PLACEHOLDER, args.reset_code)
 				
 				break
 			
