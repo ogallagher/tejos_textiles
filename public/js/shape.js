@@ -26,7 +26,12 @@ function Shape(hole,cap,puzzle) {
 		this.cap = null	
 		this.hasCap = false
 		if (cap != 'null') {
-			this.cap = new paper.CompoundPath(cap)
+			this.cap = new paper.Path(cap)
+			
+			if (!this.cap.clockwise) {
+				this.cap.reorient(false, true)
+			}
+			
 			this.cap.scale(puzzle.scale)
 			this.capP = this.cap.position.multiply(puzzle.scale)
 			this.capS = this.cap.bounds.size
