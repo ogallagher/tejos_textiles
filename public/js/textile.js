@@ -341,11 +341,11 @@ function textile_load_puzzle() {
 			
 			//assign completion callback
 			puzzle.onComplete = textile_puzzle_on_complete
-
+			
 			//load authors and fragments
 			dbclient_fetch_puzzle_fragments(puzzle.id, function(fragments) {
 				html_imports('work_tile', function(tile_str) {
-					let fragments_list = $('#fragments_list')
+					let fragments_list = $('#fragments_list').empty()
 					let authors_list = $('#featured_authors').html('')
 					let author_button_str = '<a class="btn btn-outline-secondary rounded-0" href="#"></a>'
 					let author_names = []

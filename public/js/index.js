@@ -166,7 +166,7 @@ window.onbeforeunload = function() {
 function index_on_login(account_info) {
 	let old_admin = (account != null && account.admin)
 	let new_admin = (account_info != null && account_info.admin)
-	if (old_admin != new_admin ||  account == null) {
+	if (old_admin != new_admin || account == null) {
 		//fetch puzzles from db and insert into page if account admin status changed
 		dbclient_fetch_puzzles(new_admin, index_puzzles_onload)
 	}
@@ -375,7 +375,7 @@ function index_puzzles_onload(dbdata) {
 			//load authors and fragments
 			dbclient_fetch_puzzle_fragments(featured_puzzle.id, function(fragments) {		
 				html_imports('work_tile', function(tile_str) {
-					let fragments_list = $('#fragments_list')
+					let fragments_list = $('#fragments_list').empty()
 					let authors_list = $('#featured_authors').html('')
 					let author_button_str = '<a class="btn btn-outline-secondary" href="#"></a>'
 					let author_names = []
