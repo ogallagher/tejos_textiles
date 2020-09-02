@@ -91,16 +91,17 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 	//enable this paperscope
 	paper = this.paper
 	
-	//attach to featured canvas
+	//unfeature previously featured
+	if (featuredPuzzle != null && featuredPuzzle.paper.view != null) {
+		featuredPuzzle.paper.view.remove() //unselect other
+	}
+	
+	//attach this to featured canvas
 	this.paper.setup(fcanvas)
 	this.resize(fcontainer)
 	let v0 = paper.view
 	
-	//feature
-	if (featuredPuzzle != null && featuredPuzzle.paper.view != null) {
-		featuredPuzzle.paper.view.remove() //unselect other
-	}
- 	featuredPuzzle = this; //select this
+ 	featuredPuzzle = this; //select this as new featured puzzle
 	
 	//add graphic elements	
 	this.foreground = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height)

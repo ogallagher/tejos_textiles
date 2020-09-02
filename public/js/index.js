@@ -6,10 +6,10 @@ Owen Gallagher
 
 const WAS_HERE_COOKIE_KEY = 'was_here'
 
-let featured_puzzle
-let account //see sessionclient:Account class
-let user_rating
-let loaded_user_stats
+let featured_puzzle = null
+let account = null //see sessionclient:Account class
+let user_rating = null
+let loaded_user_stats = false
 
 window.onload = function() {
 	force_https()
@@ -355,8 +355,10 @@ function index_puzzles_onload(dbdata) {
 				featured_puzzle.resize(fcontainer)
 			}
 			
-			if (!loaded_user_stats && account) {
-				index_on_login(account)
+			if (account) {
+				if (!loaded_user_stats) {
+					index_on_login(account)
+				}
 			}
 			else {
 				//update average rating and difficulty
