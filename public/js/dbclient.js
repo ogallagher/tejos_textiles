@@ -379,7 +379,7 @@ function dbclient_fetch_user(username, callback) {
 						})
 					}
 				}
-			
+				
 				account.photo = account_details.photo
 				account.subscribed = (account_details.subscription.data[0] == 1)
 			

@@ -172,19 +172,20 @@ try {
 			
 			sessionserver.handle_request(endpoint, args, dbserver)
 				.then(function(data) {
-					if (endpoint == sessionserver.ENDPOINT_CREATE && args[3]) {
+					if ((endpoint == sessionserver.ENDPOINT_CREATE && data.register) || 
+						endpoint == sessionserver.ENDPOINT_REQUEST_ACTIVATE) {
 						console.log('requesting activation')
 						//args = [username, password, session_id, email, subscribed]
 						//create activation code
 						sessionserver
-						.request_activate(args[0])
+						.request_activate(data.username)
 						.then(function(activation_code) {
 							res.json({success: data})
 							
 							//send registration/activation email
-							emailserver.email(args[3], emailserver.EMAIL_REGISTER, {
-								username: args[0],
-								subscribed: args[4],
+							emailserver.email(data.email, emailserver.EMAIL_REGISTER, {
+								username: data.username,
+								subscribed: data.subscribed,
 								activation_code: activation_code
 							})
 						})

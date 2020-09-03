@@ -26,6 +26,7 @@ const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
 const ENDPOINT_DB = 'db'
+const ENDPOINT_REQUEST_ACTIVATE = 'request_activate'
 const ENDPOINT_ACTIVATE = 'activate'
 const ENDPOINT_SAVE_PLAY = 'save_play'
 const ENDPOINT_RESUME_PLAY = 'resume_play'
@@ -354,6 +355,36 @@ function sessionclient_activate(activation_code) {
 				},
 				error: function(err) {
 					reject('http')
+				}
+			})
+		}
+		else {
+			reject('session')
+		}
+	})
+}
+
+function sessionclient_request_activate() {
+	let session_id = cookies_get(SESSION_COOKIE_KEY)
+	let username = cookies_get(USERNAME_COOKIE_KEY)
+	
+	return new Promise(function(resolve,reject) {
+		if (session_id && username) {
+			let args = [username]
+			
+			$.post({
+				url: URL_SESSIONS,
+				data: {
+					endpoint: ENDPOINT_REQUEST_ACTIVATE,
+					args: args
+				},
+				success: function(data) {
+					if (data.success) {
+						resolve()
+					}
+					else {
+						reject(data.error)
+					}
 				}
 			})
 		}

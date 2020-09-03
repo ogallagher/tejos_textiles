@@ -71,6 +71,31 @@ window.onload = function() {
 	})
 	html_imports('footer','#import_footer')
 	
+	//activate button
+	$('#activate').click(function() {
+		let message = $('#edit_toast_message').empty()
+		
+		sessionclient_request_activate()
+		.then(function() {
+			//activation request success
+			message.html('Success! New ativation code sent to ' + account.email);
+			
+			$('#edit_toast').toast('show')
+		})
+		.catch(function(err) {
+			console.log('activation request failed: ' + err)
+			
+			if (err == 'session') {
+				message.html('Error: session not found. Try logging out and back in again?')
+			}
+			else if (err == 'db') {
+				message.html('Error: failed to fetch email from database')
+			}
+			
+			$('#edit_toast').toast('show')
+		})
+	})
+	
 	//edit controls
 	let edit_account = $('#edit_account')
 	let save_account = $('#save_account')
@@ -116,14 +141,14 @@ window.onload = function() {
 				//show result
 				if (result.success == 10) {
 					//10 = sessionserver.SUCCESS
-					message.html(message.html() + 'No account changes. ')
+					message.html('No account changes. ')
 				}
 				else if (result.success) {
-					message.html(message.html() + 'Account update successful. ')
+					message.html('Account update successful. ')
 				}
 				else {
 					console.log('user update result: ' + result)
-					message.html(message.html() + 'Error: failed to update your account info on the server. Check browser logs for details. ')
+					message.html('Error: failed to update your account info on the server. Check browser logs for details. ')
 				}
 				$('#edit_toast').toast('show')
 				
@@ -141,7 +166,7 @@ window.onload = function() {
 				dbclient_update_works(account.username, edited_works, function(result) {
 					//show result
 					if (result.success) {
-						message.html(message.html() + 'Contributions update successful. ')
+						message.html('Contributions update successful. ')
 						
 						for (let work of edited_works) {
 							if (work.deleted) {
@@ -586,6 +611,14 @@ function account_on_details(details) {
 }
 
 function account_enable_edits() {
+	//show activate button (if account not enabled)
+	if (!account.enabled) {
+		$('#activate').show()
+	}
+	else {
+		$('#activate').hide()
+	}
+	
 	editing = false
 	edits = {}
 	
@@ -597,8 +630,11 @@ function account_enable_edits() {
 }
 
 function account_disable_edits() {
+	$('#activate').hide()
+	
 	$('.editable').click(null).attr('data-editing',false)
 	editing = false
+	
 	$('#edit_account').hide()
 	$('#save_account').hide()
 	$('#delete_account').hide()

@@ -55,6 +55,7 @@ const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
 const ENDPOINT_DELETE = 'delete'
 const ENDPOINT_DB = 'db' //user wants to access database, but is doing an action that requires authentication
+const ENDPOINT_REQUEST_ACTIVATE = 'request_activate'
 const ENDPOINT_ACTIVATE = 'activate'
 const ENDPOINT_SAVE_PLAY = 'save_play'
 const ENDPOINT_RESUME_PLAY = 'resume_play'
@@ -216,6 +217,7 @@ exports.handle_request = function(endpoint, args, dbserver) {
 							else {
 								resolve({
 									register: true,
+									username: username,
 									email: email,
 									subscribed: subscribed
 								})
@@ -350,6 +352,36 @@ exports.handle_request = function(endpoint, args, dbserver) {
 					}
 				})
 				reject(STATUS_NO_SESSION)
+				break
+				
+			case ENDPOINT_REQUEST_ACTIVATE:
+				//send new activation code to user
+				username = args //not args[0] because there's only one arg and... post body parser reasons
+				console.log('request activate user ' + username)
+				
+				//get associated email
+				dbserver
+				.get_query('fetch_user', [username])
+				.then(function(action) {
+					dbserver.send_query(action.sql, function(err, res) {
+						if (err || !res) {
+							console.log(err)
+							console.log(res)
+							reject(STATUS_DB_ERR)
+						}
+						else {
+							let email = res.email
+							let subscribed = res.subscription.data[0] == 1
+							
+							//caller will request activation and send email
+							resolve({
+								username: username,
+								email: email,
+								subscribed: subscribed
+							})
+						}
+					})
+				})
 				break
 				
 			case ENDPOINT_ACTIVATE:
