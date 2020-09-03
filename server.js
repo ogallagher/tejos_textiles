@@ -177,7 +177,7 @@ try {
 						//args = [username, password, session_id, email, subscribed]
 						//create activation code
 						sessionserver
-						.request_activate(args[2])
+						.request_activate(args[0])
 						.then(function(activation_code) {
 							res.json({success: data})
 							
@@ -221,7 +221,7 @@ try {
 					else if (err == sessionserver.STATUS_NO_SESSION) {
 						res.json({error: 'null'})
 					}
-					else if (err == sessionserver.STATUS_EXPIRE) {
+					else if (err == sessionserver.STATUS_EXPIRE || err == sessionserver.STATUS_NO_ACTIVATION) {
 						if (endpoint == sessionserver.ENDPOINT_ACTIVATE) {
 							//args = [session_id, username, activation_code]
 							//get dest email
@@ -239,7 +239,7 @@ try {
 											
 											//send new activation code
 											sessionserver
-												.request_activate(args[0])
+												.request_activate(username)
 												.then(function(activation_code) {
 													//send new activation email
 													emailserver.email(dest_email, emailserver.EMAIL_REGISTER, {

@@ -14,25 +14,27 @@ const enums = require('./enums.js')
 
 //config
 const SESSIONS_PATH = 'efs/sessions/'			//sessions are stored in this directory, accessed from root directory
+const ACTIVATIONS_PATH = 'efs/activations/'		//activations are stored in this directory
 const SESSION_TTL = enums.time.WEEK				//session expiration
 const SESSION_CLEANER_DELAY = enums.time.WEEK	//session cleaner runs once per __
 const SESSION_SAVER_DELAY = enums.time.HOUR		//session saver runs once per __
 const SESSION_CACHE_MAX = 15					//max number of session objects in session_cache
 
 //global vars
-const SUCCESS =				10
-const STATUS_NO_SESSION =	1
-const STATUS_EXPIRE =		2
-const STATUS_CREATE_ERR =	3
-const STATUS_ENDPOINT_ERR =	4
-const STATUS_LOGIN_WRONG = 	5
-const STATUS_DB_ERR =		6
-const STATUS_DELETE_ERR =	7
-const STATUS_FAST =			8
-const STATUS_ACTIVATION =	9
-const STATUS_XSS_ERR =		11
-const STATUS_NO_PLAY =		12
-const STATUS_RESET =		13 //session is only to be used to reset an account password
+const SUCCESS =					10
+const STATUS_NO_SESSION =		1
+const STATUS_EXPIRE =			2
+const STATUS_CREATE_ERR =		3
+const STATUS_ENDPOINT_ERR =		4
+const STATUS_LOGIN_WRONG = 		5
+const STATUS_DB_ERR =			6
+const STATUS_DELETE_ERR =		7
+const STATUS_FAST =				8
+const STATUS_ACTIVATION =		9
+const STATUS_XSS_ERR =			11
+const STATUS_NO_PLAY =			12
+const STATUS_RESET =			13 //session is only to be used to reset an account password
+const STATUS_NO_ACTIVATION =	14
 
 exports.SUCCESS =				SUCCESS
 exports.STATUS_NO_SESSION =		STATUS_NO_SESSION
@@ -47,6 +49,7 @@ exports.STATUS_ACTIVATION =		STATUS_ACTIVATION
 exports.STATUS_XSS_ERR =		STATUS_XSS_ERR
 exports.STATUS_NO_PLAY =		STATUS_NO_PLAY
 exports.STATUS_RESET =			STATUS_RESET
+exports.STATUS_NO_ACTIVATION =	STATUS_NO_ACTIVATION
 
 const ENDPOINT_CREATE = 'create'
 const ENDPOINT_VALIDATE = 'validate'
@@ -85,8 +88,10 @@ let session_cleaner
 let session_saver
 
 /*
+
 A session object is flexible, allowing for new properties to be added. At most, it will
-have the following stricture:
+have the following structure:
+
 {
 	login: <timestamp of latest login>,
 	partial_plays: [
@@ -96,9 +101,16 @@ have the following stricture:
 			completes: <ordered array of booleans corresponding to each shape's (in)complete status>
 		}
 	],
-	code: <activation code>,
 	reset: <password reset code; if set, this session is only valid to reset the account, not to access it>
 }
+
+An activation object will have the following structure:
+
+{
+	username: <username>,
+	code: <code>
+}
+
 */
 
 
@@ -114,6 +126,15 @@ exports.init = function() {
 		
 		//remove expired sessions
 		clean_sessions()
+	}
+	
+	//create activations dir
+	if (!fs.existsSync(ACTIVATIONS_PATH)) {
+		fs.mkdirSync(ACTIVATIONS_PATH)
+		console.log('created activations directory at ' + ACTIVATIONS_PATH)
+	}
+	else {
+		console.log('found existing activations directory at ' + ACTIVATIONS_PATH)
 	}
 	
 	//set up session cleaner
@@ -332,17 +353,20 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				break
 				
 			case ENDPOINT_ACTIVATE:
-				session_id = args[0]
+				//args[0] session id ignored
 				username = args[1]
 				
 				console.log('attempting to activate account ' + username)
 				
-				get_session(session_id)
-				.then(function(session) {
-					if (session.code) {
-						if (session.code == args[2]) {
+				get_activation(username)
+				.then(function(activation) {
+					if (activation.code) {
+						if (activation.code == args[2]) {
 							console.log(username + ' activation successful!')
-						
+							
+							//delete activation file
+							delete_activation(username)
+							
 							//update database
 							dbserver.get_query('activate', [username])
 							.then(function(action) {
@@ -367,13 +391,15 @@ exports.handle_request = function(endpoint, args, dbserver) {
 						}
 					}
 					else {
+						console.log('no code found for username; sending new one')
 						//no code found; count as expired code
 						reject(STATUS_EXPIRE)
 					}
 				})
 				.catch(function(error_code) {
 					//server will take care of creating new session with new code and email
-					reject(STATUS_EXPIRE)
+					console.log('no activation request found; sending new activation code')
+					reject(STATUS_NO_ACTIVATION)
 				})
 				
 				break
@@ -426,7 +452,7 @@ exports.handle_request = function(endpoint, args, dbserver) {
 					//request password reset; create code and send email
 					reset_code = create_code()
 					
-					create_session(session_id, null, reset_code)
+					create_session(session_id, reset_code)
 					.then(function(session) {
 						console.log('[' + session_id + '].reset = ' + reset_code)
 						resolve(reset_code)
@@ -522,21 +548,21 @@ exports.handle_request = function(endpoint, args, dbserver) {
 	})
 }
 
-exports.request_activate = function(session_id) {
+exports.request_activate = function(username) {
 	//create activation code
 	let activation_code = create_code()
 	
 	return new Promise(function(resolve,reject) {
-		//create session with new activation code
-		create_session(session_id, activation_code)
-			.then(function(session) {
-				console.log('[' + session_id + '].code = ' + session.code)
-				resolve(activation_code)
-			})
-			.catch(function(err) {
-				console.log('failed to create session ' + session_id + ': ' + err)
-				reject(STATUS_CREATE_ERR)
-			})
+		//create activation with new code
+		create_activation(username, activation_code)
+		.then(function(activation) {
+			console.log('' + username + '\'s code = ' + activation.code)
+			resolve(activation_code)
+		})
+		.catch(function(err) {
+			console.log('failed to create session ' + session_id + ': ' + err)
+			reject(STATUS_CREATE_ERR)
+		})
 	})
 }
 
@@ -598,7 +624,7 @@ function get_session(id) {
 				else {
 					try {
 						let session = JSON.parse(data)
-					
+						
 						if (expired(session)) {
 							//session expired; delete session and notify to reauthenticate
 							delete_session(id)
@@ -608,25 +634,8 @@ function get_session(id) {
 							//session exists and is still valid; update timestamp
 							update_session(id, session)
 						
-							//add to session_cache, don't exceed SESSION_CACHE_MAX
-							let cached = session_cache.find(function(si) {
-								return si.id == id
-							})
-							if (!cached) {
-								//append
-								session_cache.push({
-									id: id,
-									data: session
-								})
-							
-								while (session_cache.length > SESSION_CACHE_MAX) {
-									session_cache.shift() //removes first (oldest) element
-								}
-							}
-							else {
-								//replace
-								cached.data = session	
-							}
+							//cache session
+							cache_session(id, session)
 						
 							//return session info
 							resolve(session)
@@ -641,12 +650,9 @@ function get_session(id) {
 	})
 }
 
-function create_session(session_id, activation_code, reset_code) {
+function create_session(session_id, reset_code) {
 	let session = {
 		login: new Date().getTime()
-	}
-	if (activation_code) {
-		session.code = activation_code
 	}
 	if (reset_code) {
 		session.reset = reset_code
@@ -664,6 +670,28 @@ function create_session(session_id, activation_code, reset_code) {
 			}
 		})
 	})
+}
+
+function cache_session(id, session) {
+	//add to session_cache, don't exceed SESSION_CACHE_MAX
+	let cached = session_cache.find(function(si) {
+		return si.id == id
+	})
+	if (!cached) {
+		//append
+		session_cache.push({
+			id: id,
+			data: session
+		})
+		
+		while (session_cache.length > SESSION_CACHE_MAX) {
+			session_cache.shift() //removes first (oldest) element
+		}
+	}
+	else {
+		//replace
+		cached.data = session	
+	}
 }
 
 function delete_session(id,callback) {
@@ -756,4 +784,52 @@ function save_sessions() {
 
 function expired(session) {
 	return (new Date().getTime() - session.login > SESSION_TTL)
+}
+
+function create_activation(username, code) {
+	let activation = {
+		username: username,
+		code: code
+	}
+	
+	return new Promise(function(resolve,reject) {
+		//create session file
+		fs.writeFile(ACTIVATIONS_PATH + username, JSON.stringify(activation), function(err) {
+			if (err) {
+				console.log(err)
+				reject()
+			}
+			else {
+				resolve(activation)
+			}
+		})
+	})
+}
+
+function get_activation(username) {
+	let activation_file = ACTIVATIONS_PATH + username
+	
+	return new Promise(function(resolve,reject) {
+		fs.readFile(activation_file, function(err,data) {
+			if (err) {
+				//activation does not exist
+				reject(STATUS_NO_ACTIVATION)
+			}
+			else {
+				//return activation info
+				resolve(JSON.parse(data))
+			}
+		})
+	})
+}
+
+function delete_activation(username) {
+	fs.unlink(ACTIVATIONS_PATH + username, function(err) {
+		if (err) {
+			console.log('error: activation for ' + username + ' failed to be deleted')
+		}
+		else {
+			console.log('activation for ' + username + ' deleted')
+		}
+	})
 }
