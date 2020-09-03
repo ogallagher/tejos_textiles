@@ -6,9 +6,13 @@ Owen Gallagher
 
 let activation_code_input
 let result_output
+let url_code
 
 window.onload = function() {
 	force_https()
+	
+	//attempt to read activation code from url params
+	url_code = url_params_get('code')
 	
 	activation_code_input = $('#activation_code')
 	result_output = $('#result').hide()
@@ -85,6 +89,12 @@ function activate_on_login(account) {
 		else {
 			//session cookie is valid; enable activation code entry
 			console.log('activation form enabled')
+			
+			if (url_code) {
+				//code provided in activation link; autofill and submit
+				activation_code_input.val(url_code)
+				$('#activate').click()
+			}
 		}
 	}
 	else {

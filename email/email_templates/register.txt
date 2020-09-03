@@ -5,7 +5,7 @@ Hello ?username?,
 
 Thank you for joining the Textiles community! With an account you'll be able to take advantage of all the features of our site, including textile solve stats and records, contribution of new literature or textile ideas, and giving textile ratings.
 
-Your activation code is ?activation_code?. Visit this link to activate your account: https://textilesjournal.org/activate.html
+Your activation code is ?activation_code?. Visit this link to activate your account: https://textilesjournal.org/activate.html?code=?activation_code?
 
 Here are your current account settings:
 
