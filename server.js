@@ -171,7 +171,7 @@ try {
 			let args = req.body['args[]']
 			
 			sessionserver.handle_request(endpoint, args, dbserver)
-				.then(function(data) {
+				.then(function(data) {					
 					if ((endpoint == sessionserver.ENDPOINT_CREATE && data.register) || 
 						endpoint == sessionserver.ENDPOINT_REQUEST_ACTIVATE) {
 						console.log('requesting activation')

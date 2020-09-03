@@ -54,6 +54,22 @@ window.onload = function() {
 		}
 	})
 	
+	//enable activate link in rate_enable_toast
+	$('#request_activate').click(function() {
+		sessionclient_request_activate()
+		.then(function() {
+			alert('Success! A new activation link was sent to your email address.')
+		})
+		.catch(function(err) {
+			if (err == 'session') {
+				alert('You need to log into an account before you can activate it')
+			}
+			else if (err == 'db') {
+				alert('Error: failed to fetch account email from database')
+			}
+		})
+	})
+	
 	//import navbar
 	html_imports('navbar','#import_navbar', function() {
 		//import login modal

@@ -65,6 +65,7 @@ exports.ENDPOINT_CREATE = ENDPOINT_CREATE
 exports.ENDPOINT_VALIDATE = ENDPOINT_VALIDATE
 exports.ENDPOINT_DELETE = ENDPOINT_DELETE
 exports.ENDPOINT_DB = ENDPOINT_DB
+exports.ENDPOINT_REQUEST_ACTIVATE = ENDPOINT_REQUEST_ACTIVATE
 exports.ENDPOINT_ACTIVATE = ENDPOINT_ACTIVATE
 exports.ENDPOINT_SAVE_PLAY = ENDPOINT_SAVE_PLAY
 exports.ENDPOINT_RESUME_PLAY = ENDPOINT_RESUME_PLAY
@@ -370,9 +371,12 @@ exports.handle_request = function(endpoint, args, dbserver) {
 							reject(STATUS_DB_ERR)
 						}
 						else {
+							if (Array.isArray(res)) {
+								res = res[0]
+							}
 							let email = res.email
-							let subscribed = res.subscription.data[0] == 1
-							
+							let subscribed = res.subscription[0] == 1
+														
 							//caller will request activation and send email
 							resolve({
 								username: username,
