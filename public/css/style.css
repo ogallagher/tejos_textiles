@@ -38,7 +38,7 @@ Custom classes
 
 */
 
-.font-title-xlg {
+.font-title-xl {
 	font-family: 'Poiret One', 'Trebuchet MS', cursive;
 	font-size: 2.0rem;
 }
@@ -343,6 +343,10 @@ Custom classes
     html {
       font-size: 0.8rem;
     }
+	
+	.font-content-md {
+		font-size: 1.25rem;
+	}
 }
 
 /* lg */

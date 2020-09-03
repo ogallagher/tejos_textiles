@@ -397,7 +397,7 @@ function index_puzzles_onload(dbdata) {
 					let authors_list = $('#featured_authors').html('')
 					let author_button_str = '<a class="btn btn-outline-secondary" href="#"></a>'
 					let author_names = []
-			
+					
 					for (let fragment of fragments) {
 						//load author
 						let author = fragment.author
@@ -417,12 +417,12 @@ function index_puzzles_onload(dbdata) {
 						//id
 						let tile_id = 'fragment_' + fragment.id
 						tile.prop('id', tile_id)
-				
+						
 						//title
 						tile.find('.work-tile-title')
 						.html(fragment.title)
 						.attr('data-target','#' + tile_id + '_license_collapse') //enable expand/collapse
-						.removeClass('font-title-xlg').addClass('font-title-lg') //shrink from default font
+						.removeClass('font-title-xl').addClass('font-title-lg') //shrink from default font
 					
 						//date
 						tile.find('.work-tile-date').html(string_utils_date(fragment.date))
