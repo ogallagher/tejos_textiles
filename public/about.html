@@ -98,9 +98,9 @@
 								alt="Doctor Knowall"/>
 							<p>
 								You may find yourself wondering, What do textiles have to do with any of this? Well, while the rest of the world uses
-								this word to refer to fabrics, we’ve repurposed it to refer to our new kind of puzzle. A textile consists of a dense
-								patchwork of free-form text as a background, obscured by an opaque cover, and the player/solver/reader can see through
-								the cover via specifically shaped windows. The player moves those window shapes around until each is looking at its
+								this word to refer to fabrics, we’ve repurposed it to refer to our new kind of puzzle. A textile consists of a
+								patchwork of free-form text/drawings as a background, obscured by an opaque foreground cover, and the player/solver/reader
+								can see through the cover via specifically shaped windows. The player moves those window shapes around until each is looking at its
 								corresponding hidden text. Once all the shapes are placed correctly, the textile is solved!
 							</p>
 							<p>
@@ -151,7 +151,8 @@
 							<p>
 								This is still a newborn project with few visitors, few registered accounts, few contributors, a tiny team, missing features,
 								errors... you get the picture. That said, we’d like all the help we can get! If you’re interested in the site, register an account with us.
-								If you are a writer and are looking for somewhere to share, look no further; see the <a href="contribute.html">Contribute</a> page for more details. If you’re up for the
+								If you are an artist and are looking for somewhere to share, look no further; see the <a href="contribute.html">Contribute</a>
+								page for more details. If you’re up for the
 								challenge you can even send us a whole textile to publish! See <a href="#how_its_made">How it’s Made</a> for how to do so. If you’re
 								knowledgable in web development and would like to test/review/debug/improve the source, visit the
 								<a href="https://github.com/ogallagher/tejos_textiles">Github page</a>.
@@ -172,8 +173,9 @@
 							<ol>
 								<li class="mt-2">
 									<h3>Literature Content</h3>
-									To start you need some text fragments. There are essentially no rules here, though it can’t be too long since it’ll all need to
-									fit inside the space of the textile. It can be from a single work, or from multiple. A work is a source text that the textile will
+									To start you need some text/visual content for the background. There are essentially no rules here, though it can’t be too long since
+									it’ll all need to
+									fit inside the space of the textile. It can be from a single work, or from multiple. A work is a source that the textile will
 									use, and a fragment is an excerpt that is found verbatim in the textile. Make sure you’re allowed to use the work(s), of course.
 									Keep track of what gets used in the textile so that we can publish it with references to included works.
 								</li>
@@ -191,7 +193,7 @@
 								</li>
 								<li class="mt-2">
 									<h3>Execute</h3>
-									It’s finally time to create something. There is more than one way to do this step, but I'll describe our specific method here.
+									It’s finally time to create something. There is more than one way to do this step, but I'll describe our usual method here.
 									
 									<ol>
 										<li>
@@ -253,9 +255,10 @@ open ${img}.svg -a &lt;path_to_browser&gt;.app
 								<li class="mt-4">
 									<h3>Create the SVG</h3>
 									Import the shapes and text vector (svg) files into an <a href="https://inkscape.org/">Inkscape</a> project,
-									and resize them so they are properly aligned. You can use the app to modify the shapes as well. We always
-									replace the shapes with simplified ones drawn in Inkscape, to shrink the file size. If you have the
-									patience, you can also simplify the paths of the text, which greatly reduces the file size for us.
+									and resize them so they are properly aligned. You can use the program to modify the shapes as well. In fact,
+									you could theoretically skip the physical drawing stage entirely and do everything in Inkscape from the beginning.
+									Sometimes this is quicker, especially with the foreground shapes, which are more often simple geometry. If you have the
+									patience, you can simplify the vector paths, which greatly reduces the file size for us.
 								</li>
 								<li class="mt-2">
 									<h3>Export the SVG</h3>
