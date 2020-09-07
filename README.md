@@ -5,6 +5,8 @@
 </p>
 <p>
   Link to English edition: <a href="https://textilesjournal.org">Textiles Journal</a>
+</p>
+<p>
   Link to Spanish edition: Revista Tejos (tbd)
 </p>
 
