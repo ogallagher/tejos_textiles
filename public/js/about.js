@@ -4,6 +4,8 @@ Owen Gallagher
 15 October 2019
 */
 
+let tutorial_expanded = true
+
 window.onload = function() {
 	force_https()
 	
@@ -27,4 +29,22 @@ window.onload = function() {
 
 function about_on_login(account_info) {
 	navbar_toggle_account(account_info)
+}
+
+function about_toggle_tutorial() {
+	console.log('toggle_tutorial')
+	tutorial_expanded = !tutorial_expanded
+	
+	console.log($('#tutorial_button'))
+	
+	if (tutorial_expanded) {
+		$('#tutorial_button .oi').show()
+		
+		$('#tutorial_title').hide()
+	}
+	else {
+		$('#tutorial_button .oi').hide()
+		
+		$('#tutorial_title').show()
+	}
 }

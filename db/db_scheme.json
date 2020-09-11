@@ -19,7 +19,7 @@
 	    "password": "password",
 	    "email": "email",
 	    "links": "links",
-	    "subscription": "description",
+	    "subscription": "subscription",
 	    "bio": "bio",
 	    "photo": "photo",
 			"admin": "admin",
