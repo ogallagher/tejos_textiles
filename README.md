@@ -4,10 +4,12 @@
   An online literary journal publishing works in an interactive new medium.
 </p>
 <p>
-  Link to English edition: <a href="https://textilesjournal.org">Textiles Journal</a>
+  Link to English edition (offline): <a href="https://textilesjournal.org">Textiles Journal</a>
 </p>
 <p>
   Link to Spanish edition: Revista Tejos (tbd)
 </p>
 
-# Used technologies
+# Showcase
+
+The website is not currently online, but a [showcase/tutorial/into video](https://youtu.be/UXBHbKvbn6g) can be viewed [on Youtube](https://www.youtube.com/channel/UCYPWd-g9bPJVQuWHtdK3WpA).
