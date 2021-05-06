@@ -13,8 +13,9 @@ const fs = require('fs')
 const enums = require('./enums.js')
 
 //config
-const SESSIONS_PATH = 'efs/sessions/'			//sessions are stored in this directory, accessed from root directory
-const ACTIVATIONS_PATH = 'efs/activations/'		//activations are stored in this directory
+const LOCAL_STORAGE_PATH = 'efs'
+const SESSIONS_PATH = `${LOCAL_STORAGE_PATH}/sessions/`			//sessions are stored in this directory, accessed from root directory
+const ACTIVATIONS_PATH = `${LOCAL_STORAGE_PATH}/activations/`		//activations are stored in this directory
 const SESSION_TTL = enums.time.WEEK				//session expiration
 const SESSION_CLEANER_DELAY = enums.time.WEEK	//session cleaner runs once per __
 const SESSION_SAVER_DELAY = enums.time.HOUR		//session saver runs once per __
@@ -118,6 +119,12 @@ An activation object will have the following structure:
 
 //global methods
 exports.init = function() {
+	// create local storage dir
+	if (!fs.existsSync(LOCAL_STORAGE_PATH)) {
+		fs.mkdirSync(LOCAL_STORAGE_PATH)
+		console.log('created local storage directory at ' + LOCAL_STORAGE_PATH)
+	}
+	
 	//create sessions dir
 	if (!fs.existsSync(SESSIONS_PATH)) {
 	    fs.mkdirSync(SESSIONS_PATH)

@@ -45,11 +45,9 @@ try {
 	const cors = require('cors')
 	const origins = [
 		'https://localhost', 						//local testing (same device)
-		'http://localhost',							//local testing (same devicel; http)
+		'http://localhost',							//local testing (same device; http)
 		'https://192.168.0.24',						//local testing (different devices)
 		'http://192.168.0.24',						//local testing (different devices; http)
-		'https://textilesjournal.herokuapp.com',	//english site heroku
-		'https://revistatejos.herokuapp.com',		//spanish site heroku
 		'https://textilesjournal.org',				//english site domain
 		'http://textilesjournal.org',				//english site domain (http)
 		'https://www.textilesjournal.org',			//english site subdomain (www)
@@ -149,161 +147,161 @@ try {
 	
 	//expose database
 	app
-		.route('/db')
-		.get(function (req,res) {
-			let endpoint = req.query.endpoint //db api endpoint
-			let args = req.query.args //inputs for compiled sql string
-			
-			handle_db(endpoint,args,res)
-		})
-		.post(function (req,res) {
-			let endpoint = req.body.endpoint //db api endpoint
-			let args = req.body.args //inputs for compiled sql string
+	.route('/db')
+	.get(function (req,res) {
+		let endpoint = req.query.endpoint //db api endpoint
+		let args = req.query.args //inputs for compiled sql string
 		
-			handle_db(endpoint,args,res)
-		});
+		handle_db(endpoint,args,res)
+	})
+	.post(function (req,res) {
+		let endpoint = req.body.endpoint //db api endpoint
+		let args = req.body.args //inputs for compiled sql string
+	
+		handle_db(endpoint,args,res)
+	})
 	
 	//expose sessions
 	app
-		.route('/sessions')
-		.post(function (req,res) {
-			let endpoint = req.body.endpoint
-			let args = req.body['args[]']
-			
-			sessionserver.handle_request(endpoint, args, dbserver)
-				.then(function(data) {					
-					if ((endpoint == sessionserver.ENDPOINT_CREATE && data.register) || 
-						endpoint == sessionserver.ENDPOINT_REQUEST_ACTIVATE) {
-						console.log('requesting activation')
-						//args = [username, password, session_id, email, subscribed]
-						//create activation code
-						sessionserver
-						.request_activate(data.username)
-						.then(function(activation_code) {
-							res.json({success: data})
-							
-							//send registration/activation email
-							emailserver.email(data.email, emailserver.EMAIL_REGISTER, {
-								username: data.username,
-								subscribed: data.subscribed,
-								activation_code: activation_code
-							})
-						})
-						.catch(function() {
-							res.json({error: 'activation'})
-						})
-					}
-					else if (endpoint == sessionserver.ENDPOINT_RESET_PASSWORD) {
-						if (!args[3]) {
-							//new password not provided; requesting reset, not completing reset
-							let reset_code = data
-							
-							//send password reset email
-							emailserver.email(args[2], emailserver.EMAIL_PASSWORD_RESET, {
-								username: args[1],
-								reset_code: reset_code
-							})
-						}
-						
-						res.json({success: true})
-					}
-					else {
-						res.json({success: data})
-					}
-				})
-				.catch(function(err) {
-					/*
-					Session server status codes are used internally, but converted to strings when passed to
-					the client.
-					*/
-					if (err == sessionserver.STATUS_CREATE_ERR) {
-						res.json({error: 'create'})
-					}
-					else if (err == sessionserver.STATUS_NO_SESSION) {
-						res.json({error: 'null'})
-					}
-					else if (err == sessionserver.STATUS_EXPIRE || err == sessionserver.STATUS_NO_ACTIVATION) {
-						if (endpoint == sessionserver.ENDPOINT_ACTIVATE) {
-							//args = [session_id, username, activation_code]
-							//get dest email
-							let username = args[1]
-							dbserver.get_query('fetch_user',[username])
-								.then(function(action) {
-									dbserver.send_query(action.sql, function(err, data) {
-										if (err) {
-											console.log('error: user ' + username + ' not found in db')
-										}
-										else {
-											let account_info = data[0]
-											let dest_email = account_info.email
-											let subscribed = (account_info.subscription[0] == 1)
-											
-											//send new activation code
-											sessionserver
-												.request_activate(username)
-												.then(function(activation_code) {
-													//send new activation email
-													emailserver.email(dest_email, emailserver.EMAIL_REGISTER, {
-														username: username,
-														subscribed: subscribed,
-														activation_code: activation_code
-													})
-												})
-												.catch(function() {
-													console.log('error: unable to create new activation code for ' + username)
-												})
-										}
-									})
-								})
-								.catch(function(err) {
-									console.log('error: unable to find db --> fetch_user')
-								})
-						}
-						
-						res.json({error: 'expired'})
-					}
-					else if (err == sessionserver.STATUS_LOGIN_WRONG) {
-						res.json({error: 'login'})
-					}
-					else if (err == sessionserver.STATUS_DB_ERR) {
-						res.json({error: 'db'})
-					}
-					else if (err == sessionserver.STATUS_DELETE_ERR) {
-						res.json({error: 'delete'})
-					}
-					else if (err == sessionserver.STATUS_ACTIVATION) {
-						res.json({error: 'activation'})
-					}
-					else if (err == sessionserver.STATUS_XSS_ERR) {
-						res.json({error: 'xss'})
-					}
-					else if (err == sessionserver.STATUS_NO_PLAY) {
-						res.json({error: 'no_play'})
-					}
-					else if (err == sessionserver.STATUS_RESET) {
-						res.json({error: 'reset'})
-					}
-					else {
-						res.json({error: 'endpoint'})
-						console.log(err)
-					}
-				})
-		})
+	.route('/sessions')
+	.post(function (req,res) {
+		let endpoint = req.body.endpoint
+		let args = req.body['args[]']
 		
-	app
-		.route('/email')
-		.post(function(req,res) {
-			emailserver
-			.email(emailserver.TJ_EMAIL, emailserver.EMAIL_CUSTOM, req.body)
-			.then(function(err) {
-				if (err) {
-					res.json({error: 'email'})
+		sessionserver.handle_request(endpoint, args, dbserver)
+			.then(function(data) {
+				if ((endpoint == sessionserver.ENDPOINT_CREATE && data.register) || 
+					endpoint == sessionserver.ENDPOINT_REQUEST_ACTIVATE) {
+					console.log('requesting activation')
+					//args = [username, password, session_id, email, subscribed]
+					//create activation code
+					sessionserver
+					.request_activate(data.username)
+					.then(function(activation_code) {
+						res.json({success: data})
+						
+						//send registration/activation email
+						emailserver.email(data.email, emailserver.EMAIL_REGISTER, {
+							username: data.username,
+							subscribed: data.subscribed,
+							activation_code: activation_code
+						})
+					})
+					.catch(function() {
+						res.json({error: 'activation'})
+					})
+				}
+				else if (endpoint == sessionserver.ENDPOINT_RESET_PASSWORD) {
+					if (!args[3]) {
+						//new password not provided; requesting reset, not completing reset
+						let reset_code = data
+						
+						//send password reset email
+						emailserver.email(args[2], emailserver.EMAIL_PASSWORD_RESET, {
+							username: args[1],
+							reset_code: reset_code
+						})
+					}
+					
+					res.json({success: true})
 				}
 				else {
-					res.json({success: 'email'})
+					res.json({success: data})
 				}
 			})
+			.catch(function(err) {
+				/*
+				Session server status codes are used internally, but converted to strings when passed to
+				the client.
+				*/
+				if (err == sessionserver.STATUS_CREATE_ERR) {
+					res.json({error: 'create'})
+				}
+				else if (err == sessionserver.STATUS_NO_SESSION) {
+					res.json({error: 'null'})
+				}
+				else if (err == sessionserver.STATUS_EXPIRE || err == sessionserver.STATUS_NO_ACTIVATION) {
+					if (endpoint == sessionserver.ENDPOINT_ACTIVATE) {
+						//args = [session_id, username, activation_code]
+						//get dest email
+						let username = args[1]
+						dbserver.get_query('fetch_user',[username])
+							.then(function(action) {
+								dbserver.send_query(action.sql, function(err, data) {
+									if (err) {
+										console.log('error: user ' + username + ' not found in db')
+									}
+									else {
+										let account_info = data[0]
+										let dest_email = account_info.email
+										let subscribed = (account_info.subscription[0] == 1)
+										
+										//send new activation code
+										sessionserver
+											.request_activate(username)
+											.then(function(activation_code) {
+												//send new activation email
+												emailserver.email(dest_email, emailserver.EMAIL_REGISTER, {
+													username: username,
+													subscribed: subscribed,
+													activation_code: activation_code
+												})
+											})
+											.catch(function() {
+												console.log('error: unable to create new activation code for ' + username)
+											})
+									}
+								})
+							})
+							.catch(function(err) {
+								console.log('error: unable to find db --> fetch_user')
+							})
+					}
+					
+					res.json({error: 'expired'})
+				}
+				else if (err == sessionserver.STATUS_LOGIN_WRONG) {
+					res.json({error: 'login'})
+				}
+				else if (err == sessionserver.STATUS_DB_ERR) {
+					res.json({error: 'db'})
+				}
+				else if (err == sessionserver.STATUS_DELETE_ERR) {
+					res.json({error: 'delete'})
+				}
+				else if (err == sessionserver.STATUS_ACTIVATION) {
+					res.json({error: 'activation'})
+				}
+				else if (err == sessionserver.STATUS_XSS_ERR) {
+					res.json({error: 'xss'})
+				}
+				else if (err == sessionserver.STATUS_NO_PLAY) {
+					res.json({error: 'no_play'})
+				}
+				else if (err == sessionserver.STATUS_RESET) {
+					res.json({error: 'reset'})
+				}
+				else {
+					res.json({error: 'endpoint'})
+					console.log(err)
+				}
+			})
+	})
+	
+	app
+	.route('/email')
+	.post(function(req,res) {
+		emailserver
+		.email(emailserver.TJ_EMAIL, emailserver.EMAIL_CUSTOM, req.body)
+		.then(function(err) {
+			if (err) {
+				res.json({error: 'email'})
+			}
+			else {
+				res.json({success: 'email'})
+			}
 		})
+	})
 	
 	//for enabling https by getting ssl cert from certbot
 	app.get('/.well-known/acme-challenge/:content', function(req,res) {

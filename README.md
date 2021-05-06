@@ -12,4 +12,4 @@
 
 # Showcase
 
-The website is not currently online, but a [showcase/tutorial/into video](https://youtu.be/UXBHbKvbn6g) can be viewed [on Youtube](https://www.youtube.com/channel/UCYPWd-g9bPJVQuWHtdK3WpA).
+The website is not currently online, but a [showcase/tutorial/intro video](https://youtu.be/UXBHbKvbn6g) can be viewed [on Youtube](https://www.youtube.com/channel/UCYPWd-g9bPJVQuWHtdK3WpA).
