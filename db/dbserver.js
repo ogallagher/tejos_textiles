@@ -37,10 +37,10 @@ exports.init = function(site) {
 		} 
 		
 		let fields = config.url.split(/:|@/) //array = mysql //user password host 3306/db
-		config.user = fields[1].substring(2)
-		config.pass = fields[2]
-		config.host = fields[3]
-		config.db = fields[4].split('/')[1]
+		config.user = decodeURIComponent(fields[1].substring(2))
+		config.pass = decodeURIComponent(fields[2])
+		config.host = decodeURIComponent(fields[3])
+		config.db = decodeURIComponent(fields[4].split('/')[1])
 		
 		if (site == enums.site.TEXTILES) {
 			config.name = 'textilesdb'
