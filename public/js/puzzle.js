@@ -219,7 +219,7 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 				if (shapesOut.length == shapesIn.length) {
 					var holeClips = new paper.Group()
 					var capClips = new paper.Group()
-					for (var i=0; i<shapesOut.length; i++) {
+					for (var i=0; i < shapesOut.length; i++) {
 						let shape = new Shape(shapesOut[i],shapesIn[i],self)
 		
 						self.shapes.push(shape)
@@ -308,7 +308,7 @@ Puzzle.prototype.resume = function(partial_play) {
 	let completes = partial_play.completes
 	let shape = null
 	console.log(partial_play)
-	for (let i=0; i<completes.length; i++) {
+	for (let i=0; i < completes.length; i++) {
 		if (completes[i] == '1') {
 			shape = this.shapes[i]
 			shape.drag = new paper.Point(0,0)

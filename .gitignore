@@ -7,4 +7,5 @@ efs/
 .htaccess
 tmp/
 app.js
+logs/
 

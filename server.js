@@ -12,6 +12,32 @@ try {
 		console.log('environment variables loaded from .env')
 	}
 	
+	// logging
+	const temp_logger = require('temp_js_logger')
+	temp_logger.config({
+		level: 'debug',
+		with_timestamp: true,
+		name: 'server',
+		with_lineno: true,
+		parse_level_prefix: true,
+		with_level: true,
+		with_always_level_name: false,
+		with_cli_colors: true,
+		log_to_file: true
+	})
+	.then(temp_logger.imports_promise)
+	.then(() => {
+		main(temp_logger)
+	})
+}
+catch (err) {
+	console.log(
+		`error make sure you run the (npm install) command to get needed node modules first\n${err.stack}`
+	)
+	process.exit(1)
+}
+
+function main(temp_logger) {
 	//web server
 	const express = require('express')
 	const app = express()
@@ -73,22 +99,22 @@ try {
 		if (SITE == enums.site.TEJOS) {
 			site_name = 'tejos'
 		}
-		console.log(site_name + ' server is running at <host>:' + app.get('port'))
+		console.log('info ' + site_name + ' server is running at <host>:' + app.get('port'))
 
-		console.log('connecting to database')
+		console.log('info connecting to database')
 		dbserver.init(SITE)
 
-		console.log('enabling sessions')
+		console.log('info enabling sessions')
 		sessionserver.init()
 	
-		console.log('enabling email notifications')
+		console.log('info enabling email notifications')
 		emailserver
 			.init()
 			.then(function() {
-				console.log('email server initialized')
+				console.log('info email server initialized')
 			})
 			.catch(function() {
-				console.log('error: email server failed')
+				console.log('error email server failed')
 			})
 	}
 	
@@ -106,8 +132,7 @@ try {
 			.listen(app.get('port'), on_start)
 		}
 		catch (err) {
-			console.log(err)
-			console.log('error: https server needs root permissions to run')
+			console.log(`error https server needs root permissions to run\n${err.stack}`)
 		}
 	}
 	else {
@@ -116,7 +141,7 @@ try {
 	}
 
 	function handle_db(endpoint,args,res) {
-		console.log('db: ' + endpoint + ' [' + args + ']')
+		console.log('info db: ' + endpoint + ' [' + args + ']')
 		
 		dbserver
 			.get_query(endpoint, args, true)
@@ -127,7 +152,7 @@ try {
 			    else if (action.sql) {
 			  		dbserver.send_query(action.sql, function(err,data) {
 			  			if (err) {
-			  				console.log('error in db data fetch: ' + err)
+			  				console.log('error error in db data fetch: ' + err)
 			  				res.json({error: 'fetch error'})
 			  			}
 			  			else {
@@ -140,7 +165,7 @@ try {
 				}
 			})
 			.catch(function(problem) {
-				console.log('error in conversion from endpoint to sql: ' + problem)
+				console.log('error error in conversion from endpoint to sql: ' + problem)
 				res.json({error: 'endpoint error'})
 			})
 	}
@@ -172,7 +197,7 @@ try {
 			.then(function(data) {
 				if ((endpoint == sessionserver.ENDPOINT_CREATE && data.register) || 
 					endpoint == sessionserver.ENDPOINT_REQUEST_ACTIVATE) {
-					console.log('requesting activation')
+					console.log('info requesting activation')
 					//args = [username, password, session_id, email, subscribed]
 					//create activation code
 					sessionserver
@@ -229,7 +254,7 @@ try {
 							.then(function(action) {
 								dbserver.send_query(action.sql, function(err, data) {
 									if (err) {
-										console.log('error: user ' + username + ' not found in db')
+										console.log('error user ' + username + ' not found in db')
 									}
 									else {
 										let account_info = data[0]
@@ -248,13 +273,13 @@ try {
 												})
 											})
 											.catch(function() {
-												console.log('error: unable to create new activation code for ' + username)
+												console.log('error unable to create new activation code for ' + username)
 											})
 									}
 								})
 							})
 							.catch(function(err) {
-								console.log('error: unable to find db --> fetch_user')
+								console.log('error unable to find db --> fetch_user')
 							})
 					}
 					
@@ -307,9 +332,4 @@ try {
 	app.get('/.well-known/acme-challenge/:content', function(req,res) {
 		res.send(process.env.CERTBOT_DOMAIN_AUTH)
 	})
-}
-catch (err) {
-	console.log(err)
-	console.log('Error: make sure you run the `npm install` command to get needed node modules first')
-	process.exit(1)
 }

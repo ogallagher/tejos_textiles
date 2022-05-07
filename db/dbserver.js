@@ -132,7 +132,7 @@ exports.get_query = function(endpoint, args, is_external) {
 						if (approved) {
 							//handle endpoints with special implementations
 							if (endpoint == 'fetch_puzzles') {
-								for (let i=0; i<params.length; i++) {
+								for (let i=0; i < params.length; i++) {
 									let arg = args[i]
 									if (isNaN(args[i])) {
 										//is string, escaped
@@ -161,7 +161,7 @@ exports.get_query = function(endpoint, args, is_external) {
 									for (let column of columns) {
 										//col regexp '.*((term_1)|(term_2)|...).*'
 										let regexp = column + " regexp '.*("
-								
+										
 										let terms = []
 										for (let term of args) {
 											terms.push('(' + term + ')')
@@ -187,6 +187,7 @@ exports.get_query = function(endpoint, args, is_external) {
 								}
 								
 								regex += terms.join('|') + ").*'"
+								console.log(`debug terms regex = ${regex}`)
 								
 								query = query.replace('?terms?', regex)
 							}
@@ -256,7 +257,7 @@ exports.get_query = function(endpoint, args, is_external) {
 						let approved = true
 						
 						//handle general endpoints by inserting escaped params into the query directly
-						for (let i=0; i<params.length && approved; i++) {
+						for (let i=0; i < params.length && approved; i++) {
 							let arg = args[i]
 							if (isNaN(args[i])) {
 								//is string, escaped
