@@ -237,41 +237,59 @@
 											<a href="https://www.ffmpeg.org/download.html">ffmpeg</a> and <a href="http://potrace.sourceforge.net/">potrace</a>.
 										</li>
 										<div class="border-top border-bottom mt-3 mb-1">
-											<button class="btn clickable text-bold-hover" data-toggle="collapse" data-target="#vectorize_img">
-												<code>vectorize_img</code>
+											<button class="btn clickable text-bold-hover" data-toggle="collapse" data-target="#vectorize-img">
+												<code>vectorize-img</code>
 											</button>
-											<div id="vectorize_img" class="bg-dark p-3 collapse">
+											<div id="vectorize-img" class="bg-dark p-3 collapse">
 <pre><code class="text-left text-light" style="font-size:1rem;">
 #!/bin/bash
-# vectorize_img
+# vectorize-img
 # Owen Gallagher
-# 1 August 2019
 
-# usage to convert ./image.png to ./image.svg:    $vectorize_img image png;
-#set input filename and filetype
+# usage: vectorize-img &lt;image-path&gt; [&lt;blacklevel=0.5&gt;]
+
+shared_out=''
+
+function split_str() {
+  local str=$1
+  local delim=$2
+  
+  # echo "split $str with delim $delim"
+  IFS="$delim"
+  local arr=($str)
+  unset IFS
+  
+  shared_out=("${arr[@]}")
+}
+
+# set input file and blacklevel (threshold for potrace vectorizer)
 if [[ -z $1 ]]
 then
 	echo 'Error arg1: no input filename included'
 	exit 1
 else
-	if [[ -z $2 ]]
-	then
-		echo 'Error arg2: no input filetype included'
-		exit 2
-	fi
+  if [[ -z $2 ]]
+  then
+    blacklevel=0.5
+  else
+    blacklevel=$2
+  fi
 fi
 
-img=$1
-ext=$2
+split_str "$1" '.'
 
-#convert to bitmap image
+img=${shared_out[0]}
+ext=${shared_out[1]}
+echo "img=$img ext=$ext blacklevel=$blacklevel"
+
+# convert to bitmap image
 ffmpeg -i ${img}.${ext} ${img}.bmp
 
-#vectorize
-#customize blacklevel to set threshold for vectorization
-potrace --svg --progress --blacklevel 0.5 ${img}.bmp
+# vectorize
+# customize blacklevel to set threshold for vectorization
+potrace --svg --progress --blacklevel $blacklevel ${img}.bmp
 
-#see results (open &lt;file&gt; is a mac command)
+# see results (open &lt;file&gt; is a mac command)
 open ${img}.svg -a &lt;path_to_browser&gt;.app
 </code></pre>
 											</div>
