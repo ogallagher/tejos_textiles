@@ -12,7 +12,9 @@ let user_rating = null
 let loaded_user_stats = false
 
 window.onload = function() {
-	force_https()
+	if (force_https) {
+		force_https()
+	}
 	
 	//enable toasts
 	$('.toast').toast({
@@ -98,27 +100,36 @@ window.onload = function() {
 		$('#help_modal').modal('show')
 	})
 	
-	//import footer
+	// import footer
 	html_imports('footer','#import_footer')
 	
-	//import win screen
+	// import win screen
 	html_imports('win_screen', function(win_screen_str) {
-		//win screen template
+		// win screen template
 		$('#featured_container').append($(win_screen_str))
 		
-		//close button
+		// close button
 		$('#win_screen_close').click(function() {
 			//close win screen
 			$('#win_screen').fadeOut(1000)
 		})
 		
-		//login-to-record-play toast
+		// login-to-record-play toast
 		$('#login_play_toast').toast({
 			autohide: false
 		})
 	})
 	
-	//enable play-again button
+	// import pause screen
+	html_imports('pause_screen', function(pause_screen_str) {
+		$('#featured_container').append($(pause_screen_str))
+		$('#pause_screen_close').click(function() {
+			$('#pause_screen').hide()
+			featured_puzzle.resume(featured_puzzle.partialPlay)
+		})
+	})
+	
+	// enable play-again button
 	$('#featured_again').click(function() {
 		//hide win screen
 		$('#win_screen').hide()
@@ -132,7 +143,7 @@ window.onload = function() {
 		$(this).hide()
 	})
 	
-	//enable save button
+	// enable save button
 	$('#save').click(function() {
 		//save partial play before leaving
 		if (account && featured_puzzle.startTime) {
@@ -290,7 +301,7 @@ function index_on_logout() {
 	$('.featured-tag[data-tag-type="user-stats"]').remove()
 }
 
-//when a puzzle is loaded from dbclient, add it to the document and make it interactive
+// when a puzzle is loaded from dbclient, add it to the document and make it interactive
 function index_puzzles_onload(dbdata) {
 	//bind puzzles to list
 	let domlist = $('#puzzles_list').empty()
@@ -300,9 +311,8 @@ function index_puzzles_onload(dbdata) {
 		//load puzzle data from db and add puzzles
 		let first = true
 		for (let p of dbdata) {
-			let puzzle = new Puzzle(p) //see puzzle.js
-			
-			puzzle.onComplete = index_puzzle_on_complete //handle puzzle completion
+			// see puzzle.js
+			let puzzle = new Puzzle(p) 
 			
 			let jpuzzle = $(jstring)
 			
@@ -347,6 +357,12 @@ function index_puzzles_onload(dbdata) {
 		if (featured_puzzle) {
 			$('#featured_url').attr('href','textile.html?puzzle_id=' + featured_puzzle.id)
 			
+			//handle puzzle start
+			featured_puzzle.onStart = function() {
+				//show save button
+				$('#save').show()
+			}
+			
 			//resume from partial play
 			featured_puzzle.onLoad = function() {
 				sessionclient_resume_partial_play(featured_puzzle.id)
@@ -357,6 +373,12 @@ function index_puzzles_onload(dbdata) {
 					}
 				})
 			}
+			
+			// handle puzzle completion
+			featured_puzzle.onComplete = index_puzzle_on_complete
+		
+			// handle puzzle click/tap
+			featured_puzzle.onClick = index_puzzle_on_click
 			
 			featured_puzzle.feature(ftitle,fdate,fcanvas,fcontainer)
 				.then(function() {
@@ -384,14 +406,8 @@ function index_puzzles_onload(dbdata) {
 				$('#featured_difficulty').val(Math.round(featured_puzzle.difficulty))
 			}
 			
-			//handle puzzle start
-			featured_puzzle.onStart = function() {
-				//show save button
-				$('#save').show()
-			}
-			
 			//load authors and fragments
-			dbclient_fetch_puzzle_fragments(featured_puzzle.id, function(fragments) {		
+			dbclient_fetch_puzzle_fragments(featured_puzzle.id, function(fragments) {
 				html_imports('work_tile', function(tile_str) {
 					let fragments_list = $('#fragments_list').empty()
 					let authors_list = $('#featured_authors').html('')
@@ -530,7 +546,7 @@ function index_puzzles_onload(dbdata) {
 	})
 }
 
-//handle interaction with featured star buttons
+// handle interaction with featured star buttons
 function index_featured_stars() {
 	//list of star buttons
 	let rating = $('#featured_rating')
@@ -643,7 +659,7 @@ function index_featured_stars() {
 }
 
 function index_puzzle_on_complete(puzzle) {
-	console.log('puzzle completed!')
+	console.log('info puzzle completed!')
 	
 	//show win screen
 	$('#solve_time').html(puzzle.solveTime / 1000) //solve time in seconds
@@ -697,6 +713,14 @@ function index_puzzle_on_complete(puzzle) {
 		
 		cookies_set(PLAYS_COOKIE_KEY, cookie_plays + puzzle.id + ',' + puzzle.solveTime)
 	}
+}
+
+function index_puzzle_on_click(puzzle) {
+	console.log('info puzzle paused')
+	puzzle.pause(false)
+	
+	// show pause screen
+	$('#pause_screen').show()
 }
 
 function index_load_work_text(work_id, dest_selector) {

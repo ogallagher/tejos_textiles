@@ -15,23 +15,6 @@ Imports elements defined in other pages
 */
 
 const imports_dir = 'components/'
-const imports = [
-	'navbar',
-	'footer',
-	'textile_row',
-	'textile_thumbnail',
-	'login',
-	'featured_tag',
-	'textile_tag',
-	'link_row',
-	'work_tile',
-	'work_tag',
-	'edit_link_row',
-	'win_screen',
-	'help',
-	'activity',
-	'record'
-]
 
 /*
 
@@ -45,30 +28,23 @@ Args:
 
 */
 function html_imports(name,dest,callback) {
-	//return the element from imports[] where the element string matches name
-	var component = imports.find(function(c) {
-		return c == name
+	$.get({
+		url: `${imports_dir}/${name}.html`, 
+		success: function(component) {
+			if (typeof dest == 'string') {
+				$(dest).append(component)
+			}
+			else {
+				dest(component)
+			}
+			
+			if (callback) {
+				callback()
+			}
+		}, 
+		error: function(err) {
+			console.log(err)
+		},
+		dataType: 'html'
 	})
-	
-	if (component) {
-		$.get({
-			url: imports_dir + component + '.html', 
-			success: function(component) {
-				if (typeof dest == 'string') {
-					$(dest).append(component)
-				}
-				else {
-					dest(component)
-				}
-				
-				if (callback) {
-					callback()
-				}
-			}, 
-			error: function(err) {
-				console.log(err)
-			},
-			dataType: 'html'
-		})
-	}
 }

@@ -22,11 +22,12 @@
         <!-- js external -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
         
         <!-- js internal -->
 		<script src="js/force_https.js"></script>
+		<script src="js/is_mobile.js"></script>
 		<script src="js/url_params.js"></script>
 		<script src="js/string_utils.js"></script>
         <script src="js/html_imports.js"></script>
@@ -54,98 +55,103 @@
             <div id="import_navbar"></div>
         </header>
 		
-		<article class="container-fluid mb-3">
-			<!-- featured puzzle -->
-            <div id="title_bar" class="row py-1 sticky-top bg-light">
-				<div class="col font-title-xl text-center text-uppercase bg-dark text-light ml-3" id="featured_title">
-					Loading title...
-				</div>
-				<div class="col-auto font-title-md d-flex flex-row justify-content-end">
-					<button id="help_button"
-						class="btn px-3 my-auto mr-1 ml-3 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-						title="instructions">
-						<span class="oi oi-question-mark"></span>
-					</button>
-					<button id="featured_again"
-						class="btn px-3 my-auto ml-2 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-						title="play again" style="display:none;">
-						<span class="oi oi-reload"></span>
-					</button>
-					<button id="save"
-						class="btn px-3 my-auto ml-2 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-						title="save progress" style="display:none;">
-						<span class="oi oi-file"></span>
-					</button>
-					<button id="anchor_scroll"
-						class="btn px-3 my-auto mr-3 ml-2 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
-						title="anchor scroll on textile">
-						<span id="anchor_scroll_icon" class="oi oi-link-broken"></span>
-					</button>
-				</div>
-				<div id="save_toast" class="toast fade hide col-auto my-auto mx-2 px-2" role="alert">
-					<div class="toast-body">
-						<div class="font-navigation text-raspberry" id="save_toast_message">
-							message
-						</div>
+		<article class="mb-3 px-0">
+			<div class="container-fluid sticky-top">
+            	<div id="title_bar" class="row px-2 py-1 bg-light">
+					<div class="col font-title-xl text-center text-uppercase bg-dark text-light ml-3" id="featured_title">
+						Loading title...
 					</div>
-				</div>
-            </div>
-            <div class="mx-2" style="overflow:visible;">
-                <div>
-                    <div id="featured_container" class="layers-container">
-						<div id="featured_placeholder" class="overlap-1-center text-center d-flex flex-column font-navigation-lg">
-							<div>
-								Loading textile...
+					<div class="col-auto font-title-md d-flex flex-row justify-content-end">
+						<button id="help_button"
+							class="btn px-3 my-auto mr-1 ml-3 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+							title="instructions">
+							<span class="oi oi-question-mark"></span>
+						</button>
+						<button id="featured_again"
+							class="btn px-3 my-auto ml-2 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+							title="play again" style="display:none;">
+							<span class="oi oi-reload"></span>
+						</button>
+						<button id="save"
+							class="btn px-3 my-auto ml-2 mr-1 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+							title="save progress" style="display:none;">
+							<span class="oi oi-file"></span>
+						</button>
+						<button id="anchor_scroll"
+							class="btn px-3 my-auto mr-3 ml-2 text-center text-dark-nohover text-light-hover border-dark bg-dark-hover"
+							title="anchor scroll on textile">
+							<span id="anchor_scroll_icon" class="oi oi-link-broken"></span>
+						</button>
+					</div>
+					<div id="save_toast" class="toast fade hide col-auto my-auto mx-2 px-2" role="alert">
+						<div class="toast-body">
+							<div class="font-navigation text-raspberry" id="save_toast_message">
+								message
 							</div>
 						</div>
-                        <canvas id="featured_puzzle" class="puzzle-canvas border border-dark" style="width:100%;height:100vh;"></canvas>
-						<!-- win screen inserted here -->
-                    </div>
+					</div>
+	            </div>
+			</div>
+			
+			<!-- featured puzzle -->
+            <div>
+                <div id="featured_container" class="layers-container">
+					<div id="featured_placeholder" class="overlap-1-center text-center d-flex flex-column font-navigation-lg">
+						<div>
+							Loading textile...
+						</div>
+					</div>
+                    <canvas id="featured_puzzle" class="puzzle-canvas border border-dark" style="width:100%;height:100vh;"></canvas>
+					<!-- win screen inserted here -->
+					<!-- pause screen inserted here -->
                 </div>
-                <div class="font-navigation" id="textile_tags">
-                    <!--authors-->
-                    <div class="input-group my-2">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text rounded-0">
-                                authors
-                            </div>
-                        </div>
-                        <div class="input-group-append ml-auto" id="featured_authors">
-                            <a class="btn btn-outline-secondary">
-                                unknown
-                            </a>
-                        </div>
-                    </div>
-                    <!--date-->
-                    <div class="input-group my-2">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text rounded-0">
-                                date
-                            </div>
-                        </div>
-                        <div class="input-group-append ml-auto">
-                            <a class="btn btn-outline-secondary rounded-0" id="featured_date">
-                                unknown
-                            </a>
-                        </div>
-                    </div>
-                    <!--rating-->
-                    <div class="input-group my-2">
-                        <div class="input-group-prepend">
+            </div>
+			
+			<div class="container-fluid">
+	            <div class="font-navigation" id="textile_tags">
+	                <!--authors-->
+	                <div class="input-group my-2">
+	                    <div class="input-group-prepend">
+	                        <div class="input-group-text rounded-0">
+	                            authors
+	                        </div>
+	                    </div>
+	                    <div class="input-group-append ml-auto" id="featured_authors">
+	                        <a class="btn btn-outline-secondary">
+	                            unknown
+	                        </a>
+	                    </div>
+	                </div>
+	                <!--date-->
+	                <div class="input-group my-2">
+	                    <div class="input-group-prepend">
+	                        <div class="input-group-text rounded-0">
+	                            date
+	                        </div>
+	                    </div>
+	                    <div class="input-group-append ml-auto">
+	                        <a class="btn btn-outline-secondary rounded-0" id="featured_date">
+	                            unknown
+	                        </a>
+	                    </div>
+	                </div>
+	                <!--rating-->
+	                <div class="input-group my-2">
+	                    <div class="input-group-prepend">
 							<div id="featured_rating_key" class="input-group-text rounded-0">
 								rating
 							</div>
-                        </div>
-                        <div class="input-group-append ml-auto">
-                            <button class="btn btn-outline-secondary rounded-0" type="button" id="featured_rating">
+	                    </div>
+	                    <div class="input-group-append ml-auto">
+	                        <button class="btn btn-outline-secondary rounded-0" type="button" id="featured_rating">
 								<span class="oi oi-star text-gray" id="featured_rating_1"></span>
 								<span class="oi oi-star text-gray" id="featured_rating_2"></span>
 								<span class="oi oi-star text-gray" id="featured_rating_3"></span>
 								<span class="oi oi-star text-gray" id="featured_rating_4"></span>
 								<span class="oi oi-star text-gray" id="featured_rating_5"></span>
-                            </button>
-                        </div>
-                    </div>
+	                        </button>
+	                    </div>
+	                </div>
 					<!--difficulty-->
 					<div class="input-group my-2">
 						<div class="input-group-prepend">
@@ -190,14 +196,15 @@
 						</div>
 					</div>
 					<!--user play stats inserted here-->
-                </div>
-            </div>
-			<h2 id="fragments_header" class="col-12 pl-4 pt-3 font-title text-copper-hover text-dark-nohover clickable border-top" 
-				data-toggle="collapse" data-target="#fragments_list" style="display:none;">
-				Included Works
-			</h2>
-			<div class="row collapse" id="fragments_list">
-				<!-- featured puzzle fragments -->
+	            </div>
+			
+				<h2 id="fragments_header" class="col-12 pl-4 pt-3 font-title text-copper-hover text-dark-nohover clickable border-top" 
+					data-toggle="collapse" data-target="#fragments_list" style="display:none;">
+					Included Works
+				</h2>
+				<div class="row collapse" id="fragments_list">
+					<!-- featured puzzle fragments -->
+				</div>
 			</div>
 		</article>
 		

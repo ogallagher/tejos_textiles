@@ -264,7 +264,7 @@ Custom classes
 	-moz-user-select: -moz-none;
 	-khtml-user-select: none;
 	-webkit-user-select: none;
-   
+	
 	/*
 	Introduced in IE 10.
 	See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
@@ -328,9 +328,9 @@ Custom classes
 		height: 200px;
 	}
 	
-    html {
-      font-size: 0.75rem;
-    }
+	html {
+		font-size: 0.75rem;
+	}
 }
 
 /* md */
@@ -340,9 +340,9 @@ Custom classes
 		height: 256px;
 	}
 	
-    html {
-      font-size: 0.8rem;
-    }
+	html {
+		font-size: 0.8rem;
+	}
 	
 	.font-content-md {
 		font-size: 1.25rem;
@@ -356,9 +356,9 @@ Custom classes
 		height: 300px;
 	}
 	
-    html {
-      font-size: 1rem;
-    }
+	html {
+		font-size: 1rem;
+	}
 }
 
 /* xl */

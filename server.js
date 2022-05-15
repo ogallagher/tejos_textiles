@@ -72,8 +72,6 @@ function main(temp_logger) {
 	const origins = [
 		'https://localhost', 						//local testing (same device)
 		'http://localhost',							//local testing (same device; http)
-		'https://192.168.0.24',						//local testing (different devices)
-		'http://192.168.0.24',						//local testing (different devices; http)
 		'https://textilesjournal.org',				//english site domain
 		'http://textilesjournal.org',				//english site domain (http)
 		'https://www.textilesjournal.org',			//english site subdomain (www)

@@ -8,14 +8,18 @@ Main entrypoint for textile.html
 
 */
 
+const IS_MOBILE = is_mobile()
+
 let account
 let puzzle
 let user_rating
 let loaded_user_stats
-let scroll_lock
+let scroll_lock = false
 
 window.onload = function() {
-	force_https()
+	if (force_https) {
+		force_https()
+	}
 	
 	textile_load_puzzle()
 	
@@ -34,7 +38,7 @@ window.onload = function() {
 		})
 	})
 	
-	//import and enable puzzle instructions
+	// import and enable puzzle instructions
 	html_imports('help','#import_puzzle_help')
 	$('#help_button').click(function() {
 		$('#help_modal').modal('show')
@@ -94,6 +98,23 @@ window.onload = function() {
 		})
 	})
 	
+	// import pause screen
+	html_imports('pause_screen', function(pause_screen_str) {
+		$('#featured_container').append($(pause_screen_str))
+		$('#pause_screen_close').click(function() {
+			$('#pause_screen').hide()
+			puzzle.resume(puzzle.partialPlay)
+			
+			if (IS_MOBILE) {
+				// hide title bar
+				$('#title_bar').hide()
+				
+				// scroll lock puzzle
+				textile_scroll_lock_puzzle(true)
+			}
+		})
+	})
+	
 	//enable play-again button
 	$('#featured_again').click(function() {
 		//hide win screen
@@ -139,39 +160,47 @@ window.onload = function() {
 		delay: 2500
 	})
 	
-	//enable scroll-lock button
-	scroll_lock = false
-	$('#anchor_scroll').click(function() {
-		scroll_lock = !scroll_lock
-		
-		if (scroll_lock) {
-			//scroll to puzzle
-			window.location.href = '#featured_container'
-			
-			//prevent scrolling
-			$('body')
-			.on('scroll touchmove mousewheel', function(e) {
-				e.preventDefault()
-			})
-			.css('overflow','hidden')
-			
-			//button icon
-			$('#anchor_scroll_icon')
-			.removeClass('oi-link-broken')
-			.addClass('oi-link-intact')
-		}
-		else {
-			//enable scrolling
-			$('body')
-			.off('scroll touchmove mousewheel')
-			.css('overflow','auto')
-			
-			//button icon
-			$('#anchor_scroll_icon')
-			.removeClass('oi-link-intact')
-			.addClass('oi-link-broken')
-		}
-	})
+	// scroll-lock button
+	if (IS_MOBILE) {
+		$('#anchor_scroll').hide()
+	}
+	else {
+		$('#anchor_scroll').click(function() {
+			textile_scroll_lock_puzzle(!scroll_lock)
+		})
+	}
+}
+
+function textile_scroll_lock_puzzle(lock) {
+	if (lock) {
+		//scroll to puzzle
+		window.location.href = '#featured_container'
+	
+		//prevent scrolling
+		$('body')
+		.on('scroll touchmove mousewheel', function(e) {
+			e.preventDefault()
+		})
+		.css('overflow','hidden')
+	
+		//button icon
+		$('#anchor_scroll_icon')
+		.removeClass('oi-link-broken')
+		.addClass('oi-link-intact')
+	}
+	else {
+		//enable scrolling
+		$('body')
+		.off('scroll touchmove mousewheel')
+		.css('overflow','auto')
+	
+		//button icon
+		$('#anchor_scroll_icon')
+		.removeClass('oi-link-intact')
+		.addClass('oi-link-broken')
+	}
+	
+	scroll_lock = lock
 }
 
 function textile_on_login(account_info) {
@@ -310,13 +339,13 @@ function textile_load_puzzle() {
 
 			//load graphics
 			puzzle.feature(puzzle_title,puzzle_date,puzzle_canvas,puzzle_container)
-				.then(function() {
-					$('#featured_placeholder').remove()
-					console.log('feature success')
-				})
-				.catch(function() {
-					console.log('feature failed')
-				})
+			.then(function() {
+				$('#featured_placeholder').remove()
+				console.log('feature success')
+			})
+			.catch(function() {
+				console.log('feature failed')
+			})
 
 			window.onresize = function() {
 				puzzle.resize(puzzle_container)
@@ -333,14 +362,21 @@ function textile_load_puzzle() {
 				$('#featured_difficulty').val(Math.round(puzzle.difficulty))
 			}
 			
-			//assign start callback
+			// assign start callback
 			puzzle.onStart = function() {
 				//show save button
 				$('#save').show()
 			}
 			
-			//assign completion callback
+			// handle completion puzzle complete
 			puzzle.onComplete = textile_puzzle_on_complete
+			
+			// handle puzzle click/tap
+			puzzle.onClick = textile_puzzle_on_click
+			if (IS_MOBILE) {
+				// load initially as paused
+				puzzle.onClick(puzzle)
+			}
 			
 			//load authors and fragments
 			dbclient_fetch_puzzle_fragments(puzzle.id, function(fragments) {
@@ -668,6 +704,22 @@ function textile_puzzle_on_complete(puzzle) {
 		}
 		
 		cookies_set(PLAYS_COOKIE_KEY, cookie_plays + puzzle.id + ',' + puzzle.solveTime)
+	}
+}
+
+function textile_puzzle_on_click(puzzle) {
+	console.log('info puzzle paused')
+	puzzle.pause(false)
+	
+	// show pause screen
+	$('#pause_screen').show()
+	
+	if (IS_MOBILE) {
+		// show title bar
+		$('#title_bar').show()
+		
+		// scroll unlock
+		textile_scroll_lock_puzzle(false)
 	}
 }
 

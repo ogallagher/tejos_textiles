@@ -9,16 +9,19 @@ graphics context.
 
 */
 
-//puzzles
+// puzzles
 let featuredPuzzle
 
-//interaction
+// interaction
 let selectedShape = null
+/* TODO why is doubleClick not an instance member of Puzzle? can it be combined w dragBegin? */
 let doubleClick = new paper.Point()
 
-//configuration
+// configuration
 const PUZZLE_DPI = 200
 const PUZZLE_Z_MIN = 0.5
+// max delay in ms between consecutive clicks to count as double
+const PUZZLE_DOUBLE_CLICK_DELAY = 500
 
 //Puzzle class
 function Puzzle(dbdata) {
@@ -48,20 +51,28 @@ function Puzzle(dbdata) {
 		this.zoom = 1
 		this.dragBegin = new paper.Point()
 		this.anchor = new paper.Point()
-	
+		this.timeoutSingleClick = null
+		this.partialPlay = null
+		
+		// date when begun
 		this.startTime = null
+		// play duration
 		this.solveTime = 0
+		// date when last paused
+		this.pauseTime = null
+		// loaded partial play duration
 		this.resumeTime = 0
 		this.enabled = true
 	}
 	
 	this.paper = new paper.PaperScope()
-	this.onStart = function(){}		//callback for when the puzzle begins (startTime is set)
-	this.onComplete = function(){}	//callback for when the puzzle is completed
-	this.onLoad = function(){}		//callback for when featured (loaded/graphics ready)
+	this.onStart = function(){}		// callback for when the puzzle begins (startTime is set)
+	this.onComplete = function(){}	// callback for when the puzzle is completed
+	this.onLoad = function(){}		// callback for when featured (loaded/graphics ready)
+	this.onClick = function(){}		// callback for click/tap (press and release in same location)
 }
 
-//instance methods
+// instance methods
 Puzzle.prototype.updateGraphics = function() {
 	let v = this.paper.view
 	
@@ -81,17 +92,17 @@ Puzzle.prototype.updateGraphics = function() {
 }
 
 Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
-	//update metadata fields
+	// update metadata fields
 	ftitle.html(this.title)
 	
 	fdate
 	.html(string_utils_date(this.date))
 	.prop('href', 'gallery.html?date=' + this.date.substring(0,this.date.indexOf('T')))
 	
-	//enable this paperscope
+	// enable this paperscope
 	paper = this.paper
 	
-	//unfeature previously featured
+	// unfeature previously featured
 	if (featuredPuzzle != null && featuredPuzzle.paper.view != null) {
 		featuredPuzzle.paper.view.remove() //unselect other
 	}
@@ -101,23 +112,22 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 	this.resize(fcontainer)
 	let v0 = paper.view
 	
- 	featuredPuzzle = this; //select this as new featured puzzle
+	// select this as new featured puzzle
+ 	featuredPuzzle = this
 	
-	//add graphic elements	
+	// add graphic elements	
 	this.foreground = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height)
 	this.foregroundCaps = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height)
 	this.background = new paper.Path.Rectangle(0,0,v0.size.width,v0.size.height)
 	let self = this
 	
-	//event handlers
+	// event handlers
 	paper.view.onMouseDown = function(event) {
-		let mouse = event.point
-		let miss = true;
-	
+		let m = event.point
+		
 		if (self.enabled) {
 			for (let shape of self.shapes) {
-				if (shape.contains(mouse) && !shape.isComplete) {
-					miss = false
+				if (shape.contains(m) && !shape.isComplete) {
 					shape.throwAnchor()
 					selectedShape = shape
 					break
@@ -125,14 +135,54 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 			}
 		}
 		
-		self.dragBegin = mouse
+		self.dragBegin = m
 		self.anchor = self.pan
-	
-		doubleClick = mouse
 	}
+	
 	paper.view.onMouseUp = function(event) {
-		if (self.enabled) {
-			if (selectedShape != null) {				
+		let m = event.point
+		
+		// double click
+		if (m.equals(doubleClick)) {
+			// clear single click timeout
+			clearTimeout(self.timeoutSingleClick)
+			
+			// erase double click location
+			doubleClick = new paper.Point()
+			
+			let z1 = self.zoom
+		
+			if (self.zoom == PUZZLE_Z_MIN) {
+				self.zoom = 1
+			}
+			else {
+				self.zoom = PUZZLE_Z_MIN
+			}
+
+			let x = m.subtract(m.divide(z1).multiply(self.zoom))
+			self.pan = self.pan.add(x)
+
+			self.updateGraphics()
+		}
+		else {
+			// save potential double click location
+			doubleClick = m
+			self.timeoutSingleClick = setTimeout(
+				function() {
+					// erase double click location
+					doubleClick = new paper.Point()
+					
+					// single click
+					if (m.equals(self.dragBegin)) {
+						// click/tap in place
+						self.onClick(self)
+					}
+				},
+				PUZZLE_DOUBLE_CLICK_DELAY
+			)
+			
+			// end drag?
+			if (self.enabled && selectedShape != null) {				
 				//shapes dragged, check for puzzle completion
 				let complete = true
 				for (let shape of self.shapes) {
@@ -140,15 +190,17 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 						complete = false
 					}
 				}
-			
+		
 				if (complete) {
 					self.complete()
 				}
 			}
-		
-			selectedShape = null
 		}
+	
+		selectedShape = null
 	}
+	
+	/* TODO disable doubleClick point on drag? */
 	paper.view.onMouseDrag = function(event) {
 		var mouse = event.point.subtract(self.dragBegin).divide(self.zoom);
 		
@@ -160,29 +212,10 @@ Puzzle.prototype.feature = function(ftitle,fdate,fcanvas,fcontainer) {
 			selectedShape.dragTo(mouse)
 		}
 		
-		//begin solve timer
+		// begin solve timer
 		if (self.enabled && self.startTime == null) {
 			self.startTime = new Date()
 			self.onStart()
-		}
-	}
-	paper.view.onDoubleClick = function(event) {
-		let m = event.point;
-		
-		if (m.equals(doubleClick)) {
-			let z1 = self.zoom;
-			
-			if (self.zoom == PUZZLE_Z_MIN) {
-				self.zoom = 1
-			}
-			else {
-				self.zoom = PUZZLE_Z_MIN
-			}
-	
-			let x = m.subtract(m.divide(z1).multiply(self.zoom))
-			self.pan = self.pan.add(x);
-	
-			self.updateGraphics()
 		}
 	}
 	
@@ -278,42 +311,67 @@ Puzzle.prototype.enable = function() {
 	this.updateGraphics()
 }
 
-Puzzle.prototype.pause = function() {
-	//return data for partial completion
-	let partial_play = {
-		puzzle_id: this.id,
-		duration: new Date().getTime() - this.startTime.getTime(),
-		completes: '' //char flags for completed shapes
-	}
+Puzzle.prototype.pause = function(save_completes) {
+	save_completes = (save_completes === undefined) ? true : save_completes
 	
-	let flags = ''
-	for (let shape of this.shapes) {
-		if (shape.isComplete) {
-			flags += '1'
+	if (this.startTime != null) {
+		// save time when last paused
+		this.pauseTime = new Date()
+		console.log(`debug puzzle saved at ${this.pauseTime}`)
+		
+		// return data for partial completion
+		let partial_play = {
+			puzzle_id: this.id,
+			duration: this.pauseTime.getTime() - this.startTime.getTime() + this.resumeTime,
+			completes: '' //char flags for completed shapes
 		}
-		else {
-			flags += '0'
+		
+		if (save_completes) {
+			let flags = ''
+			for (let shape of this.shapes) {
+				if (shape.isComplete) {
+					flags += '1'
+				}
+				else {
+					flags += '0'
+				}
+			}
+			partial_play.completes = flags
 		}
-	}
-	partial_play.completes = flags
 	
-	return partial_play
+		this.partialPlay = partial_play
+		return partial_play
+	}
+	else {
+		console.log('warning puzzle not paused because not yet begun')
+	}
 }
 
 Puzzle.prototype.resume = function(partial_play) {
-	//load data from partial completion
-	this.resumeTime = partial_play.duration //load time so far
+	partial_play = (partial_play === undefined) ? this.partialPlay : partial_play
 	
-	//load shapes
-	let completes = partial_play.completes
-	let shape = null
-	console.log(partial_play)
-	for (let i=0; i < completes.length; i++) {
-		if (completes[i] == '1') {
-			shape = this.shapes[i]
-			shape.drag = new paper.Point(0,0)
-			shape.complete()
+	if (partial_play != null) {
+		// reset start time
+		this.startTime = new Date()
+		console.log(`info puzzle resumed at ${this.startTime}`)
+	
+		// load data from partial completion
+		this.resumeTime += partial_play.duration //load time so far
+	
+		//load shapes
+		let completes = partial_play.completes
+		let shape = null
+		console.log(partial_play)
+		for (let i=0; i < completes.length; i++) {
+			if (completes[i] == '1') {
+				shape = this.shapes[i]
+				shape.drag = new paper.Point(0,0)
+				shape.complete()
+			}
 		}
+	}
+	else {
+		console.log('warning no partial play to resume')
 	}
 }
 
