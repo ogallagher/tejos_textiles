@@ -50,12 +50,12 @@ exports.init = function(site) {
 		}		
 	}
 	else {
-		console.log('error: database credentials environment variables not found')
+		console.log('error database credentials environment variables not found')
 	}
 	
 	//connect to database
 	if (config != null) {
-		console.log('connecting to ' + config.name)
+		console.log('info connecting to ' + config.name)
 		
 		//create connections pool
 		db = mysql.createPool({
@@ -69,11 +69,11 @@ exports.init = function(site) {
 		//test a connection
 		db.getConnection(function(err, connection) {
 			if (err) {
-				console.log('error: failed to connect to ' + config.host)
+				console.log('error failed to connect to ' + config.host)
 				console.log(err)
 			}
 			else {
-				console.log('database connected')
+				console.log('info database connected')
 				connection.release()
 			}
 		})
@@ -82,7 +82,7 @@ exports.init = function(site) {
 	//init db api
 	fs.readFile(PATH_DB_API, function(err,data) {
 		if (err) {
-			console.log('error: read from db api file failed: ' + err)
+			console.log('error read from db api file failed: ' + err)
 		}
 		else {
 			//read api file
@@ -92,12 +92,12 @@ exports.init = function(site) {
 	
 	//init cache server
 	cacheserver.init()
-		.then(function() {
-			console.log('cache server initialized')
-		})
-		.catch(function() {
-			console.log('error: cache server failed')
-		})
+	.then(function() {
+		console.log('info cache server initialized')
+	})
+	.catch(function() {
+		console.log('error cache server failed')
+	})
 }
 
 exports.get_query = function(endpoint, args, is_external) {
@@ -123,7 +123,7 @@ exports.get_query = function(endpoint, args, is_external) {
 							let matches = arg.match(/[<>]/)
 							if (matches) {
 								approved = false
-								console.log('suspicious: blocked possible xss attempt with db query arg: ')
+								console.log('warning blocked possible xss attempt with db query arg: ')
 								console.log(matches)
 								reject('xss')
 							}
@@ -269,7 +269,7 @@ exports.get_query = function(endpoint, args, is_external) {
 							let matches = arg.match(/[<>]/)
 							if (matches) {
 								approved = false
-								console.log('suspicious: blocked possible xss attempt with db query arg: ')
+								console.log('warning blocked possible xss attempt with db query arg: ')
 								console.log(matches)
 								reject('xss')
 							}
@@ -284,7 +284,7 @@ exports.get_query = function(endpoint, args, is_external) {
 					resolve({sql: query})
 				}
 				else {
-					console.log('suspicious: blocked external attempt to access endpoint ' + endpoint)
+					console.log('warning blocked external attempt to access endpoint ' + endpoint)
 					reject('no query for endpoint')
 				}
 			}
@@ -348,15 +348,15 @@ function try_cache(endpoint, args) {
 	
 	if (key) {
 		cacheserver
-			.get(key)
-			.then(function(val) {
-				//got value; return
-				return val
-			})
-			.catch(function(err) {
-				//no value found; remember key to add to cache
-				cacheserver.save_key(key)
-				return undefined
-			})
+		.get(key)
+		.then(function(val) {
+			//got value; return
+			return val
+		})
+		.catch(function(err) {
+			//no value found; remember key to add to cache
+			cacheserver.save_key(key)
+			return undefined
+		})
 	}
 }

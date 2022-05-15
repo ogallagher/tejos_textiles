@@ -51,7 +51,7 @@ exports.init = function() {
 			if (cache) {
 				exports.set('test_key', 'test_value', 600, function(err) {
 					if (err) {
-						console.log('error: cache server failed to set test_key')
+						console.log('error cache server failed to set test_key')
 						console.log(err)
 						cache.quit()
 						cache = null
@@ -63,7 +63,7 @@ exports.init = function() {
 				})
 			}
 			else {
-				console.log('error: cache server connection failed')
+				console.log('error cache server connection failed')
 				reject()
 			}
 		}
@@ -83,16 +83,16 @@ exports.set = function(key,value,expiry,callback) {
 				callback(err)
 			}
 			else if (err) {
-				console.log('error: cache server could not add entry for ' + key)
+				console.log('error cache server could not add entry for ' + key)
 				console.log(err)
 			}
 			else {
-				console.log('cache server set ' + key)
+				console.log('debug cache server set ' + key)
 			}
 		})
 	}
 	else {
-		console.log('error: cache server could not set ' + key + ',' + value)
+		console.log('error cache server could not set ' + key + ',' + value)
 	}
 }
 
@@ -115,11 +115,11 @@ exports.get = function(key) {
 				})
 			}
 			else {
-				reject('error: cache server cannot get null key')
+				reject('error cache server cannot get null key')
 			}
 		}
 		else {
-			reject('error: cache server never connected')
+			reject('error cache server never connected')
 		}
 	})
 }

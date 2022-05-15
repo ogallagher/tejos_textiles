@@ -52,12 +52,12 @@ let mailer
 exports.init = function() {
 	return new Promise(function(resolve,reject) {
 		//load email templates			
-		console.log('creating email templates')
+		console.log('info creating email templates')
 		
 		//load email template stylesheet
 		fs.readFile(PATH_EMAIL_CSS, function(err,data) {
 			if (err) {
-				console.log('error: read from email css file failed: ' + err)
+				console.log('error read from email css file failed: ' + err)
 				reject()
 			}
 			else {
@@ -69,7 +69,7 @@ exports.init = function() {
 				templates.register = {}
 				fs.readFile(PATH_EMAIL_REGISTER + '.html', function(err,data) {
 					if (err) {
-						console.log('error: read from register html template failed: ' + err)
+						console.log('error read from register html template failed: ' + err)
 						reject()
 					}
 					else {
@@ -80,7 +80,7 @@ exports.init = function() {
 				})
 				fs.readFile(PATH_EMAIL_REGISTER + '.txt', function(err, data) {
 					if (err) {
-						console.log('error: read from register txt template failed: ' + err)
+						console.log('error read from register txt template failed: ' + err)
 						reject()
 					}
 					else {
@@ -96,7 +96,7 @@ exports.init = function() {
 				templates.password_reset = {}
 				fs.readFile(PATH_EMAIL_PASSWORD_RESET + '.html', function(err,data) {
 					if (err) {
-						console.log('error: read from password reset html template failed: ' + err)
+						console.log('error read from password reset html template failed: ' + err)
 						reject()
 					}
 					else {
@@ -107,7 +107,7 @@ exports.init = function() {
 				})
 				fs.readFile(PATH_EMAIL_PASSWORD_RESET + '.txt', function(err,data) {
 					if (err) {
-						console.log('error: read from password reset txt template failed: ' + err)
+						console.log('error read from password reset txt template failed: ' + err)
 						reject()
 					}
 					else {
@@ -118,7 +118,7 @@ exports.init = function() {
 		})
 		
 		//email config
-		console.log('getting email credentials and configuring')
+		console.log('info getting email credentials and configuring')
 		if (process.env.EMAIL) {
 			try {
 				//email credentials
@@ -140,13 +140,13 @@ exports.init = function() {
 						reject()
 					}
 					else {
-						console.log('email connection verified: ' + success)
+						console.log('info email connection verified: ' + success)
 						
 						//email defaults
 						defaults = { 
 							from: '"Textiles Journal" ' + TJ_EMAIL
 						}
-						console.log('sending email as ' + defaults.from)
+						console.log('info sending email as ' + defaults.from)
 						
 						resolve()
 					}
@@ -158,7 +158,7 @@ exports.init = function() {
 			}
 		}
 		else {
-			console.log('error: email credentials not found in env variables')
+			console.log('error email credentials not found in env variables')
 			reject()
 		}
 	})
@@ -242,15 +242,15 @@ exports.email = function(dest_email, type, args) {
 			.sendMail(message)
 			.then(function(info) {
 				if (info) {
-					console.log('message sent successfully, status: ' + info.response)
+					console.log('info message sent successfully, status: ' + info.response)
 				}
 				else {
-					console.log('message sent successfully')
+					console.log('info message sent successfully')
 				}
 				resolve()
 			})
 			.catch(function(err) {
-				console.log('error: message send failed: ' + err)
+				console.log('error message send failed: ' + err)
 				if (err.response) {
 					console.log(err.response.body)
 				}
