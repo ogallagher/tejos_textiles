@@ -139,8 +139,6 @@ function main(temp_logger) {
 	}
 
 	function handle_db(endpoint,args,res) {
-		console.log('info db: ' + endpoint + ' [' + args + ']')
-		
 		dbserver
 			.get_query(endpoint, args, true)
 			.then(function(action) {

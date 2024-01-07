@@ -22,7 +22,7 @@ const DB_TEXTILES = 'db_textilesjournal'
 var db //database connection object
 var api //database api, for hiding actual sql from the client
 
-exports.init = function(site) {	
+exports.init = function(site) {
 	//get database connection credentials
 	let config = null
 	
@@ -100,8 +100,22 @@ exports.init = function(site) {
 	})
 }
 
+function is_xss_safe(arg) {
+	let matches = arg.match(/[<>]/)
+	if (matches) {
+		console.log('warning blocked possible xss attempt with db query arg: ')
+		console.log(matches)
+		return false
+	}
+  else {
+    return true
+  }
+}
+
 exports.get_query = function(endpoint, args, is_external) {
 	return new Promise(function(resolve,reject) {
+    console.log('info db: ' + endpoint + ' ' + JSON.stringify(args))
+    
 		let cached = try_cache(endpoint, args)
 		
 		if (cached) {
@@ -120,11 +134,8 @@ exports.get_query = function(endpoint, args, is_external) {
 						//double check against JS injection (XSS)
 						let approved = true
 						for (let arg of args) {
-							let matches = arg.match(/[<>]/)
-							if (matches) {
+							if (!is_xss_safe(arg)) {
 								approved = false
-								console.log('warning blocked possible xss attempt with db query arg: ')
-								console.log(matches)
 								reject('xss')
 							}
 						}
@@ -211,7 +222,7 @@ exports.get_query = function(endpoint, args, is_external) {
 									changes.push('links=' + db.escape(args[3]))
 									go = true
 								}
-								if (args[4] != null) { //can be true, false, or null/undefined
+								if (args[4] !== null && args[4] !== undefined) { //can be true, false, or null/undefined
 									//update subscribed
 									let subscribed = 0
 									if (args[4]) {
@@ -226,6 +237,7 @@ exports.get_query = function(endpoint, args, is_external) {
 									query = query.replace('?changes?', changes).replace('?username?', db.escape(args[0]))
 								}
 								else {
+                  console.log(`warning skip user update with empty changes ${changes} from args ${args.join(',')}`)
 									reject('empty')
 								}
 							}
@@ -266,11 +278,8 @@ exports.get_query = function(endpoint, args, is_external) {
 							//else, is number, directly inserted
 							
 							//double check against JS injection (XSS)
-							let matches = arg.match(/[<>]/)
-							if (matches) {
+							if (!is_xss_safe(arg)) {
 								approved = false
-								console.log('warning blocked possible xss attempt with db query arg: ')
-								console.log(matches)
 								reject('xss')
 							}
 							else {
@@ -279,6 +288,53 @@ exports.get_query = function(endpoint, args, is_external) {
 							}
 						}
 					}
+          
+          // handle simulated triggers/side effects
+          if (entry.triggers !== undefined) {
+            // convert params list to map
+            let params_map = new Map()
+            for (let i=0; i < params.length; i++) {
+              // as of here, all args already confirmed safe
+              params_map.set(params[i], args[i])
+            }
+            
+            for (let trigger of entry.triggers) {
+              console.log(`debug ${endpoint} triggers ${trigger.endpoint}`)
+              // spawn trigger query asynchronously
+              let trigger_args = []
+              for (let i=0; i < trigger.params.length; i++) {
+                let trigger_arg = trigger.params[i]
+                // compile trigger param placeholders using caller args
+                for (let [key, val] of params_map.entries()) {
+                  trigger_arg = trigger_arg.replace(key, val)
+                }
+                trigger_args.push(trigger_arg)
+              }
+              
+              // triggers are considered internal
+              exports.get_query(trigger.endpoint, trigger_args, false)
+              .then(function(action) {
+                if (action.cached) {
+                  // trigger targets should not be cached
+                  console.log(`error trigger endpoint ${trigger.endpoint} should not be cached`)
+                  console.log(action)
+                }
+                else {
+      			  		exports.send_query(action.sql, function(err, data) {
+      			  			if (err) {
+      			  				console.log('error error in db data fetch: ' + err)
+      			  			}
+      			  			else {
+      			  				console.log(`debug trigger ${trigger.endpoint} result = ${JSON.stringify(data[0])}`)
+      			  			}
+      			  		})
+                }
+              })
+              .catch(function(err) {
+                console.log(`error ${endpoint} trigger ${trigger.endpoint} get query failed ${err}`)
+              })
+            }
+          }
 					
 					//console.log(endpoint + ' --> ' + query) //TODO remove this
 					resolve({sql: query})

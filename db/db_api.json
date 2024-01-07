@@ -88,7 +88,7 @@
 		"external": false
 	},
  	"fetch_user": {
-    	"params": ["?username?"],
+    "params": ["?username?"],
 		"query": "select username,enabled,`admin`,subscription,email from people where username=?username?",
 		"external": false
 	},
@@ -121,7 +121,13 @@
 		"params": ["?username?","?changes?"],
 		"query": "update people set ?changes? where username=?username?",
 		"external": false,
-		"special": true
+		"special": true,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["people", "username=?username?"]
+      }
+    ]
 	},
 	"update_works":{
 		"params": [],
@@ -173,5 +179,15 @@
 		"params": ["?username?","?new_password?"],
 		"query": "update people set `password`=?new_password? where username=?username?",
 		"external": false
-	}
+	},
+  "add_update": {
+    "params": ["?item_table?","?item_id?"],
+    "query": "call add_update(?item_table?, ?item_id?)",
+    "external": false
+  },
+  "fetch_update": {
+    "params": ["?item_table?","?item_id?"],
+    "query": "select last_update from updates where item_table=?item_table? and item_id=?item_id?",
+    "external": true
+  }
 }

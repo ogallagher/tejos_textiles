@@ -303,7 +303,7 @@ exports.handle_request = function(endpoint, args, dbserver) {
 				session_id = args[0]
 				db_endpoint = args[1]
 				db_args = []
-				for (let i=2; i<args.length; i++) {
+				for (let i=2; i < args.length; i++) {
 					db_args.push(args[i])
 				}
 				console.log('checking credential ' + session_id + ' for db --> ' + db_endpoint)
