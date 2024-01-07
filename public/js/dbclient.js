@@ -24,7 +24,8 @@ function dbclient_fetch_update(item_table, item_id) {
   
   let req = {
     endpoint: 'fetch_update',
-    args: [item_table, item_id]
+    args: [item_table, item_id],
+    version: new Date().getTime()
   }
   
   return new Promise(function(res, rej) {
