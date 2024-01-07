@@ -42,6 +42,8 @@ const EMAIL_SUBSCRIBED_PLACEHOLDER = /\?subscribed\?/g
 const EMAIL_ACTIVATION_CODE_PLACEHOLDER = /\?activation_code\?/g
 const EMAIL_RESET_CODE_PLACEHOLDER = /\?reset_code\?/g
 
+const SECONDS_IN_MINUTE = 60
+
 //local vars
 let defaults
 let templates
@@ -122,6 +124,7 @@ exports.init = function() {
 		if (process.env.EMAIL) {
 			try {
 				//email credentials
+        // TODO handle credentials refresh
 				mailer = nodemailer.createTransport({
 					host: 'smtp.gmail.com',
 					secure: true,
@@ -130,7 +133,9 @@ exports.init = function() {
 						type: 'OAuth2',
 						user: TJ_EMAIL,
 						serviceClient: process.env.GSUITE_APP_ID,
-						privateKey: process.env.GSUITE_PRIVATE_KEY
+						privateKey: process.env.GSUITE_PRIVATE_KEY,
+            accessToken: false,
+            serviceRequestTimeout: 30 * SECONDS_IN_MINUTE
 					}
 				})
 				
