@@ -13,7 +13,7 @@
     "fs": "0.0.1-security",
     "https": "^1.0.0",
     "memjs": "^1.2.2",
-    "mysql": "^2.17.1",
+    "mysql": "^2.18.0",
     "nodemailer": "^6.6.1",
     "temp_js_logger": "^0.6.0"
   },
