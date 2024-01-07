@@ -11,7 +11,53 @@ const COLLECTION_TOP_RATED = 1
 const COLLECTION_TOP_PLAYED = 2
 const COLLECTION_EDITORS_CHOICE = 3
 
-function dbclient_fetch_puzzles(admin, callback) {	
+function dbclient_fetch_update(item_table, item_id) {
+  if ((typeof item_id) !== 'string') {
+    // item id provided as keys and values. convert to string
+    let item_id_entries = []
+    for (let [key, val] of Object.entries(item_id)) {
+      item_id_entries.push(`${key}=${val}`)
+    }
+    item_id = item_id_entries.join(',')
+  }
+  console.log(`fetching update for ${item_table}[${item_id}]`)
+  
+  let req = {
+    endpoint: 'fetch_update',
+    args: [item_table, item_id]
+  }
+  
+  return new Promise(function(res, rej) {
+    $.get({
+      url: '/db',
+      data: req,
+      success: function(data) {
+        if (data.length > 0) {
+          // return first and only row containing last update/version for the requested item
+          let last_update = data[0].last_update
+          if (last_update !== undefined) {
+            console.log(`debug fetched ${item_id} version ${last_update}`)
+            res(last_update)
+          }
+          else {
+            console.log(`warning did not find key last_update in ${data[0]}. return default zero`)
+            res(0)
+          }
+        }
+        else {
+          // item does not yet exist; return default version zero
+          res(0)
+        }
+      },
+      error: function(err) {
+        console.log(`error update fetch failed: ` + err.responseText)
+        rej(null)
+      }
+    })
+  })
+}
+
+function dbclient_fetch_puzzles(admin, callback) {
 	console.log('fetching puzzles...');
 	
 	if (admin == null) {
@@ -30,7 +76,10 @@ function dbclient_fetch_puzzles(admin, callback) {
 			console.log('fetched ' + data.length + ' puzzles from db')
 			
 			callback(data)
-		}
+		},
+    error: function(err) {
+      console.log(`error puzzles fetch failed: ` + err.responseText)
+    }
 	})
 }
 
@@ -343,53 +392,67 @@ function dbclient_fetch_user_plays(username,puzzle_id,callback) {
 
 function dbclient_fetch_user(username, callback) {
 	console.log('fetching user ' + username)
-	
+  
 	let req = {
 		endpoint: 'fetch_user_details',
 		args: [username]
 	}
-	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(res) {
-			if (res.error) {
-				callback(null)
-			}
-			else {
-				let account_details = res[0]
+  
+  // fetch version for last update of this user
+  dbclient_fetch_update('people', {
+    username: username
+  })
+  .then(
+    (last_update) => {
+      req.version = last_update
+    },
+    () => {
+      console.log(`debug unable to fetch version of user; result may be from browser cache`)
+    }
+  )
+  .finally(() => {
+  	$.get({
+  		url: '/db',
+  		data: req,
+  		success: function(res) {
+  			if (res.error) {
+  				callback(null)
+  			}
+  			else {
+  				let account_details = res[0]
 				
-				let account = new Account(null, username)
-				account.enabled = (account_details.enabled.data[0] == 1)
-				account.admin = (account_details.admin.data[0] == 1)
-				account.deleted = (account_details.deleted.data[0] == 1)
-				account.anonymous = (account_details.anonymous.data[0] == 1)
+  				let account = new Account(null, username)
+  				account.enabled = (account_details.enabled.data[0] == 1)
+  				account.admin = (account_details.admin.data[0] == 1)
+  				account.deleted = (account_details.deleted.data[0] == 1)
+  				account.anonymous = (account_details.anonymous.data[0] == 1)
 				
-				account.bio = account_details.bio
-				account.email = account_details.email
+  				account.bio = account_details.bio
+  				account.email = account_details.email
 			
-				account.links = []
-				if (account_details.links) {
-					let link_entries = account_details.links.split(',')
-					for (let link_entry of link_entries) {
-						let key_value = link_entry.split('=')
-						account.links.push({
-							name: key_value[0],
-							link: key_value[1]
-						})
-					}
-				}
+  				account.links = []
+  				if (account_details.links) {
+  					let link_entries = account_details.links.split(',')
+  					for (let link_entry of link_entries) {
+  						let key_value = link_entry.split('=')
+  						account.links.push({
+  							name: key_value[0],
+  							link: key_value[1]
+  						})
+  					}
+  				}
 				
-				account.photo = account_details.photo
-				account.subscribed = (account_details.subscription.data[0] == 1)
+  				account.photo = account_details.photo
+  				account.subscribed = (account_details.subscription.data[0] == 1)
 			
-				callback(account)
-			}
-		},
-		error: function(err) {
-			callback(null)
-		}
-	})
+  				callback(account)
+  			}
+  		},
+  		error: function(err) {
+  			callback(null)
+  		}
+  	})
+  })
 }
 
 function dbclient_fetch_user_activity(username, callback) {

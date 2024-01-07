@@ -525,7 +525,7 @@ exports.handle_request = function(endpoint, args, dbserver) {
 						}
 						else {
 							//remove existing partial plays for the same puzzle
-							for (let p=0; p<session.partial_plays.length; p++) {
+							for (let p=0; p < session.partial_plays.length; p++) {
 								if (session.partial_plays[p].puzzle_id == play.puzzle_id) {
 									session.partial_plays.splice(p,1)
 									p--
@@ -613,7 +613,7 @@ exports.request_activate = function(username) {
 function create_code() {
 	let code = ''
 	
-	for (let i=0; i<ACTIVATION_CODE_LEN; i++) {
+	for (let i=0; i < ACTIVATION_CODE_LEN; i++) {
 		let char = Math.floor(Math.random() * ACTIVATION_CODE_RANGE) + ACTIVATION_CODE_MIN
 		
 		if (char > NUM_MAX) {

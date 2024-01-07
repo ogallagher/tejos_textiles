@@ -139,7 +139,7 @@ window.onload = function() {
 			
 			dbclient_update_user(account.username, edits, function(result) {
 				//show result
-				if (result.success == 10) {
+				if (result.success === 10) {
 					//10 = sessionserver.SUCCESS
 					message.html('No account changes. ')
 				}
@@ -691,7 +691,7 @@ function account_more_works() {
 		html_imports('work_tile', function(jwork_string) {
 			html_imports('work_tag', function(jtag_string) {
 				console.log('more works: ' + works_start + ' to ' + works_end)
-				for (let i=works_start; i<works.length && i<works_end; i++) {
+				for (let i=works_start; i < works.length && i < works_end; i++) {
 					let jwork = $(jwork_string)
 					let work = works[i]
 					
@@ -832,7 +832,7 @@ function account_more_activity() {
 		let activity_container = $('#history')
 		
 		html_imports('activity', function(activity_row) {
-			for (let i=activities_start; i<activities.length && i<activities_end; i++) {
+			for (let i=activities_start; i < activities.length && i < activities_end; i++) {
 				/*
 				{
 					activity:	play | rate | difficulty | author,
@@ -905,7 +905,7 @@ function account_more_records() {
 		let records_container = $('#records')
 		
 		html_imports('record', function(record_row) {
-			for (let i=records_start; i<records.length && i<records_end; i++) {
+			for (let i=records_start; i < records.length && i < records_end; i++) {
 				/*
 				{
 					record:		solve
