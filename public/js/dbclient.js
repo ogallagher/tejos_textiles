@@ -12,50 +12,50 @@ const COLLECTION_TOP_PLAYED = 2
 const COLLECTION_EDITORS_CHOICE = 3
 
 function dbclient_fetch_update(item_table, item_id) {
-  if ((typeof item_id) !== 'string') {
-    // item id provided as keys and values. convert to string
-    let item_id_entries = []
-    for (let [key, val] of Object.entries(item_id)) {
-      item_id_entries.push(`${key}=${val}`)
-    }
-    item_id = item_id_entries.join(',')
-  }
-  console.log(`fetching update for ${item_table}[${item_id}]`)
-  
-  let req = {
-    endpoint: 'fetch_update',
-    args: [item_table, item_id],
-    version: new Date().getTime()
-  }
-  
-  return new Promise(function(res, rej) {
-    $.get({
-      url: '/db',
-      data: req,
-      success: function(data) {
-        if (data.length > 0) {
-          // return first and only row containing last update/version for the requested item
-          let last_update = data[0].last_update
-          if (last_update !== undefined) {
-            console.log(`debug fetched ${item_id} version ${last_update}`)
-            res(last_update)
-          }
-          else {
-            console.log(`warning did not find key last_update in ${data[0]}. return default zero`)
-            res(0)
-          }
-        }
-        else {
-          // item does not yet exist; return default version zero
-          res(0)
-        }
-      },
-      error: function(err) {
-        console.log(`error update fetch failed: ` + err.responseText)
-        rej(null)
-      }
-    })
-  })
+	if ((typeof item_id) !== 'string') {
+		// item id provided as keys and values. convert to string
+		let item_id_entries = []
+		for (let [key, val] of Object.entries(item_id)) {
+			item_id_entries.push(`${key}=${val}`)
+		}
+		item_id = item_id_entries.join(',')
+	}
+	console.log(`fetching update for ${item_table}[${item_id}]`)
+	
+	let req = {
+		endpoint: 'fetch_update',
+		args: [item_table, item_id],
+		version: new Date().getTime()
+	}
+	
+	return new Promise(function(res, rej) {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.length > 0) {
+					// return first and only row containing last update/version for the requested item
+					let last_update = data[0].last_update
+					if (last_update !== undefined) {
+						console.log(`debug fetched ${item_id} version ${last_update}`)
+						res(last_update)
+					}
+					else {
+						console.log(`warning did not find key last_update in ${data[0]}. return default zero`)
+						res(0)
+					}
+				}
+				else {
+					// item does not yet exist; return default version zero
+					res(0)
+				}
+			},
+			error: function(err) {
+				console.log(`error update fetch failed: ` + err.responseText)
+				rej(null)
+			}
+		})
+	})
 }
 
 function dbclient_fetch_puzzles(admin, callback) {
@@ -78,9 +78,9 @@ function dbclient_fetch_puzzles(admin, callback) {
 			
 			callback(data)
 		},
-    error: function(err) {
-      console.log(`error puzzles fetch failed: ` + err.responseText)
-    }
+		error: function(err) {
+			console.log(`error puzzles fetch failed: ` + err.responseText)
+		}
 	})
 }
 
@@ -121,22 +121,35 @@ function dbclient_fetch_puzzle(id, callback) {
 		args: [id]
 	}
 	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
-			if (data.error) {
+	dbclient_fetch_update('puzzles', {
+		puzzle_id: id
+	})
+	.then(
+		(last_update) => {
+			req.version = last_update
+		},
+		() => {
+			console.log(`debug unable to fetch version of puzzle ${id}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.error) {
+					console.log('error: failed to fetch puzzle: ' + err.responseText)
+					callback()
+				}
+				else {
+					callback(data[0])
+				}
+			},
+			error: function(err) {
 				console.log('error: failed to fetch puzzle: ' + err.responseText)
 				callback()
 			}
-			else {
-				callback(data[0])
-			}
-		},
-		error: function(err) {
-			console.log('error: failed to fetch puzzle: ' + err.responseText)
-			callback()
-		}
+		})
 	})
 }
 
@@ -247,22 +260,35 @@ function dbclient_user_exists(username,callback) {
 		args: [username]
 	}
 	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
-			if (data.error) {
-				console.log('error: username check failed: ' + data.error)
+	dbclient_fetch_update('people', {
+		username: username
+	})
+	.then(
+		(last_update) => {
+			req.version = last_update
+		},
+		() => {
+			console.log(`debug unable to fetch version of user ${username}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.error) {
+					console.log('error: username check failed: ' + data.error)
+					callback(false)
+				}
+				else {
+					callback(data[0].taken)
+				}
+			},
+			error: function(err) {
+				console.log('error: username check failed: ' + err.responseText)
 				callback(false)
 			}
-			else {
-				callback(data[0].taken)
-			}
-		},
-		error: function(err) {
-			console.log('error: username check failed: ' + err.responseText)
-			callback(false)
-		}
+		})
 	})
 }
 
@@ -313,10 +339,24 @@ function dbclient_rate(username,puzzle_id,rating,callback) {
 		})
 }
 
-function dbclient_fetch_user_rating(username,puzzle_id,callback) {
+function dbclient_fetch_user_rating(username, puzzle_id, callback) {
 	console.log('fetching ' + username + '\'s rating of ' + puzzle_id)
 	
-	sessionclient_db_request('fetch_rating', [username,puzzle_id])
+	dbclient_fetch_update('ratings', {
+		username: username,
+		puzzle_id: puzzle_id
+	})
+	.then(
+		(last_update) => {
+			return last_update
+		},
+		() => {
+			console.log(`debug unable to fetch version of rating ${username}-${puzzle_id}; result may be from browser cache`)
+			return undefined
+		}
+	)
+	.finally((version) => {
+		sessionclient_db_request('fetch_rating', [username,puzzle_id], version)
 		.then(function(data) {
 			if (data.error) {
 				console.log('rating fetch failed: ' + data.error)
@@ -330,6 +370,7 @@ function dbclient_fetch_user_rating(username,puzzle_id,callback) {
 			console.log('rating fetch failed: ' + err)
 			callback(null)
 		})
+	})
 }
 
 //rate puzzle difficulty on a scale from 1=easy to 10=hard
@@ -353,10 +394,24 @@ function dbclient_measure_difficulty(username, puzzle_id, difficulty, callback) 
 		})
 }
 
-function dbclient_fetch_user_difficulty(username,puzzle_id,callback) {
+function dbclient_fetch_user_difficulty(username, puzzle_id, callback) {
 	console.log('fetching ' + username + '\'s difficulty measure of ' + puzzle_id)
 	
-	sessionclient_db_request('fetch_difficulty', [username,puzzle_id])
+	dbclient_fetch_update('difficulties', {
+		username: username,
+		puzzle_id: puzzle_id
+	})
+	.then(
+		(last_update) => {
+			return last_update
+		},
+		() => {
+			console.log(`debug unable to fetch version of difficulty ${username}-${puzzle_id}; result may be from browser cache`)
+			return undefined
+		}
+	)
+	.finally((version) => {
+		sessionclient_db_request('fetch_difficulty', [username,puzzle_id], version)
 		.then(function(data) {
 			if (data.error) {
 				console.log('difficulty fetch failed: ' + data.error)
@@ -370,12 +425,27 @@ function dbclient_fetch_user_difficulty(username,puzzle_id,callback) {
 			console.log('difficulty fetch failed: ' + err)
 			callback(null)
 		})
+	})
 }
 
 function dbclient_fetch_user_plays(username,puzzle_id,callback) {
 	console.log('fetching ' + username + '\'s play data of ' + puzzle_id)
 	
-	sessionclient_db_request('fetch_user_plays', [username,puzzle_id])
+	dbclient_fetch_update('plays', {
+		username: username,
+		puzzle_id: puzzle_id
+	})
+	.then(
+		(last_update) => {
+			return last_update
+		},
+		() => {
+			console.log(`debug unable to fetch version of plays ${username}-${puzzle_id}; result may be from browser cache`)
+			return undefined
+		}
+	)
+	.finally((version) => {
+		sessionclient_db_request('fetch_user_plays', [username,puzzle_id], version)
 		.then(function(data) {
 			if (data.error) {
 				console.log('user plays fetch failed: ' + data.error)
@@ -389,71 +459,72 @@ function dbclient_fetch_user_plays(username,puzzle_id,callback) {
 			console.log('user plays fetch failed: ' + err)
 			callback(null)
 		})
+	})
 }
 
 function dbclient_fetch_user(username, callback) {
 	console.log('fetching user ' + username)
-  
+	
 	let req = {
 		endpoint: 'fetch_user_details',
 		args: [username]
 	}
-  
-  // fetch version for last update of this user
-  dbclient_fetch_update('people', {
-    username: username
-  })
-  .then(
-    (last_update) => {
-      req.version = last_update
-    },
-    () => {
-      console.log(`debug unable to fetch version of user; result may be from browser cache`)
-    }
-  )
-  .finally(() => {
-  	$.get({
-  		url: '/db',
-  		data: req,
-  		success: function(res) {
-  			if (res.error) {
-  				callback(null)
-  			}
-  			else {
-  				let account_details = res[0]
+	
+	// fetch version for last update of this user
+	dbclient_fetch_update('people', {
+		username: username
+	})
+	.then(
+		(last_update) => {
+			req.version = last_update
+		},
+		() => {
+			console.log(`debug unable to fetch version of user ${username}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(res) {
+				if (res.error) {
+					callback(null)
+				}
+				else {
+					let account_details = res[0]
 				
-  				let account = new Account(null, username)
-  				account.enabled = (account_details.enabled.data[0] == 1)
-  				account.admin = (account_details.admin.data[0] == 1)
-  				account.deleted = (account_details.deleted.data[0] == 1)
-  				account.anonymous = (account_details.anonymous.data[0] == 1)
+					let account = new Account(null, username)
+					account.enabled = (account_details.enabled.data[0] == 1)
+					account.admin = (account_details.admin.data[0] == 1)
+					account.deleted = (account_details.deleted.data[0] == 1)
+					account.anonymous = (account_details.anonymous.data[0] == 1)
 				
-  				account.bio = account_details.bio
-  				account.email = account_details.email
+					account.bio = account_details.bio
+					account.email = account_details.email
 			
-  				account.links = []
-  				if (account_details.links) {
-  					let link_entries = account_details.links.split(',')
-  					for (let link_entry of link_entries) {
-  						let key_value = link_entry.split('=')
-  						account.links.push({
-  							name: key_value[0],
-  							link: key_value[1]
-  						})
-  					}
-  				}
+					account.links = []
+					if (account_details.links) {
+						let link_entries = account_details.links.split(',')
+						for (let link_entry of link_entries) {
+							let key_value = link_entry.split('=')
+							account.links.push({
+								name: key_value[0],
+								link: key_value[1]
+							})
+						}
+					}
 				
-  				account.photo = account_details.photo
-  				account.subscribed = (account_details.subscription.data[0] == 1)
+					account.photo = account_details.photo
+					account.subscribed = (account_details.subscription.data[0] == 1)
 			
-  				callback(account)
-  			}
-  		},
-  		error: function(err) {
-  			callback(null)
-  		}
-  	})
-  })
+					callback(account)
+				}
+			},
+			error: function(err) {
+				callback(null)
+			}
+		})
+	})
 }
 
 function dbclient_fetch_user_activity(username, callback) {
@@ -491,22 +562,35 @@ function dbclient_fetch_user_records(username, callback) {
 		args: [username]
 	}
 	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
-			if (data.error) {
-				console.log('error: records fetch failed: ' + data.error)
+	dbclient_fetch_update('plays', {
+		username: username
+	})
+	.then(
+		(last_update) => {
+			args.version = last_update
+		},
+		() => {
+			console.log(`unable to fetch version of plays ${username}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.error) {
+					console.log('error: records fetch failed: ' + data.error)
+					callback(null)
+				}
+				else {
+					callback(data[0])
+				}
+			},
+			error: function(err) {
+				console.log('error: records fetch failed: ' + err.responseText)
 				callback(null)
 			}
-			else {
-				callback(data[0])
-			}
-		},
-		error: function(err) {
-			console.log('error: records fetch failed: ' + err.responseText)
-			callback(null)
-		}
+		})
 	})
 }
 

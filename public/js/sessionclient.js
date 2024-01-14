@@ -284,11 +284,15 @@ function sessionclient_resume_partial_play(puzzle_id) {
 	})
 }
 
-/*
-some database actions require passing through the session server for authentication against the session_id
-before the db can be accessed
-*/
-function sessionclient_db_request(db_endpoint, db_args) {
+/**
+ * Some database actions require passing through the session server for authentication against the session_id 
+ * before the db can be accessed.
+ * 
+ * @param {string} db_endpoint Database API endpoint name.
+ * @param {string[]} db_args List of arguments, ordered according to the db endpoint.
+ * @param {string?} version Optional request version.
+ */ 
+function sessionclient_db_request(db_endpoint, db_args, version) {
 	return new Promise(function(resolve,reject) {
 		let session_id = cookies_get(SESSION_COOKIE_KEY)
 	
@@ -298,12 +302,17 @@ function sessionclient_db_request(db_endpoint, db_args) {
 				args.push(db_arg)
 			}
 			
+			let data = {
+				endpoint: ENDPOINT_DB,
+				args: args
+			}
+			if (version !== undefined) {
+				data.version = version
+			}
+			
 			$.post({
 				url: URL_SESSIONS,
-				data: {
-					endpoint: ENDPOINT_DB,
-					args: args
-				},
+				data: data,
 				success: function(data) {
 					if (data.success) {
 						resolve(data.success)
@@ -508,7 +517,7 @@ function sessionclient_reset_password(username, reset_code, password) {
 function sessionclient_generate_session_id() {
 	let session_id = new Date().getTime()
 	
-	for (let i=0; i<SESSION_ID_LEN; i++) {
+	for (let i=0; i < SESSION_ID_LEN; i++) {
 		let char = String.fromCharCode(Math.floor(Math.random() * SESSION_ID_CHAR_RANGE) + SESSION_ID_CHAR_MIN)
 		
 		if (char != '/') {
