@@ -247,7 +247,8 @@ exports.get_query = function(endpoint, args, is_external) {
 							}
 							else if (endpoint == 'update_works') {
 								//args = [username, works]
-								let works = JSON.parse(args[1])
+								const author = args[0]
+								const works = JSON.parse(args[1])
 								query = ''
 								
 								const has_triggers = (triggers !== undefined && triggers.length > 0)
@@ -280,8 +281,13 @@ exports.get_query = function(endpoint, args, is_external) {
 											const trigger = JSON.parse(JSON.stringify(triggers_item[t]))
 											
 											for (let p=0; p < trigger.params.length; p++) {
-												// compile all instances if work id placeholder
-												trigger.params[p] = trigger.params[p].replace('?id?', work.id)
+												trigger.params[p] = (
+													trigger.params[p]
+													// compile all instances of work id placeholder
+													.replace('?id?', work.id)
+													// compile all instances of username placeholder
+													.replace('?username?', author)
+												)
 											}
 											
 											// set trigger for work w, trigger template t

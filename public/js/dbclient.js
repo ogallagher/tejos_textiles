@@ -535,22 +535,43 @@ function dbclient_fetch_user_activity(username, callback) {
 		args: [username]
 	}
 	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
-			if (data.error) {
-				console.log('error: activity fetch failed: ' + data.error)
+	Promise.all([
+		// plays version
+		dbclient_fetch_update('plays', {username: username}),
+		// ratings version
+		dbclient_fetch_update('ratings', {username: username}),
+		// difficulties version
+		dbclient_fetch_update('difficulties', {username: username}),
+		// works version
+		dbclient_fetch_update('works', {username: username})
+	])
+	.then(
+		(last_update_versions) => {
+			// create composite version for activity request
+			req.version = last_update_versions.join('-')
+		},
+		() => {
+			console.log(`debug unable to fetch composite version of user activity ${username}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.error) {
+					console.log('error: activity fetch failed: ' + data.error)
+					callback(null)
+				}
+				else {
+					callback(data[0])
+				}
+			},
+			error: function(err) {
+				console.log('error: activity fetch failed: ' + err.responseText)
 				callback(null)
 			}
-			else {
-				callback(data[0])
-			}
-		},
-		error: function(err) {
-			console.log('error: activity fetch failed: ' + err.responseText)
-			callback(null)
-		}
+		})
 	})
 }
 
@@ -567,7 +588,7 @@ function dbclient_fetch_user_records(username, callback) {
 	})
 	.then(
 		(last_update) => {
-			args.version = last_update
+			req.version = last_update
 		},
 		() => {
 			console.log(`unable to fetch version of plays ${username}; result may be from browser cache`)
@@ -602,22 +623,35 @@ function dbclient_fetch_works(username, callback) {
 		args: [username]
 	}
 	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
-			if (data.error) {
-				console.log('error: works fetch failed: ' + data.error)
+	dbclient_fetch_update('works', {
+		username: username
+	})
+	.then(
+		(last_update) => {
+			req.version = last_update
+		},
+		() => {
+			console.log(`unable to fetch version of works ${username}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.error) {
+					console.log('error: works fetch failed: ' + data.error)
+					callback(null)
+				}
+				else {
+					callback(data)
+				}
+			},
+			error: function(err) {
+				console.log('error: works fetch failed: ' + err.responseText)
 				callback(null)
 			}
-			else {
-				callback(data)
-			}
-		},
-		error: function(err) {
-			console.log('error: works fetch failed: ' + err.responseText)
-			callback(null)
-		}
+		})
 	})
 }
 
@@ -692,22 +726,35 @@ function dbclient_fetch_work_fragments(work_id, callback) {
 		args: [work_id]
 	}
 	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
-			if (data.error) {
-				console.log('fragments fetch failed: ' + data.error)
+	dbclient_fetch_update('fragments', {
+		work_id: work_id
+	})
+	.then(
+		(last_update) => {
+			req.version = last_update
+		},
+		() => {
+			console.log(`debug unable to fetch version of work fragments ${work_id}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.error) {
+					console.log('fragments fetch failed: ' + data.error)
+					callback(null)
+				}
+				else {
+					callback(data)
+				}
+			},
+			error: function(err) {
+				console.log('fragments fetch failed: ' + err.responseText)
 				callback(null)
 			}
-			else {
-				callback(data)
-			}
-		},
-		error: function(err) {
-			console.log('fragments fetch failed: ' + err.responseText)
-			callback(null)
-		}
+		})
 	})
 }
 
@@ -719,22 +766,35 @@ function dbclient_fetch_puzzle_fragments(puzzle_id, callback) {
 		args: [puzzle_id]
 	}
 	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
-			if (data.error) {
-				console.log('fragments fetch failed: ' + data.error)
+	dbclient_fetch_update('fragments', {
+		puzzle_id: puzzle_id
+	})
+	.then(
+		(last_update) => {
+			req.version = last_update
+		},
+		() => {
+			console.log(`debug unable to fetch version of puzzle fragments ${puzzle_id}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.error) {
+					console.log('fragments fetch failed: ' + data.error)
+					callback(null)
+				}
+				else {
+					callback(data)
+				}
+			},
+			error: function(err) {
+				console.log('fragments fetch failed: ' + err.responseText)
 				callback(null)
 			}
-			else {
-				callback(data)
-			}
-		},
-		error: function(err) {
-			console.log('fragments fetch failed: ' + err.responseText)
-			callback(null)
-		}
+		})
 	})
 }
 
@@ -746,22 +806,35 @@ function dbclient_fetch_work_text(work_id, callback) {
 		args: [work_id]
 	}
 	
-	$.get({
-		url: '/db',
-		data: req,
-		success: function(data) {
-			if (data.error) {
-				console.log('work text fetch failed: ' + data.error)
+	dbclient_fetch_update('works', {
+		id: work_id
+	})
+	.then(
+		(last_update) => {
+			req.version = last_update
+		},
+		() => {
+			console.log(`unable to fetch version of works ${work_id}; result may be from browser cache`)
+		}
+	)
+	.finally(() => {
+		$.get({
+			url: '/db',
+			data: req,
+			success: function(data) {
+				if (data.error) {
+					console.log('work text fetch failed: ' + data.error)
+					callback(null)
+				}
+				else {
+					callback(data)
+				}
+			},
+			error: function(err) {
+				console.log('work text fetch failed: ' + err.responseText)
 				callback(null)
 			}
-			else {
-				callback(data)
-			}
-		},
-		error: function(err) {
-			console.log('work text fetch failed: ' + err.responseText)
-			callback(null)
-		}
+		})
 	})
 }
 

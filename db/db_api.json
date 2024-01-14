@@ -54,6 +54,10 @@
       {
         "endpoint": "add_update",
         "params": ["puzzles", "puzzle_id=?puzzle_id?"]
+      },
+      {
+        "endpoint": "add_update",
+        "params": ["ratings", "username=?username?"]
       }
     ]
 	},
@@ -69,6 +73,10 @@
       {
         "endpoint": "add_update",
         "params": ["puzzles", "puzzle_id=?puzzle_id?"]
+      },
+      {
+        "endpoint": "add_update",
+        "params": ["difficulties", "username=?username?"]
       }
     ]
 	},
@@ -169,15 +177,24 @@
     "triggers": [
       {
         "endpoint": "add_update",
-        "params": ["works", "id=?id?"],
-        "special": true
+        "params": ["works", "id=?id?"]
+      },
+      {
+        "endpoint": "add_update",
+        "params": ["works", "username=?username?"]
       }
     ]
 	},
 	"contribute": {
 		"params": ["?author?","?title?","?text?","?description?","?date?","?license?"],
 		"query": "insert into works(title,`text`,`date`,description,author,license) values (?title?,?text?,?date?,?description?,?author?,?license?)",
-		"external": false
+		"external": false,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["works", "username=?author?"]
+      }
+    ]
 	},
 	"fetch_work_fragments": {
 		"params": ["?work_id?"],
