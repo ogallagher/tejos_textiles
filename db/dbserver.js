@@ -63,7 +63,8 @@ exports.init = function(site) {
 			user: config.user,
 			password: config.pass,
 			database: config.db,
-			waitForConnections: true
+			waitForConnections: true,
+			multipleStatements: true
 		})
 		
 		//test a connection
@@ -107,15 +108,15 @@ function is_xss_safe(arg) {
 		console.log(matches)
 		return false
 	}
-  else {
-    return true
-  }
+	else {
+		return true
+	}
 }
 
 exports.get_query = function(endpoint, args, is_external) {
 	return new Promise(function(resolve,reject) {
-    console.log('info db: ' + endpoint + ' ' + JSON.stringify(args))
-    
+		console.log('info db: ' + endpoint + ' ' + JSON.stringify(args))
+		
 		let cached = try_cache(endpoint, args)
 		
 		if (cached) {
@@ -127,8 +128,9 @@ exports.get_query = function(endpoint, args, is_external) {
 			if (entry) {
 				if (!is_external || entry.external) {
 					//allow query if it's internal, or if external queries are allowed for this endpoint
-					let params = entry.params //array of parameters to be replaced in query
-					let query = entry.query //sql query to be assembled
+					let params = entry.params // array of parameters to be replaced in query
+					let query = entry.query // sql query to be assembled
+					let triggers = entry.triggers
 					
 					if (entry.special) {
 						//double check against JS injection (XSS)
@@ -237,8 +239,10 @@ exports.get_query = function(endpoint, args, is_external) {
 									query = query.replace('?changes?', changes).replace('?username?', db.escape(args[0]))
 								}
 								else {
-                  console.log(`warning skip user update with empty changes ${changes} from args ${args.join(',')}`)
+									console.log(`warning skip user update with empty changes ${changes} from args ${args.join(',')}`)
 									reject('empty')
+									// skip triggers on empty also
+									triggers = undefined
 								}
 							}
 							else if (endpoint == 'update_works') {
@@ -246,7 +250,14 @@ exports.get_query = function(endpoint, args, is_external) {
 								let works = JSON.parse(args[1])
 								query = ''
 								
-								for (let work of works) {
+								const has_triggers = (triggers !== undefined && triggers.length > 0)
+								let triggers_item = (has_triggers ? triggers : null)
+								// triggers will be expanded to apply for each work
+								triggers = new Array(entry.triggers.length * works.length)
+								
+								for (let w=0; w < works.length; w++) {
+									const work = works[w]
+									
 									if (work.deleted) {
 										//delete work
 										query += 'delete from works where id=' + work.id + ';'
@@ -260,6 +271,22 @@ exports.get_query = function(endpoint, args, is_external) {
 										subquery += '`text`=' + db.escape(work.content)
 								
 										query += subquery + ' where id=' + work.id + ';'
+									}
+									
+									// prepare and multiple triggers to execute for each work
+									if (has_triggers) {
+										for (let t=0; t < triggers_item.length; t++) {
+											// clone triggers_item child before modifying
+											const trigger = JSON.parse(JSON.stringify(triggers_item[t]))
+											
+											for (let p=0; p < trigger.params.length; p++) {
+												// compile all instances if work id placeholder
+												trigger.params[p] = trigger.params[p].replace('?id?', work.id)
+											}
+											
+											// set trigger for work w, trigger template t
+											triggers[w * triggers_item.length + t] = trigger
+										}
 									}
 								}
 							}
@@ -288,55 +315,58 @@ exports.get_query = function(endpoint, args, is_external) {
 							}
 						}
 					}
-          
-          // handle simulated triggers/side effects
-          if (entry.triggers !== undefined) {
-            // convert params list to map
-            let params_map = new Map()
-            for (let i=0; i < params.length; i++) {
-              // as of here, all args already confirmed safe
-              params_map.set(params[i], args[i])
-            }
-            
-            for (let trigger of entry.triggers) {
-              console.log(`debug ${endpoint} triggers ${trigger.endpoint}`)
-              // spawn trigger query asynchronously
-              let trigger_args = []
-              for (let i=0; i < trigger.params.length; i++) {
-                let trigger_arg = trigger.params[i]
-                // compile trigger param placeholders using caller args
-                for (let [key, val] of params_map.entries()) {
-                  trigger_arg = trigger_arg.replace(key, val)
-                }
-                trigger_args.push(trigger_arg)
-              }
-              
-              // triggers are considered internal
-              exports.get_query(trigger.endpoint, trigger_args, false)
-              .then(function(action) {
-                if (action.cached) {
-                  // trigger targets should not be cached
-                  console.log(`error trigger endpoint ${trigger.endpoint} should not be cached`)
-                  console.log(action)
-                }
-                else {
-      			  		exports.send_query(action.sql, function(err, data) {
-      			  			if (err) {
-      			  				console.log('error error in db data fetch: ' + err)
-      			  			}
-      			  			else {
-      			  				console.log(`debug trigger ${trigger.endpoint} result = ${JSON.stringify(data[0])}`)
-      			  			}
-      			  		})
-                }
-              })
-              .catch(function(err) {
-                console.log(`error ${endpoint} trigger ${trigger.endpoint} get query failed ${err}`)
-              })
-            }
-          }
 					
-					//console.log(endpoint + ' --> ' + query) //TODO remove this
+					// handle simulated triggers/side effects
+					if (triggers !== undefined) {
+						// convert params list to map. this could be done earlier instead of using separate params and args lists
+						let params_map = new Map()
+						for (let i=0; i < params.length; i++) {
+							// as of here, all args already confirmed safe
+							params_map.set(params[i], args[i])
+						}
+						
+						for (let trigger of triggers) {
+							console.log(`debug ${endpoint} triggers ${trigger.endpoint}(${JSON.stringify(trigger.params)})`)
+							// spawn trigger query asynchronously
+							let trigger_args = []
+							for (let i=0; i < trigger.params.length; i++) {
+								let trigger_arg = trigger.params[i]
+								// compile trigger param placeholders using caller args
+								for (let [key, val] of params_map.entries()) {
+									trigger_arg = trigger_arg.replace(key, val)
+								}
+								trigger_args.push(trigger_arg)
+							}
+							
+							exports.get_query(
+								trigger.endpoint, 
+								trigger_args, 
+								// triggers are considered internal
+								false
+							)
+							.then(function(action) {
+								if (action.cached) {
+									// trigger targets should not be cached
+									console.log(`error trigger endpoint ${trigger.endpoint} should not be cached`)
+									console.log(action)
+								}
+								else {
+									exports.send_query(action.sql, function(err, data) {
+										if (err) {
+											console.log('error error in db data fetch: ' + err)
+										}
+										else {
+											console.log(`debug trigger ${trigger.endpoint} result = ${JSON.stringify(data[0])}`)
+										}
+									})
+								}
+							})
+							.catch(function(err) {
+								console.log(`error ${endpoint} trigger ${trigger.endpoint} get query failed ${err}`)
+							})
+						}
+					}
+					
 					resolve({sql: query})
 				}
 				else {
@@ -361,6 +391,10 @@ exports.send_query = function(sql,callback) {
 			conn.query(sql, function(err,res) {
 				//release connection when no longer needed
 				conn.release()
+				
+				if (err) {
+					console.log(`debug failed db query = ${sql}`)
+				}
 				
 				//return error if defined, and response results
 				callback(err,res)

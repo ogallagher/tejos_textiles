@@ -331,7 +331,7 @@ exports.handle_request = function(endpoint, args, dbserver) {
 						}
 					})
 					.catch(function(err) {
-						console.log('db query not created for ' + db_endpoint + ': ' + err)
+						console.log(`debug db query not created for ${db_endpoint}: ${err}\n${err.stack}`)
 					
 						if (err == 'empty') {
 							resolve(SUCCESS)

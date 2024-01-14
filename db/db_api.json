@@ -45,12 +45,32 @@
 	"rate": {
 		"params": ["?username?","?puzzle_id?","?rating?"],
 		"query": "call add_rating(?username?,?puzzle_id?,?rating?)",
-		"external": false
+		"external": false,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["ratings", "username=?username?,puzzle_id=?puzzle_id?"]
+      },
+      {
+        "endpoint": "add_update",
+        "params": ["puzzles", "puzzle_id=?puzzle_id?"]
+      }
+    ]
 	},
 	"measure_difficulty": {
 		"params": ["?username?","?puzzle_id?","?difficulty?"],
 		"query": "call add_difficulty(?username?,?puzzle_id?,?difficulty?)",
-		"external": false
+		"external": false,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["difficulties", "username=?username?,puzzle_id=?puzzle_id?"]
+      },
+      {
+        "endpoint": "add_update",
+        "params": ["puzzles", "puzzle_id=?puzzle_id?"]
+      }
+    ]
 	},
 	"fetch_rating": {
 		"params": ["?username?","?puzzle_id?"],
@@ -80,12 +100,24 @@
 	"register": {
 		"params": ["?username?","?password?","?email?","?subscribed?"],
 		"query": "insert into people(username,`password`,email,subscription) values (?username?,?password?,?email?,?subscribed?)",
-		"external": false
+		"external": false,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["people", "username=?username?"]
+      }
+    ]
 	},
 	"activate": {
 		"params": ["?username?"],
 		"query": "update people set enabled=true where username=?username?",
-		"external": false
+		"external": false,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["people", "username=?username?"]
+      }
+    ]
 	},
  	"fetch_user": {
     "params": ["?username?"],
@@ -133,7 +165,14 @@
 		"params": [],
 		"query": "",
 		"external": false,
-		"special": true
+		"special": true,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["works", "id=?id?"],
+        "special": true
+      }
+    ]
 	},
 	"contribute": {
 		"params": ["?author?","?title?","?text?","?description?","?date?","?license?"],
@@ -158,17 +197,35 @@
 	"play": {
 		"params": ["?username?","?puzzle_id?","?duration?"],
 		"query": "insert into plays(username,puzzle_id,duration) values (?username?,?puzzle_id?,?duration?)",
-		"external": false
+		"external": false,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["plays", "username=?username?,puzzle_id=?puzzle_id?"]
+      }
+    ]
 	},
 	"delete_user": {
 		"params": ["?username?"],
 		"query": "update people set deleted=1 where username=?username?",
-		"external": false
+		"external": false,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["people", "username=?username?"]
+      }
+    ]
 	},
 	"recover_user": {
 		"params": ["?username?"],
 		"query": "update people set deleted=0 where username=?username?",
-		"external": false
+		"external": false,
+    "triggers": [
+      {
+        "endpoint": "add_update",
+        "params": ["people", "username=?username?"]
+      }
+    ]
 	},
 	"match_email": {
 		"params": ["?username?","?email?"],
