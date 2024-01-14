@@ -7,9 +7,9 @@
 			16 October 2019
 		-->
 		
-        <meta charset="utf-8"/>
-        <!--scales viewport depending on worldspace device width-->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta charset="utf-8"/>
+		<!--scales viewport depending on worldspace device width-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -19,30 +19,30 @@
 		<meta name="msapplication-TileColor" content="#ffffff">
 		<meta name="theme-color" content="#ffffff">
 		
-        <meta name="description" content="An online arts journal, presenting words and doodles in a new medium."/>
-        <meta name="author" content="Owen Gallagher"/>
-        
-        <title>About Textiles Journal</title>
-        
-        <!-- js external -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-        
-        <!-- js internal -->
-		<script src="js/force_https.js"></script>
-        <script src="js/html_imports.js"></script>
-		<script src="js/cookies.js"></script>
-		<script src="js/sessionclient.js"></script>
-		<script src="js/dbclient.js"></script>
-        <script src="js/about.js"></script>
-        
-        <!-- css external -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-        
-        <!-- css internal -->
-        <link rel="stylesheet" type="text/css" href="css/style.css" />
+		<meta name="description" content="An online arts journal, presenting words and doodles in a new medium."/>
+		<meta name="author" content="Owen Gallagher"/>
+		
+		<title>About Textiles Journal</title>
+		
+		<!-- js external -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		
+		<!-- js internal -->
+		<script src="js/dist/force_https-v1.0.0.js"></script>
+		<script src="js/dist/html_imports-v1.0.0.js"></script>
+		<script src="js/dist/cookies-v1.0.0.js"></script>
+		<script src="js/dist/sessionclient-v1.0.0.js"></script>
+		<script src="js/dist/dbclient-v1.1.0.js"></script>
+		<script src="js/about.js"></script>
+		
+		<!-- css external -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+		
+		<!-- css internal -->
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
 	</head>
 	
 	<body class="h-100 d-flex flex-column">
@@ -53,16 +53,16 @@
 		</header>
 		
 		<!-- page banner -->
-	    <div class="container-fluid">
-	  		<div class="jumbotron row p-0" id="mission_banner">
-	  			<div class="display-1 font-title py-3 px-1 col-lg-4 bg-sea text-light d-flex flex-column justify-content-center" id="mission_statement_title">
-	  				Our Mission
-	  			</div>
-	  			<div class="display-4 font-title col-lg bg-light text-dark" id="mission_statement_main">
-	  				To publish literary and visual artwork in a new, accessible, and fun medium for the benefit of authors, readers, and gamers alike.
-	  			</div>
+		<div class="container-fluid">
+			<div class="jumbotron row p-0" id="mission_banner">
+				<div class="display-1 font-title py-3 px-1 col-lg-4 bg-sea text-light d-flex flex-column justify-content-center" id="mission_statement_title">
+					Our Mission
+				</div>
+				<div class="display-4 font-title col-lg bg-light text-dark" id="mission_statement_main">
+					To publish literary and visual artwork in a new, accessible, and fun medium for the benefit of authors, readers, and gamers alike.
+				</div>
 	  		</div>
-	    </div>
+		</div>
 		
 		<article class="container-fluid">
 			<div class="row">
@@ -270,9 +270,9 @@ then
 else
   if [[ -z $2 ]]
   then
-    blacklevel=0.5
+	blacklevel=0.5
   else
-    blacklevel=$2
+	blacklevel=$2
   fi
 fi
 
