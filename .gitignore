@@ -1,11 +1,10 @@
 .sass-cache
 .DS_Store
 node_modules/
-secrets/
 .env
 efs/
 .htaccess
 tmp/
 app.js
 logs/
-
+local/
