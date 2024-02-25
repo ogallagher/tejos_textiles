@@ -24,6 +24,16 @@ var api //database api, for hiding actual sql from the client
 
 exports.init = function(site) {
 	//get database connection credentials
+	/**
+	 * @type {{
+	 * 	url: string,
+	 * 	user: string,
+	 * 	pass: string,
+	 * 	host: string,
+	 * 	db: string,
+	 * 	name: string
+	 * }}
+	 */
 	let config = null
 	
 	if (process.env.DATABASE_URL) {
@@ -36,11 +46,12 @@ exports.init = function(site) {
 			name: null
 		} 
 		
-		let fields = config.url.split(/:|@/) //array = mysql //user password host 3306/db
+		let fields = config.url.split(/:|@/g) //array = mysql //user password host 3306/db
 		config.user = decodeURIComponent(fields[1].substring(2))
 		config.pass = decodeURIComponent(fields[2])
 		config.host = decodeURIComponent(fields[3])
 		config.db = decodeURIComponent(fields[4].split('/')[1])
+		console.log(`debug db config = ${JSON.stringify(config, undefined, 2)}`)
 		
 		if (site == enums.site.TEXTILES) {
 			config.name = 'textilesdb'
