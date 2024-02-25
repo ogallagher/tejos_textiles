@@ -16,8 +16,8 @@
     "temp_js_logger": "^0.6.0"
   },
   "scripts": {
-    "test": "node server.js",
-    "start": "node server.js"
+    "start": "forever start server.js",
+		"stop": "forever stop server.js"
   },
   "repository": {
     "type": "git",
